@@ -95,9 +95,28 @@
             color: #dbeee0;
             display: flex;
             flex-direction: column;
-            align-items: center;
+            align-items: flex-start;
             padding: 16px 8px;
             box-shadow: 0 8px 30px rgba(2, 6, 10, 0.45);
+            overflow: hidden;
+            transition: width 0.3s ease;
+        }
+
+        .sidebar:hover {
+            width: 240px;
+        }
+
+        .btn-text{
+            opacity: 0;
+            margin-left: -10px;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar:hover .btn-text{
+
+            opacity: 1;
+            margin-left: 0;
         }
 
         .profile-circle {
@@ -122,28 +141,68 @@
         }
 
         .side-btn {
-            width: 56px;
-            height: 56px;
+            width: 100%;
+            min-height: 56px;
             border-radius: 12px;
             display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 15px;
+            padding: 0 18px;
             color: #cfeee1;
             cursor: pointer;
             font-size: 18px;
             border: 1px solid transparent;
-            transition: all .18s ease;
+            transition: all .3s ease;
             background: transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .side-btn::before{
+            content: "";
+            position: absolute;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.15);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transition: width 0.5s ease,
+                        height 0.5s ease;
+        }
+
+        .side-btn:hover::before{
+            width: 220px;
+            height: 220px;
+        }
+
+        .side-btn.active::before{
+           content: "";
+           position: absolute;
+           left: 0;
+           top: 50%;
+           width: 4px;
+           height: 65%;
+           background: #4ade80;
+           border-radius: 10px;
+           box-shadow: 0 0 10px #4ade80;
         }
 
         .side-btn:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+           transform: scale(1.15) rotate(6deg);
+           color:#4ade80;
+           text-shadow: 0 0 12px #4ade80;
         }
 
         .side-btn.active {
             background: linear-gradient(180deg, var(--accent-dark), var(--accent));
             color: #fff;
+        }
+
+        .side-btn i{
+            min-width: 24px;
+            text-align: center;
+            transition: all 0.3s ease;
         }
 
         .spacer {
@@ -501,27 +560,63 @@
 
     <div class="layout">
         <!-- Sidebar -->
+        <!-- Sidebar -->
         <aside class="sidebar" aria-hidden>
             <div class="profile-circle" id="sidebarProfileIcon"><i class="fa-solid fa-leaf"></i></div>
             <nav class="menu" role="navigation" aria-label="Main menu">
-                <div class="side-btn active" id="m-dashboard" title="Dashboard" onclick="navClick('dashboard')"><i
-                        class="fa-solid fa-house-chimney"></i></div>
-                <div class="side-btn" id="m-detect" title="Disease Detection" onclick="navClick('detect')"><i
-                        class="fa-solid fa-microscope"></i></div>
-                <div class="side-btn" id="m-seed" title="Seed Calculator" onclick="navClick('seed')"><i
-                        class="fa-solid fa-seedling"></i></div>
-                <div class="side-btn" id="m-moist" title="Moisture Monitor" onclick="navClick('moisture')"><i
-                        class="fa-solid fa-chart-line"></i></div>
-                <div class="side-btn" id="m-field" title="Field Analysis" onclick="navClick('field')">
-                <i class="fa-solid fa-map"></i>
-            </div>
-                <div class="side-btn" id="m-profile" title="Profile" onclick="navClick('profile')"><i
-                        class="fa-solid fa-user"></i></div>
+                
+                <div class="side-btn active" id="m-dashboard" 
+                        title="Dashboard" 
+                        onclick="navClick('dashboard')">
+                        <i class="fa-solid fa-house-chimney"></i>
+                        <span class="btn-text">Dashboard</span>
+                </div>
+
+                <div class="side-btn" id="m-detect" 
+                        title="Disease Detection" 
+                        onclick="navClick('detect')">
+                        <i class="fa-solid fa-microscope"></i>
+                        <span class="btn-text">Disease Detection</span>
+                </div>
+
+                <div class="side-btn" id="m-seed" 
+                        title="Seed Calculator" 
+                        onclick="navClick('seed')">
+                        <i class="fa-solid fa-seedling"></i>
+                        <span class="btn-text">Seed Calculator</span>
+                </div>
+
+                <div class="side-btn" id="m-moist" 
+                        title="Moisture Monitor" 
+                        onclick="navClick('moisture')">
+                        <i class="fa-solid fa-chart-line"></i>
+                        <span class="btn-text">Moisture Monitor</span>
+                </div>
+
+                <div class="side-btn" id="m-field" 
+                        title="Field Analysis" 
+                        onclick="navClick('field')">
+                        <i class="fa-solid fa-map"></i>
+                        <span class="btn-text">Field Analysis</span>
+                </div>
+
+                <div class="side-btn" id="m-profile" 
+                        title="Profile" 
+                        onclick="navClick('profile')">
+                        <i class="fa-solid fa-user"></i>
+                        <span class="btn-text">Profile</span>
+                </div>
+
             </nav>
             <div class="spacer"></div>
             <div style="width:100%; display:flex; justify-content:center;">
-                <div class="side-btn" id="m-logout" title="Logout" onclick="logout()"><i
-                        class="fa-solid fa-arrow-right-from-bracket"></i></div>
+                
+                <div class="side-btn" id="m-logout" 
+                        title="Logout" 
+                        onclick="logout()">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        <span class="btn-text">Logout</span>
+                </div>
             </div>
         </aside>
 
@@ -1149,6 +1244,7 @@ function analyzeField() {
             detect: document.getElementById('m-detect'),
             seed: document.getElementById('m-seed'),
             moisture: document.getElementById('m-moist'),
+            field: document.getElementById('m-field'),
             profile: document.getElementById('m-profile')
             
         };
