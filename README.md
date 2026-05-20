@@ -114,6 +114,16 @@ AgroTech is also deployed as a native Android application using Android Studio.
 5. Add internet permission
 
 ---
+## 📸 Screenshots (How the Project Looks)
+<img width="1526" height="726" alt="Screenshot 2026-05-20 124449" src="https://github.com/user-attachments/assets/a4101c19-9767-49ab-803d-912ecc0159cc" />
+
+
+## 🚀 Quick Start
+
+Follow these simple steps to run the project locally:
+
+1. Clone the repository
+2. Install dependencies
 
  💻 WebView Code
 
