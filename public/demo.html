@@ -293,6 +293,13 @@
             font-weight: 600;
         }
 
+        .primary-btn:disabled {
+            background: #cccccc;
+            background-image: none;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
         .muted {
             color: var(--muted);
             font-size: 13px;
@@ -565,7 +572,7 @@
 
                                 <input type="file" id="fileInput" accept="image/*" style="display:none" />
 
-                                <button class="primary-btn"
+                                <button class="primary-btn" id="chooseImgBtn"
                                     onclick="window.imageLoaded=false; document.getElementById('fileInput').click()">
                                     Choose Image
                                 </button>
@@ -591,6 +598,11 @@
                         <div style="width:320px;">
                             <div style="background:#fbfff9; padding:14px; border-radius:12px;">
                                 <p class="muted">Result</p>
+
+                                <div id="loadingSpinner" style="display:none; margin:16px 0; text-align:center;">
+                                    <i class="fa-solid fa-spinner fa-spin" style="font-size: 28px; color: var(--accent-dark);"></i>
+                                    <p class="muted" style="margin-top:8px; font-size:13px; font-weight:500;">Analyzing crop leaf...</p>
+                                </div>
 
                                 <div id="detectResult" style="font-weight:700; margin-top:6px;">
                                     Please upload or capture an image first.
@@ -1282,7 +1294,16 @@ function analyzeField() {
                 preview.style.display = 'block';
 
                 detectResult.textContent = 'Image loaded from device. Ready to analyze.';
+                detectResult.style.display = 'block';
                 diseaseSuggestion.textContent = '';
+                diseaseSuggestion.style.display = 'block';
+                document.getElementById('loadingSpinner').style.display = 'none';
+
+                // Ensure buttons are enabled
+                runBtn.disabled = false;
+                espBtn.disabled = false;
+                document.getElementById('chooseImgBtn').disabled = false;
+
                 window.imageLoaded = true;
             };
             reader.readAsDataURL(file);
@@ -1303,6 +1324,16 @@ function analyzeField() {
             preview.onload = () => {
                 detectResult.textContent =
                     'Image captured from ESP32-CAM. Ready to analyze.';
+                detectResult.style.display = 'block';
+                diseaseSuggestion.textContent = '';
+                diseaseSuggestion.style.display = 'block';
+                document.getElementById('loadingSpinner').style.display = 'none';
+
+                // Ensure buttons are enabled
+                runBtn.disabled = false;
+                espBtn.disabled = false;
+                document.getElementById('chooseImgBtn').disabled = false;
+
                 window.imageLoaded = true;
             };
 
@@ -1324,76 +1355,94 @@ function analyzeField() {
                 return;
             }
 
-            detectResult.textContent = 'Analyzing image…';
+            // Show spinner & hide result containers
+            document.getElementById('loadingSpinner').style.display = 'block';
+            detectResult.style.display = 'none';
+            diseaseSuggestion.style.display = 'none';
+
+            // Disable buttons to prevent multiple clicks
+            runBtn.disabled = true;
+            espBtn.disabled = true;
+            document.getElementById('chooseImgBtn').disabled = true;
 
             // SIMULATED AI RESULT (demo purpose)
            
-setTimeout(() => {
+            setTimeout(() => {
 
-    // ---------- SIMPLE PLANT DETECTION ----------
-    const img = preview;
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
+                // ---------- SIMPLE PLANT DETECTION ----------
+                const img = preview;
+                const canvas = document.createElement("canvas");
+                const ctx = canvas.getContext("2d");
 
-    canvas.width = img.naturalWidth;
-    canvas.height = img.naturalHeight;
-    ctx.drawImage(img, 0, 0);
+                canvas.width = img.naturalWidth;
+                canvas.height = img.naturalHeight;
+                ctx.drawImage(img, 0, 0);
 
-    const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-    let greenPixels = 0;
+                const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+                let greenPixels = 0;
 
-    for (let i = 0; i < pixels.length; i += 4) {
-        const r = pixels[i];
-        const g = pixels[i + 1];
-        const b = pixels[i + 2];
+                for (let i = 0; i < pixels.length; i += 4) {
+                    const r = pixels[i];
+                    const g = pixels[i + 1];
+                    const b = pixels[i + 2];
 
-        if (g > r + 20 && g > b + 20) {
-            greenPixels++;
-        }
-    }
+                    if (g > r + 20 && g > b + 20) {
+                        greenPixels++;
+                    }
+                }
 
-    const greenRatio = greenPixels / (pixels.length / 4);
+                const greenRatio = greenPixels / (pixels.length / 4);
 
-    // ---------- NO PLANT FOUND ----------
-    if (greenRatio < 0.15) {
-        detectResult.innerHTML = `
-            ❌ <b>No plant detected</b><br>
-            Please upload a clear image of a crop or plant leaf.
-        `;
-        diseaseSuggestion.textContent = '';
-        return;
-    }
+                // Hide spinner & restore result visibility
+                document.getElementById('loadingSpinner').style.display = 'none';
+                detectResult.style.display = 'block';
+                diseaseSuggestion.style.display = 'block';
 
-    // ---------- PLANT FOUND → DISEASE LOGIC ----------
-    const diseases = [
-        'Healthy',
-        'Early Blight',
-        'Leaf Rust',
-        'Nutrient Deficiency',
-        'Bacterial Spot'
-    ];
+                // Re-enable buttons
+                runBtn.disabled = false;
+                espBtn.disabled = false;
+                document.getElementById('chooseImgBtn').disabled = false;
 
-    const detectedDiseases = diseases.filter(() => Math.random() > 0.6);
-    if (detectedDiseases.length === 0) detectedDiseases.push('Healthy');
+                // ---------- NO PLANT FOUND ----------
+                if (greenRatio < 0.15) {
+                    detectResult.innerHTML = `
+                        ❌ <b>No plant detected</b><br>
+                        Please upload a clear image of a crop or plant leaf.
+                    `;
+                    diseaseSuggestion.textContent = '';
+                    return;
+                }
 
-    const confidence = detectedDiseases.map(d => ({
-        name: d,
-        confidence: (70 + Math.random() * 25).toFixed(0)
-    }));
+                // ---------- PLANT FOUND → DISEASE LOGIC ----------
+                const diseases = [
+                    'Healthy',
+                    'Early Blight',
+                    'Leaf Rust',
+                    'Nutrient Deficiency',
+                    'Bacterial Spot'
+                ];
 
-    detectResult.innerHTML = `
-        <strong>Detected Issues:</strong>
-        <ul>
-            ${confidence.map(d =>
-                `<li>${d.name} <span class="muted">(${d.confidence}%)</span></li>`
-            ).join('')}
-        </ul>
-    `;
+                const detectedDiseases = diseases.filter(() => Math.random() > 0.6);
+                if (detectedDiseases.length === 0) detectedDiseases.push('Healthy');
 
-    diseaseSuggestion.innerText = 'Suggestion: ' +
-        getDiseaseSuggestion(detectedDiseases);
+                const confidence = detectedDiseases.map(d => ({
+                    name: d,
+                    confidence: (70 + Math.random() * 25).toFixed(0)
+                }));
 
-}, 1200);
+                detectResult.innerHTML = `
+                    <strong>Detected Issues:</strong>
+                    <ul>
+                        ${confidence.map(d =>
+                            `<li>${d.name} <span class="muted">(${d.confidence}%)</span></li>`
+                        ).join('')}
+                    </ul>
+                `;
+
+                diseaseSuggestion.innerText = 'Suggestion: ' +
+                    getDiseaseSuggestion(detectedDiseases);
+
+            }, 1200);
         });
 
         // ------------------ Disease suggestions ------------------
