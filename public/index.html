@@ -501,7 +501,7 @@
 
     <div class="layout">
         <!-- Sidebar -->
-        <aside class="sidebar" aria-hidden>
+        <aside class="sidebar" aria-hidden="true">
             <div class="profile-circle" id="sidebarProfileIcon"><i class="fa-solid fa-leaf"></i></div>
             <nav class="menu" role="navigation" aria-label="Main menu">
                 <div class="side-btn active" id="m-dashboard" title="Dashboard" onclick="navClick('dashboard')"><i
@@ -831,7 +831,8 @@
     </div>
 
     <!-- Bottom navigation -->
-    <div class="bottom-nav" id="bottomNav" aria-hidden>
+     <!-- Fix: Added proper aria-hidden="true" value instead of bare attribute -->
+    <div class="bottom-nav" id="bottomNav" aria-hidden="true">
         <div class="bbtn active" id="b-dashboard" title="Dashboard" onclick="navClick('dashboard')"><i
                 class="fa-solid fa-house"></i></div>
         <div class="bbtn" id="b-detect" title="Detect" onclick="navClick('detect')"><i
@@ -1708,7 +1709,8 @@ function analyzeFieldImage() {
 }
 </script>
 
-</script>
+  <!-- FIX: removed extra closing tag! -->
+
 
 
 </body>
