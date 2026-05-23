@@ -517,6 +517,8 @@
             </div>
                 <div class="side-btn" id="m-profile" title="Profile" onclick="navClick('profile')"><i
                         class="fa-solid fa-user"></i></div>
+                <div class="side-btn" id="m-aboutt" title="About" onclick="goToAbout()"><i
+                        class="fa-solid fa-circle-info"></i></div>
             </nav>
             <div class="spacer"></div>
             <div style="width:100%; display:flex; justify-content:center;">
@@ -531,6 +533,9 @@
                 <div class="brand">
                     <div class="logo" aria-hidden></div>
                     <div class="title">AgroTech</div>
+                </div>
+                <div class="top-actions" style="margin-left: 0;">
+                    <a href="/about.html" style="text-decoration: none; color: #163b2e; font-weight: 500; cursor: pointer; transition: color 0.3s ease; font-size: 14px;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='#163b2e'">About</a>
                 </div>
                 <div class="top-actions">
                     <div id="userEmailTop" class="muted"></div>
@@ -571,7 +576,7 @@
                                 </button>
 
                                 <img id="preview"
-                                    style="display:none; margin-top:12px; border-radius:10px; max-width:100%;" />
+                                    style="display:none; margin-top:12px; border-radius:10px; max-width:100%;" alt="Uploaded plant image" />
 
                                 <div style="margin-top:12px;">
                                     <button class="primary-btn" id="espCaptureBtn">
@@ -1255,6 +1260,11 @@ function analyzeField() {
         /* LOGOUT */
         function logout() { auth.signOut(); }
 
+        /* GO TO ABOUT PAGE */
+        function goToAbout() {
+            window.location.href = '/about.html';
+        }
+
         /* ======================= Disease Detection Logic ======================= */
 
         // GLOBAL state (important!)
@@ -1269,62 +1279,71 @@ function analyzeField() {
         const runBtn = document.getElementById('processBtn');
 
         // ------------------ Laptop image upload ------------------
-        fileInput.addEventListener('change', e => {
-            const file = e.target.files[0];
-            if (!file) {
-                window.imageLoaded = false;
-                return;
-            }
+        if (fileInput) {
+            fileInput.addEventListener('change', e => {
+                const file = e.target.files[0];
+                if (!file) {
+                    window.imageLoaded = false;
+                    return;
+                }
 
-            const reader = new FileReader();
-            reader.onload = ev => {
-                preview.src = ev.target.result;
-                preview.style.display = 'block';
+                const reader = new FileReader();
+                reader.onload = ev => {
+                    preview.src = ev.target.result;
+                    preview.style.display = 'block';
 
-                detectResult.textContent = 'Image loaded from device. Ready to analyze.';
-                diseaseSuggestion.textContent = '';
-                window.imageLoaded = true;
-            };
-            reader.readAsDataURL(file);
-        });
+                    detectResult.textContent = 'Image loaded from device. Ready to analyze.';
+                    diseaseSuggestion.textContent = '';
+                    window.imageLoaded = true;
+                };
+                reader.onerror = () => {
+                    detectResult.textContent = 'Error reading file. Please try again.';
+                    window.imageLoaded = false;
+                };
+                reader.readAsDataURL(file);
+            });
+        }
 
         // ------------------ ESP32-CAM capture ------------------
         const ESP_IP = '10.182.153.159';
 
-        espBtn.addEventListener('click', () => {
+        if (espBtn) {
+            espBtn.addEventListener('click', () => {
 
-            if (!ESP_IP) {
-                detectResult.textContent = 'ESP32 IP not set.';
-                return;
-            }
+                if (!ESP_IP) {
+                    detectResult.textContent = 'ESP32 IP not set.';
+                    return;
+                }
 
-            const espUrl = `http://${ESP_IP}/cam.jpg`; // ✅ correct endpoint
+                const espUrl = `http://${ESP_IP}/cam.jpg`; // ✅ correct endpoint
 
-            preview.onload = () => {
-                detectResult.textContent =
-                    'Image captured from ESP32-CAM. Ready to analyze.';
-                window.imageLoaded = true;
-            };
+                preview.onload = () => {
+                    detectResult.textContent =
+                        'Image captured from ESP32-CAM. Ready to analyze.';
+                    window.imageLoaded = true;
+                };
 
-            preview.onerror = () => {
-                preview.style.display = 'none';
-                detectResult.textContent = 'ESP32-CAM not reachable.';
-                window.imageLoaded = false;
-            };
+                preview.onerror = () => {
+                    preview.style.display = 'none';
+                    detectResult.textContent = 'ESP32-CAM not reachable.';
+                    window.imageLoaded = false;
+                };
 
-            preview.src = espUrl + '?t=' + Date.now(); // cache-bust
-            preview.style.display = 'block';
-        });
+                preview.src = espUrl + '?t=' + Date.now(); // cache-bust
+                preview.style.display = 'block';
+            });
+        }
 
         // ------------------ Run Detection ------------------
-        runBtn.addEventListener('click', () => {
-            if (!window.imageLoaded) {
-                detectResult.textContent = 'Please upload or capture an image first.';
-                diseaseSuggestion.textContent = '';
-                return;
-            }
+        if (runBtn) {
+            runBtn.addEventListener('click', () => {
+                if (!window.imageLoaded) {
+                    detectResult.textContent = 'Please upload or capture an image first.';
+                    diseaseSuggestion.textContent = '';
+                    return;
+                }
 
-            detectResult.textContent = 'Analyzing image…';
+                detectResult.textContent = 'Analyzing image…';
 
             // SIMULATED AI RESULT (demo purpose)
            
@@ -1395,6 +1414,7 @@ setTimeout(() => {
 
 }, 1200);
         });
+        }
 
         // ------------------ Disease suggestions ------------------
         function getDiseaseSuggestion(diseases) {

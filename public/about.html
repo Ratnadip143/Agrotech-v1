@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>About — AgroTech Dashboard</title>
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZP5JD05KH3"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+        gtag('config', 'G-ZP5JD05KH3');
+    </script>
+
+    <!-- Favicon and App Icons -->
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="icon" href="favicon.ico" >
+    <!-- Android Chrome Icons -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/site.webmanifest">
+
+    <!-- Fonts, icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <style>
+        :root {
+            --accent: #2ecc71;
+            --accent-dark: #27ae60;
+            --muted: #6b7280;
+            --dark: #0f1720;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            color: #0b2e21;
+            overflow: auto;
+        }
+
+        /* Parallax background container */
+        .bg-wrap {
+            position: fixed;
+            inset: 0;
+            z-index: -3;
+            overflow: hidden;
+        }
+
+        .bg-image {
+            position: absolute;
+            inset: -20%;
+            background-image: url('https://images.unsplash.com/photo-1524593119771-aa5c54b3e222?auto=format&fit=crop&w=1600&q=70');
+            background-size: cover;
+            background-position: center;
+            transform: translate3d(0, 0, 0);
+            transition: transform .15s linear;
+            filter: saturate(1.05) contrast(1);
+        }
+
+        .bg-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.85));
+        }
+
+        /* Layout */
+        .main {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Topbar */
+        .topbar {
+            height: 64px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 18px;
+            background: rgba(255, 255, 255, 0.72);
+            backdrop-filter: blur(8px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            justify-content: space-between;
+        }
+
+        .brand {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .logo {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            background-image: url('https://images.unsplash.com/photo-1542444459-db5a45f1d499?auto=format&fit=crop&w=300&q=60');
+            background-size: cover;
+        }
+
+        .title {
+            font-weight: 700;
+            color: #163b2e;
+            font-size: 18px;
+        }
+
+        .topbar-right {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: #163b2e;
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--accent);
+        }
+
+        .nav-link.active {
+            color: var(--accent);
+            border-bottom: 2px solid var(--accent);
+        }
+
+        /* Content area */
+        .content {
+            width: 100%;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 40px 18px;
+            flex: 1;
+        }
+
+        /* Section cards */
+        .about-hero {
+            background: rgba(255, 255, 255, 0.88);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 28px;
+            box-shadow: 0 30px 70px rgba(14, 22, 18, 0.12);
+            display: flex;
+            gap: 32px;
+            align-items: center;
+        }
+
+        .about-hero-text h1 {
+            margin: 0;
+            font-size: 36px;
+            color: #184c38;
+            margin-bottom: 16px;
+        }
+
+        .about-hero-text p {
+            margin: 0 0 12px 0;
+            color: #3d6552;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        .about-hero-image {
+            width: 280px;
+            height: 280px;
+            border-radius: 14px;
+            background-image: url('https://images.unsplash.com/photo-1574080320219-553eb213f72d?auto=format&fit=crop&w=400&q=60');
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 12px 35px rgba(7, 20, 12, 0.12);
+        }
+
+        /* Features grid */
+        .features-section {
+            background: rgba(255, 255, 255, 0.88);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 28px;
+            box-shadow: 0 30px 70px rgba(14, 22, 18, 0.12);
+        }
+
+        .features-section h2 {
+            margin: 0 0 28px 0;
+            font-size: 28px;
+            color: #184c38;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 20px;
+        }
+
+        .feature-card {
+            background: #fbfff9;
+            padding: 22px;
+            border-radius: 12px;
+            border: 1px solid #e6efe8;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(46, 204, 113, 0.15);
+            border-color: var(--accent);
+        }
+
+        .feature-icon {
+            font-size: 28px;
+            color: var(--accent);
+            margin-bottom: 12px;
+        }
+
+        .feature-card h3 {
+            margin: 0 0 8px 0;
+            font-size: 16px;
+            color: #184c38;
+        }
+
+        .feature-card p {
+            margin: 0;
+            color: #3d6552;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        /* Mission section */
+        .mission-section {
+            background: rgba(255, 255, 255, 0.88);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 28px;
+            box-shadow: 0 30px 70px rgba(14, 22, 18, 0.12);
+        }
+
+        .mission-section h2 {
+            margin: 0 0 16px 0;
+            font-size: 28px;
+            color: #184c38;
+        }
+
+        .mission-section p {
+            margin: 0 0 12px 0;
+            color: #3d6552;
+            line-height: 1.7;
+            font-size: 15px;
+        }
+
+        /* Team section */
+        .team-section {
+            background: rgba(255, 255, 255, 0.88);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 28px;
+            box-shadow: 0 30px 70px rgba(14, 22, 18, 0.12);
+        }
+
+        .team-section h2 {
+            margin: 0 0 28px 0;
+            font-size: 28px;
+            color: #184c38;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 24px;
+        }
+
+        .team-member {
+            text-align: center;
+        }
+
+        .member-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+            margin: 0 auto 12px;
+        }
+
+        .team-member h3 {
+            margin: 0 0 4px 0;
+            font-size: 16px;
+            color: #184c38;
+        }
+
+        .team-member p {
+            margin: 0;
+            color: #3d6552;
+            font-size: 13px;
+        }
+
+        /* CTA section */
+        .cta-section {
+            background: linear-gradient(135deg, rgba(46, 204, 113, 0.9), rgba(39, 174, 96, 0.9));
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 40px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 30px 70px rgba(46, 204, 113, 0.2);
+        }
+
+        .cta-section h2 {
+            margin: 0 0 12px 0;
+            font-size: 28px;
+            color: white;
+        }
+
+        .cta-section p {
+            margin: 0 0 24px 0;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 15px;
+        }
+
+        .cta-btn {
+            background: white;
+            color: var(--accent);
+            border: none;
+            padding: 12px 28px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(15, 23, 32, 0.95);
+            color: #dbeee0;
+            padding: 30px 18px;
+            text-align: center;
+            border-top: 1px solid rgba(46, 204, 113, 0.2);
+        }
+
+        .footer p {
+            margin: 8px 0;
+            font-size: 13px;
+        }
+
+        /* Responsive */
+        @media(max-width:900px) {
+            .about-hero {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 24px;
+            }
+
+            .about-hero-image {
+                width: 100%;
+                height: 240px;
+            }
+
+            .about-hero-text h1 {
+                font-size: 28px;
+            }
+
+            .features-section,
+            .mission-section,
+            .team-section,
+            .cta-section {
+                padding: 28px;
+            }
+        }
+
+        @media(max-width:520px) {
+            .topbar {
+                flex-direction: column;
+                gap: 8px;
+                height: auto;
+                padding: 12px 18px;
+            }
+
+            .topbar-right {
+                flex-direction: column;
+                width: 100%;
+                gap: 8px;
+            }
+
+            .nav-link {
+                font-size: 13px;
+            }
+
+            .about-hero,
+            .features-section,
+            .mission-section,
+            .team-section,
+            .cta-section {
+                padding: 20px;
+                margin-bottom: 18px;
+            }
+
+            .about-hero-text h1 {
+                font-size: 24px;
+            }
+
+            .features-section h2,
+            .mission-section h2,
+            .team-section h2,
+            .cta-section h2 {
+                font-size: 22px;
+            }
+
+            .content {
+                padding: 20px 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Parallax background -->
+    <div class="bg-wrap">
+        <div class="bg-image" id="bgImage"></div>
+        <div class="bg-overlay"></div>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+        <div class="topbar">
+            <div class="brand">
+                <div class="logo" aria-hidden></div>
+                <div class="title">AgroTech</div>
+            </div>
+            <div class="topbar-right">
+                <a href="/index.html" class="nav-link">Dashboard</a>
+                <a href="/about.html" class="nav-link active">About</a>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Hero Section -->
+            <div class="about-hero">
+                <div class="about-hero-text">
+                    <h1>About AgroTech</h1>
+                    <p>AgroTech is a comprehensive smart farming platform designed to empower farmers with cutting-edge technology and data-driven insights. Our mission is to revolutionize agriculture by making advanced tools accessible to every farmer.</p>
+                    <p>Built with passion for sustainable agriculture, AgroTech combines IoT sensors, artificial intelligence, and real-time analytics to help you make better farming decisions.</p>
+                </div>
+                <div class="about-hero-image"></div>
+            </div>
+
+            <!-- Features Section -->
+            <div class="features-section">
+                <h2>Our Features</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🔬</div>
+                        <h3>Disease Detection</h3>
+                        <p>AI-powered plant disease detection using image analysis to identify and treat crop diseases early.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🌱</div>
+                        <h3>Seed Calculator</h3>
+                        <p>Precise seed requirement calculator for various crops to optimize planting efficiency.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">💧</div>
+                        <h3>Moisture Monitor</h3>
+                        <p>Real-time soil moisture tracking with smart irrigation recommendations.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🗺️</div>
+                        <h3>Field Analysis</h3>
+                        <p>Comprehensive field soil analysis with crop recommendations based on soil conditions.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3>Analytics Dashboard</h3>
+                        <p>Beautiful, intuitive dashboard for monitoring all your farm data in one place.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔐</div>
+                        <h3>Secure & Private</h3>
+                        <p>Enterprise-grade security with Firebase authentication to keep your data safe.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Mission Section -->
+            <div class="mission-section">
+                <h2>Our Mission</h2>
+                <p>We believe that every farmer deserves access to advanced farming technologies. Our mission is to bridge the gap between traditional farming practices and modern technology by providing an intuitive platform that delivers actionable insights.</p>
+                <p>By combining Internet of Things (IoT), Artificial Intelligence, and Data Analytics, AgroTech helps farmers:</p>
+                <ul style="color: #3d6552; line-height: 2; font-size: 14px;">
+                    <li>🎯 Make data-driven decisions</li>
+                    <li>📈 Increase crop yield and quality</li>
+                    <li>💰 Reduce operational costs</li>
+                    <li>🌍 Promote sustainable farming practices</li>
+                    <li>⚡ Save time and resources</li>
+                </ul>
+            </div>
+
+            <!-- Team Section -->
+            <div class="team-section">
+                <h2>Our Team</h2>
+                <div class="team-grid">
+                    <div class="team-member">
+                        <div class="member-avatar">👨‍💼</div>
+                        <h3>John Smith</h3>
+                        <p>Founder & CEO</p>
+                    </div>
+                    <div class="team-member">
+                        <div class="member-avatar">👩‍💻</div>
+                        <h3>Sarah Johnson</h3>
+                        <p>Lead Developer</p>
+                    </div>
+                    <div class="team-member">
+                        <div class="member-avatar">👨‍🔬</div>
+                        <h3>Dr. Rajesh Kumar</h3>
+                        <p>Agriculture Expert</p>
+                    </div>
+                    <div class="team-member">
+                        <div class="member-avatar">👩‍🎨</div>
+                        <h3>Emma Davis</h3>
+                        <p>UI/UX Designer</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CTA Section -->
+            <div class="cta-section">
+                <h2>Ready to Transform Your Farm?</h2>
+                <p>Join thousands of farmers already using AgroTech to optimize their farming operations.</p>
+                <a href="/index.html" class="cta-btn">Get Started</a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>&copy; 2024 AgroTech. All rights reserved.</p>
+            <p>Smart Farming Dashboard • Empowering Farmers Worldwide</p>
+        </div>
+    </div>
+
+    <script>
+        // Parallax effect
+        const bgWrap = document.getElementById('bgImage');
+        window.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth) * 20;
+            const y = (e.clientY / window.innerHeight) * 20;
+            bgWrap.style.transform = `translate3d(${-x}px, ${-y}px, 0)`;
+        });
+    </script>
+
+</body>
+
+</html>
