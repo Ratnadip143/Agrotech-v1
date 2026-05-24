@@ -1,1716 +1,2484 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>AgroTech — Smart Farming Dashboard</title>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZP5JD05KH3"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag() { dataLayer.push(arguments); }
-        gtag('js', new Date());
-        gtag('config', 'G-ZP5JD05KH3');
-    </script>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>AgroTech — Smart Farming Dashboard</title>
 
-    <!-- Favicon and App Icons -->
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Syne:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- Android Chrome Icons -->
-    <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png">
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="/site.webmanifest">
+<style>
+/* ============================================================
+   DESIGN TOKENS
+   ============================================================ */
+:root {
 
-    <!-- Fonts, icons, Chart.js -->
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  --yellow: #f5a623;
+  --red:    #e05252;
+  --blue:   #4a90d9;
 
-    <!-- Firebase COMPAT libs (Auth + Realtime DB) -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
-    <style>
-        :root {
-            --accent: #2ecc71;
-            --accent-dark: #27ae60;
-            --muted: #6b7280;
-            --dark: #0f1720;
-        }
 
-        * {
-            box-sizing: border-box
-        }
+  --sidebar-w: 220px;
+  --sidebar-collapsed: 68px;
+  --topbar-h: 60px;
 
-        body {
-            margin: 0;
-            font-family: 'Poppins', sans-serif;
-            color: #0b2e21;
-            height: 100vh;
-            overflow: hidden;
-        }
+}
 
-        /* Parallax background container */
-        .bg-wrap {
-            position: fixed;
-            inset: 0;
-            z-index: -3;
-            overflow: hidden;
-        }
+/* ============================================================
+   RESET & BASE
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        .bg-image {
-            position: absolute;
-            inset: -20%;
-            background-image: url('https://images.unsplash.com/photo-1524593119771-aa5c54b3e222?auto=format&fit=crop&w=1600&q=70');
-            background-size: cover;
-            background-position: center;
-            transform: translate3d(0, 0, 0);
-            transition: transform .15s linear;
-            filter: saturate(1.05) contrast(1);
-        }
+html { scroll-behavior: smooth; }
 
-        .bg-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.85));
-        }
+body {
+  font-family: 'DM Sans', sans-serif;
+  color: #0d2b1e;
+  background: #f8faf9;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
 
-        /* Layout */
-        .layout {
-            display: flex;
-            width: 100%;
-            height: 100vh;
-        }
+button { cursor: pointer; font-family: inherit; }
+input, select, textarea { font-family: inherit; }
+a { text-decoration: none; color: inherit; }
 
-        /* Sidebar - Dark style (style B) */
-        .sidebar {
-            width: 80px;
-            background: var(--dark);
-            color: #dbeee0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 16px 8px;
-            box-shadow: 0 8px 30px rgba(2, 6, 10, 0.45);
-        }
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #ccddd4; border-radius: 99px; }
 
-        .profile-circle {
-            width: 44px;
-            height: 44px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #11221a;
-            color: var(--accent);
-            margin-bottom: 18px;
-            font-size: 18px;
-        }
+/* ============================================================
+   LAYOUT SHELL
+   ============================================================ */
+#app {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
 
-        .menu {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            align-items: center;
-            width: 100%;
-        }
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+.sidebar {
+  width: 220px;
+  background: #0d2b1e;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  transition: width .22s ease;
+  overflow: hidden;
+  position: relative;
+  z-index: 100;
+}
 
-        .side-btn {
-            width: 56px;
-            height: 56px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #cfeee1;
-            cursor: pointer;
-            font-size: 18px;
-            border: 1px solid transparent;
-            transition: all .18s ease;
-            background: transparent;
-        }
+.sidebar-brand {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 18px;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  flex-shrink: 0;
+}
 
-        .side-btn:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
-        }
+.sidebar-logo {
+  width: 32px; height: 32px;
+  background: #2a7a52;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 15px;
+  flex-shrink: 0;
+}
 
-        .side-btn.active {
-            background: linear-gradient(180deg, var(--accent-dark), var(--accent));
-            color: #fff;
-        }
+.sidebar-brand-name {
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  font-size: 17px;
+  color: #fff;
+  white-space: nowrap;
+}
 
-        .spacer {
-            flex: 1;
-        }
+.sidebar-brand-name span { color: #5bbf8a; }
 
-        /* Main area */
-        .main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            overflow: auto;
-        }
+.sidebar-nav {
+  flex: 1;
+  padding: 20px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
 
-        .topbar {
-            height: 64px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 0 18px;
-            background: rgba(255, 255, 255, 0.72);
-            backdrop-filter: blur(8px);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
+.nav-section-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: #2a7a52;
+  padding: 12px 10px 6px;
+  white-space: nowrap;
+}
 
-        .brand {
-            display: flex;
-            gap: 12px;
-            align-items: center;
-        }
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: rgba(255,255,255,.55);
+  cursor: pointer;
+  transition: all .15s ease;
+  white-space: nowrap;
+  border: 1px solid transparent;
+  user-select: none;
+}
 
-        .logo {
-            width: 44px;
-            height: 44px;
-            border-radius: 10px;
-            background-image: url('https://images.unsplash.com/photo-1542444459-db5a45f1d499?auto=format&fit=crop&w=300&q=60');
-            background-size: cover;
-        }
+.nav-item:hover {
+  color: rgba(255,255,255,.85);
+  background: rgba(255,255,255,.05);
+}
 
-        .title {
-            font-weight: 700;
-            color: #163b2e;
-            font-size: 18px;
-        }
+.nav-item.active {
+  background: rgba(61,160,110,.18);
+  color: #5bbf8a;
+  border-color: rgba(61,160,110,.25);
+}
 
-        .top-actions {
-            margin-left: auto;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            color: var(--muted);
-        }
+.nav-item .nav-icon {
+  width: 20px; height: 20px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
 
-        /* Content area */
-        .content {
-            width: 100%;
-            max-width: 1100px;
-            margin: 26px auto;
-            padding: 0 18px 60px;
-            display: flex;
-            align-items: flex-start;
-            justify-content: center;
-        }
+.nav-item .nav-label {
+  font-size: 13.5px;
+  font-weight: 500;
+}
 
-        /* Dashboard welcome */
-        .dashboard-wrap {
-            width: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px 0;
-        }
+.nav-item .nav-badge {
+  margin-left: auto;
+  background: #e05252;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 99px;
+  flex-shrink: 0;
+}
 
-        .welcome-box {
-            width: 760px;
-            max-width: 92%;
-            background: rgba(255, 255, 255, 0.88);
-            border-radius: 16px;
-            padding: 28px 30px;
-            box-shadow: 0 30px 70px rgba(14, 22, 18, 0.12);
-            display: flex;
-            gap: 22px;
-            align-items: center;
-        }
+.sidebar-footer {
+  padding: 12px 10px;
+  border-top: 1px solid rgba(255,255,255,.07);
+}
 
-        .welcome-left h1 {
-            margin: 0;
-            font-size: 28px;
-            color: #184c38;
-        }
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background .15s;
+}
 
-        .welcome-left p {
-            margin: 8px 0 0 0;
-            color: #3d6552;
-        }
+.sidebar-user:hover { background: rgba(255,255,255,.05); }
 
-        .welcome-right img {
-            width: 220px;
-            border-radius: 12px;
-            box-shadow: 0 12px 35px rgba(7, 20, 12, 0.12);
-        }
+.user-avatar {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: #1a4d33;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700;
+  font-size: 13px;
+  color: #a8dfc0;
+  flex-shrink: 0;
+}
 
-        /* Centered page card */
-        .page-card {
-            width: 760px;
-            max-width: 92%;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 14px;
-            padding: 22px;
-            box-shadow: 0 18px 50px rgba(10, 20, 12, 0.06);
-            display: none;
-        }
+.user-info { overflow: hidden; }
+.user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255,255,255,.85);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.user-role {
+  font-size: 11px;
+  color: #2a7a52;
+  white-space: nowrap;
+}
 
-        /* Form fields */
-        .row {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-        }
+/* ============================================================
+   MAIN CONTENT AREA
+   ============================================================ */
+.main-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-width: 0;
+}
 
-        .field {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            margin-bottom: 10px;
-        }
+/* ============================================================
+   TOPBAR
+   ============================================================ */
+.topbar {
+  height: 60px;
+  background: #ffffff;
+  border-bottom: 1px solid #e3ede7;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 24px;
+  flex-shrink: 0;
+  z-index: 50;
+}
 
-        .field input,
-        .field select {
-            padding: 10px 12px;
-            border-radius: 8px;
-            border: 1px solid #dfe7e2;
-            font-size: 14px;
-        }
+.topbar-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0d2b1e;
+}
 
-        .primary-btn {
-            background: linear-gradient(90deg, var(--accent), var(--accent-dark));
-            color: white;
-            border: none;
-            padding: 10px 14px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 600;
-        }
+.topbar-subtitle {
+  font-size: 12px;
+  color: #7d9a8a;
+  margin-top: 1px;
+}
 
-        .muted {
-            color: var(--muted);
-            font-size: 13px;
-        }
+.topbar-spacer { flex: 1; }
 
-        /* image preview */
-        #preview {
-            max-width: 100%;
-            border-radius: 8px;
-            display: block;
-            margin-top: 10px;
-        }
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 
-        /* Chart */
-        .chart-wrap {
-            width: 100%;
-            height: 260px;
-        }
+.icon-btn {
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  border: 1px solid #e3ede7;
+  background: transparent;
+  color: #4a6858;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  transition: all .15s;
+  position: relative;
+}
 
-        /* Profile card */
-        .profile-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+.icon-btn:hover { background: #f0f5f2; color: #0d2b1e; }
 
-        .avatar {
-            width: 72px;
-            height: 72px;
-            border-radius: 12px;
-            background: #e8f7ee;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 26px;
-            color: #1a553f;
-        }
+.icon-btn .notif-dot {
+  position: absolute;
+  top: 6px; right: 6px;
+  width: 7px; height: 7px;
+  background: #e05252;
+  border-radius: 50%;
+  border: 2px solid #ffffff;
+}
 
-        /* Bottom nav */
-        .bottom-nav {
-            position: fixed;
-            left: 50%;
-            transform: translateX(-50%);
-            bottom: 18px;
-            z-index: 40;
-            background: rgba(16, 20, 18, 0.9);
-            padding: 8px 12px;
-            border-radius: 40px;
-            display: flex;
-            gap: 12px;
-            box-shadow: 0 10px 30px rgba(4, 8, 6, 0.3);
-        }
+.topbar-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px 4px 4px;
+  border-radius: 12px;
+  border: 1px solid #e3ede7;
+  cursor: pointer;
+  transition: background .15s;
+}
 
-        .bbtn {
-            color: #dbeee0;
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 18px;
-        }
+.topbar-user:hover { background: #f0f5f2; }
+.topbar-user-email { font-size: 12.5px; color: #4a6858; font-weight: 500; }
 
-        .bbtn.active {
-            background: linear-gradient(90deg, var(--accent-dark), var(--accent));
-            color: #fff;
-        }
+/* ============================================================
+   CONTENT SCROLL AREA
+   ============================================================ */
+.content-area {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 28px;
+}
 
-        /* Auth overlay (login/signup) */
-        #authPanel {
-            position: fixed;
-            inset: 0;
-            z-index: 60;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(rgba(0, 0, 0, 0.32), rgba(0, 0, 0, 0.38)), url('https://images.unsplash.com/photo-1518732714860-b62714ce0c59?auto=format&fit=crop&w=1600&q=70') center/cover;
-        }
+/* ============================================================
+   PAGE SECTIONS (toggled)
+   ============================================================ */
+.page-section { display: none; }
+.page-section.active { display: block; }
 
-        .authBox {
-            width: 360px;
-            padding: 26px;
-            border-radius: 16px;
-            background: rgba(255, 255, 255, 0.14);
-            backdrop-filter: blur(12px);
-            box-shadow: 0 18px 50px rgba(0, 0, 0, 0.3);
-            color: white;
-            animation: zoomIn .34s ease forwards;
-            position: relative;
-        }
+/* ============================================================
+   TYPOGRAPHY HELPERS
+   ============================================================ */
+.section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
 
-        @keyframes zoomIn {
-            from {
-                opacity: 0;
-                transform: scale(.78)
-            }
+.section-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: #0d2b1e;
+}
 
-            to {
-                opacity: 1;
-                transform: scale(1)
-            }
-        }
+.section-sub {
+  font-size: 13px;
+  color: #7d9a8a;
+  margin-top: 2px;
+}
 
-        .authBox h2 {
-            margin: 0 0 6px 0;
-            font-size: 22px;
-            color: #e8ffef
-        }
+/* ============================================================
+   CARDS
+   ============================================================ */
+.card {
+  background: #ffffff;
+  border: 1px solid #e3ede7;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(13,43,30,.06), 0 1px 2px rgba(13,43,30,.04);
+}
 
-        .authBox .muted {
-            color: #e6fff3;
-            opacity: .9;
-            margin-bottom: 12px;
-        }
+.card-sm { padding: 16px; }
+.card-lg { padding: 24px; }
 
-        .authBox input {
-            width: 100%;
-            padding: 10px 12px;
-            border-radius: 10px;
-            border: none;
-            margin-top: 8px;
-        }
+/* ============================================================
+   STAT CARDS
+   ============================================================ */
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 14px;
+  margin-bottom: 24px;
+}
 
-        .authBox .btn {
-            width: 100%;
-            padding: 12px;
-            margin-top: 12px;
-            border-radius: 10px;
-            border: none;
-            font-weight: 700;
-            cursor: pointer;
-            background: linear-gradient(90deg, var(--accent), var(--accent-dark));
-            color: #063017;
-        }
+.stat-card {
+  background: #ffffff;
+  border: 1px solid #e3ede7;
+  border-radius: 16px;
+  padding: 18px 20px;
+  box-shadow: 0 1px 3px rgba(13,43,30,.06), 0 1px 2px rgba(13,43,30,.04);
+  position: relative;
+  overflow: hidden;
+  transition: box-shadow .18s, transform .18s;
+}
 
-        .authBox .ghost {
-            width: 100%;
-            padding: 10px;
-            margin-top: 8px;
-            border-radius: 10px;
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            cursor: pointer;
-        }
+.stat-card:hover { box-shadow: 0 4px 12px rgba(13,43,30,.08), 0 2px 4px rgba(13,43,30,.05); transform: translateY(-1px); }
 
-        .msg {
-            font-size: 13px;
-            color: #ffdede;
-            margin-top: 6px;
-        }
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: 16px 16px 0 0;
+}
 
-        /* Responsive */
-        @media(max-width:900px) {
-            .sidebar {
-                width: 64px
-            }
+.stat-card.green::before  { background: #3da06e; }
+.stat-card.yellow::before { background: #f5a623; }
+.stat-card.blue::before   { background: #4a90d9; }
+.stat-card.red::before    { background: #e05252; }
 
-            .side-btn {
-                width: 48px;
-                height: 48px
-            }
+.stat-icon {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  margin-bottom: 12px;
+}
 
-            .welcome-box {
-                width: 92%;
-                flex-direction: column;
-                gap: 12px;
-                align-items: flex-start
-            }
+.stat-icon.green  { background: #e6f7ee; color: #216040; }
+.stat-icon.yellow { background: #fff8ec; color: #f5a623; }
+.stat-icon.blue   { background: #edf4fb; color: #4a90d9; }
+.stat-icon.red    { background: #fdf0f0; color: #e05252; }
 
-            .main {
-                padding-bottom: 90px
-            }
-        }
+.stat-value {
+  font-family: 'Syne', sans-serif;
+  font-size: 26px;
+  font-weight: 700;
+  color: #0d2b1e;
+  line-height: 1;
+  margin-bottom: 4px;
+}
 
-        @media(max-width:520px) {
-            .welcome-right img {
-                display: none
-            }
+.stat-unit {
+  display: inline;
+  font-size: 13px;
+  font-weight: 400;
+  color: #7d9a8a;
+}
 
-            .page-card {
-                padding: 16px
-            }
+.stat-label {
+  font-size: 12.5px;
+  color: #7d9a8a;
+  font-weight: 500;
+}
 
-            .authBox {
-                width: 92%;
-                padding: 18px
-            }
+.stat-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11.5px;
+  font-weight: 600;
+  margin-top: 6px;
+  padding: 2px 7px;
+  border-radius: 99px;
+}
 
-            .content {
-                padding: 8px
-            }
-        }
-    </style>
+.stat-trend.up   { background: #e6f7ee; color: #216040; }
+.stat-trend.down { background: #fdf0f0; color: #e05252; }
+.stat-trend.flat { background: #f0f5f2; color: #7d9a8a; }
+
+/* ============================================================
+   DASHBOARD GRID
+   ============================================================ */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: auto;
+  gap: 16px;
+}
+
+.col-span-2 { grid-column: span 2; }
+.col-span-3 { grid-column: span 3; }
+.col-span-1 { grid-column: span 1; }
+
+/* ============================================================
+   CHART WRAPPER
+   ============================================================ */
+.chart-container {
+  position: relative;
+  width: 100%;
+  height: 220px;
+}
+
+/* ============================================================
+   ALERT FEED
+   ============================================================ */
+.alert-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid #e3ede7;
+}
+
+.alert-item:last-child { border-bottom: none; padding-bottom: 0; }
+.alert-item:first-child { padding-top: 0; }
+
+.alert-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+
+.alert-dot.warning { background: #f5a623; }
+.alert-dot.danger  { background: #e05252; }
+.alert-dot.info    { background: #4a90d9; }
+.alert-dot.success { background: #3da06e; }
+
+.alert-text { flex: 1; }
+.alert-title { font-size: 13px; font-weight: 600; color: #0d2b1e; }
+.alert-desc  { font-size: 12px; color: #7d9a8a; margin-top: 1px; }
+.alert-time  { font-size: 11px; color: #7d9a8a; flex-shrink: 0; }
+
+/* ============================================================
+   ACTIVITY FEED
+   ============================================================ */
+.activity-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #e3ede7;
+}
+
+.activity-item:last-child { border-bottom: none; }
+
+.activity-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  background: #e6f7ee;
+  color: #216040;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.activity-label { font-size: 13px; color: #0d2b1e; font-weight: 500; }
+.activity-time  { font-size: 11.5px; color: #7d9a8a; margin-top: 1px; }
+
+/* ============================================================
+   HEALTH INDICATORS
+   ============================================================ */
+.health-bar-wrap {
+  margin-bottom: 12px;
+}
+
+.health-bar-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12.5px;
+  color: #4a6858;
+  margin-bottom: 5px;
+}
+
+.health-bar-label span:last-child { font-weight: 600; color: #0d2b1e; }
+
+.health-bar {
+  height: 6px;
+  border-radius: 99px;
+  background: #f0f5f2;
+  overflow: hidden;
+}
+
+.health-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width .8s ease;
+}
+
+.health-bar-fill.good    { background: #3da06e; }
+.health-bar-fill.warning { background: #f5a623; }
+.health-bar-fill.danger  { background: #e05252; }
+
+/* ============================================================
+   WEATHER WIDGET
+   ============================================================ */
+.weather-widget {
+  background: linear-gradient(135deg, #133926, #1a4d33);
+  border-radius: 16px;
+  padding: 20px;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+
+.weather-widget::after {
+  content: '';
+  position: absolute;
+  right: -20px; top: -20px;
+  width: 120px; height: 120px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.04);
+}
+
+.weather-icon { font-size: 36px; margin-bottom: 8px; }
+.weather-temp {
+  font-family: 'Syne', sans-serif;
+  font-size: 38px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.weather-desc { font-size: 13px; opacity: .75; margin-top: 4px; }
+
+.weather-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.weather-stat-item { display: flex; flex-direction: column; gap: 2px; }
+.weather-stat-val  { font-size: 16px; font-weight: 600; }
+.weather-stat-lbl  { font-size: 11px; opacity: .6; text-transform: uppercase; letter-spacing: .05em; }
+
+/* ============================================================
+   BADGE
+   ============================================================ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px;
+  border-radius: 99px;
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.badge-green  { background: #e6f7ee; color: #1a4d33; }
+.badge-yellow { background: #fff8ec; color: #b07a10; }
+.badge-red    { background: #fdf0f0; color: #b03030; }
+.badge-blue   { background: #edf4fb; color: #2a6aad; }
+.badge-gray   { background: #f0f5f2; color: #4a6858; }
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 18px;
+  border-radius: 12px;
+  font-size: 13.5px;
+  font-weight: 600;
+  border: none;
+  transition: all .15s;
+  white-space: nowrap;
+}
+
+.btn-primary {
+  background: #2a7a52;
+  color: #fff;
+}
+.btn-primary:hover { background: #3da06e; box-shadow: 0 4px 14px rgba(42,122,82,.3); }
+
+.btn-secondary {
+  background: #ffffff;
+  color: #4a6858;
+  border: 1px solid #e3ede7;
+}
+.btn-secondary:hover { background: #f0f5f2; color: #0d2b1e; }
+
+.btn-danger {
+  background: #fdf0f0;
+  color: #e05252;
+  border: 1px solid #f7cccc;
+}
+.btn-danger:hover { background: #e05252; color: #fff; }
+
+.btn-sm { padding: 6px 14px; font-size: 12.5px; }
+.btn-lg { padding: 12px 24px; font-size: 15px; }
+
+/* ============================================================
+   FORM ELEMENTS
+   ============================================================ */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.form-label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #4a6858;
+}
+
+.form-input,
+.form-select {
+  padding: 10px 14px;
+  border: 1.5px solid #e3ede7;
+  border-radius: 12px;
+  font-size: 14px;
+  color: #0d2b1e;
+  background: #ffffff;
+  transition: border-color .15s, box-shadow .15s;
+  width: 100%;
+  outline: none;
+}
+
+.form-input:focus,
+.form-select:focus {
+  border-color: #3da06e;
+  box-shadow: 0 0 0 3px rgba(61,160,110,.12);
+}
+
+.form-hint {
+  font-size: 11.5px;
+  color: #7d9a8a;
+}
+
+/* ============================================================
+   DISEASE DETECTION PAGE
+   ============================================================ */
+.detect-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.upload-zone {
+  border: 2px dashed #ccddd4;
+  border-radius: 20px;
+  padding: 40px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .18s;
+  background: #f8faf9;
+  position: relative;
+  overflow: hidden;
+}
+
+.upload-zone:hover,
+.upload-zone.dragover {
+  border-color: #3da06e;
+  background: #f3fbf6;
+}
+
+.upload-zone.has-image {
+  border-style: solid;
+  border-color: #3da06e;
+  padding: 16px;
+}
+
+.upload-icon {
+  font-size: 36px;
+  color: #ccddd4;
+  margin-bottom: 14px;
+}
+
+.upload-zone.has-image .upload-icon { display: none; }
+
+.upload-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #0d2b1e;
+  margin-bottom: 6px;
+}
+
+.upload-sub {
+  font-size: 12.5px;
+  color: #7d9a8a;
+  margin-bottom: 16px;
+}
+
+#imagePreviewLarge {
+  width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+  border-radius: 12px;
+  display: none;
+}
+
+.upload-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.result-panel { display: flex; flex-direction: column; gap: 14px; }
+
+.result-card-inner {
+  padding: 18px;
+  border-radius: 12px;
+  background: #f8faf9;
+  border: 1px solid #e3ede7;
+}
+
+.severity-bar-wrap { margin: 12px 0; }
+.severity-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: #4a6858;
+  margin-bottom: 5px;
+}
+
+.severity-track {
+  height: 8px;
+  border-radius: 99px;
+  background: #e3ede7;
+  overflow: hidden;
+}
+
+.severity-fill {
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(90deg, #3da06e, #f5a623, #e05252);
+  transition: width .6s ease;
+}
+
+.treatment-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid #e3ede7;
+  font-size: 13px;
+  color: #0d2b1e;
+}
+
+.treatment-item:last-child { border-bottom: none; }
+
+.treatment-item i {
+  color: #2a7a52;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+/* Processing spinner */
+.processing-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border-radius: 20px;
+  display: none;
+}
+
+.spinner {
+  width: 36px; height: 36px;
+  border: 3px solid #e3ede7;
+  border-top-color: #2a7a52;
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ============================================================
+   SEED CALCULATOR
+   ============================================================ */
+.seed-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 20px;
+}
+
+.calc-result-box {
+  background: linear-gradient(135deg, #133926, #1a4d33);
+  border-radius: 20px;
+  padding: 28px;
+  color: #fff;
+  position: sticky;
+  top: 0;
+}
+
+.calc-result-label {
+  font-size: 12px;
+  opacity: .6;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  margin-bottom: 6px;
+}
+
+.calc-result-value {
+  font-family: 'Syne', sans-serif;
+  font-size: 36px;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.calc-result-unit { font-size: 14px; opacity: .65; }
+
+.calc-breakdown {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,.12);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.calc-breakdown-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  opacity: .8;
+}
+
+.calc-breakdown-row strong { opacity: 1; font-weight: 600; }
+
+/* ============================================================
+   MOISTURE MONITOR
+   ============================================================ */
+.sensor-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.moisture-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+}
+
+.sensor-card {
+  background: #ffffff;
+  border: 1px solid #e3ede7;
+  border-radius: 16px;
+  padding: 18px 16px;
+  box-shadow: 0 1px 3px rgba(13,43,30,.06), 0 1px 2px rgba(13,43,30,.04);
+}
+
+.sensor-card-icon {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.sensor-card-value {
+  font-family: 'Syne', sans-serif;
+  font-size: 30px;
+  font-weight: 700;
+  color: #0d2b1e;
+  line-height: 1;
+}
+
+.sensor-card-unit { font-size: 13px; color: #7d9a8a; margin-top: 2px; }
+.sensor-card-label { font-size: 12px; color: #7d9a8a; font-weight: 500; margin-top: 4px; }
+
+/* Moisture Monitor responsive form */
+@media (max-width: 768px) {
+  .moisture-layout .form-group {
+    min-width: 100%;
+  }
+}
+
+/* ============================================================
+   FIELD ANALYSIS
+   ============================================================ */
+.analysis-result-box {
+  padding: 20px;
+  border-radius: 16px;
+  border: 1px solid #e3ede7;
+  background: #f8faf9;
+  font-size: 13.5px;
+  color: #0d2b1e;
+  line-height: 1.65;
+}
+
+/* ============================================================
+   PROFILE PAGE
+   ============================================================ */
+.profile-avatar-lg {
+  width: 68px; height: 68px;
+  border-radius: 16px;
+  background: #e6f7ee;
+  border: 2px solid #a8dfc0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px;
+  font-weight: 700;
+  color: #1a4d33;
+}
+
+/* ============================================================
+   AUTH OVERLAY
+   ============================================================ */
+#authPanel {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, rgba(13,43,30,.92), rgba(26,77,51,.88)),
+              url('https://images.unsplash.com/photo-1524593119771-aa5c54b3e222?auto=format&fit=crop&w=1600&q=70') center/cover;
+}
+
+.auth-card {
+  width: 380px;
+  max-width: 92vw;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 32px;
+  box-shadow: 0 32px 80px rgba(0,0,0,.3);
+  animation: slideUp .3s ease forwards;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.auth-logo-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.auth-logo {
+  width: 38px; height: 38px;
+  background: #2a7a52;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 17px;
+}
+
+.auth-logo-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.auth-logo-name span { color: #2a7a52; }
+
+.auth-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.auth-sub   { font-size: 13.5px; color: #7d9a8a; margin-bottom: 22px; }
+
+.auth-btn {
+  width: 100%;
+  padding: 11px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  border: none;
+  margin-top: 6px;
+  transition: all .15s;
+}
+
+.auth-btn-primary { background: #2a7a52; color: #fff; }
+.auth-btn-primary:hover { background: #3da06e; }
+
+.auth-btn-google {
+  background: #ffffff;
+  color: #0d2b1e;
+  border: 1.5px solid #e3ede7;
+  margin-top: 10px;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.auth-btn-google:hover { background: #f0f5f2; }
+
+.auth-link {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 13px;
+  color: #7d9a8a;
+}
+
+.auth-link button {
+  background: none;
+  border: none;
+  color: #216040;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.auth-link button:hover { text-decoration: underline; }
+
+.auth-msg {
+  font-size: 12.5px;
+  margin-top: 8px;
+  min-height: 18px;
+  padding: 0 2px;
+}
+
+/* ============================================================
+   MOBILE BOTTOM NAV (≤ 768px)
+   ============================================================ */
+.bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: 62px;
+  background: #ffffff;
+  border-top: 1px solid #e3ede7;
+  z-index: 100;
+  padding: 0 12px;
+  align-items: center;
+  justify-content: space-around;
+}
+
+.bnav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: #7d9a8a;
+  font-size: 11px;
+  transition: color .15s;
+  flex: 1;
+}
+
+.bnav-item i { font-size: 17px; }
+.bnav-item.active { color: #216040; }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 1024px) {
+  .sidebar { width: 68px; }
+  .sidebar-brand-name,
+  .nav-label,
+  .nav-badge,
+  .nav-section-label,
+  .user-info { display: none; }
+  .sidebar-brand { justify-content: center; padding: 0 12px; }
+  .nav-item { justify-content: center; padding: 10px; }
+  .sidebar-user { justify-content: center; padding: 10px; }
+  .dashboard-grid { grid-template-columns: 1fr 1fr; }
+  .col-span-2 { grid-column: span 2; }
+  .col-span-3 { grid-column: span 2; }
+  .moisture-layout { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .main-wrap { padding-bottom: 62px; }
+  .bottom-nav { display: flex; }
+  .topbar { padding: 0 16px; }
+  .topbar-title { font-size: 16px; }
+  .topbar-subtitle { font-size: 11px; }
+  .content-area { padding: 16px; }
+  .dashboard-grid { grid-template-columns: 1fr; }
+  .col-span-2, .col-span-3 { grid-column: span 1; }
+  .detect-layout { grid-template-columns: 1fr; }
+  .seed-layout { grid-template-columns: 1fr; }
+  .moisture-layout { grid-template-columns: 1fr; }
+  .sensor-grid { grid-template-columns: 1fr 1fr; }
+  .stat-grid { grid-template-columns: 1fr 1fr; }
+  .card { padding: 16px; }
+  .card-header { flex-direction: column; gap: 12px; align-items: flex-start; }
+  .form-group { margin-bottom: 12px; }
+}
+
+@media (max-width: 480px) {
+  .sensor-grid { grid-template-columns: 1fr; }
+  .stat-grid { grid-template-columns: 1fr; }
+  .topbar { padding: 0 12px; gap: 8px; }
+  .topbar-actions { gap: 4px; }
+  .icon-btn { width: 32px; height: 32px; font-size: 13px; }
+  .card { padding: 12px; margin-bottom: 12px; }
+  .card-header { gap: 8px; }
+  .card-title { font-size: 13px; }
+  .card-sub { font-size: 11px; }
+  .form-input, .form-select { font-size: 13px; padding: 8px 10px; }
+  .btn { padding: 8px 14px; font-size: 12px; }
+  .chart-container { height: 180px; }
+}
+
+/* ============================================================
+   CARD HEADER UTILITY
+   ============================================================ */
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0d2b1e;
+}
+
+.card-sub {
+  font-size: 12px;
+  color: #7d9a8a;
+  margin-top: 1px;
+}
+
+/* Mini tag line for dashboard */
+.live-dot {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  color: #2a7a52;
+  font-weight: 600;
+}
+
+.live-dot::before {
+  content: '';
+  width: 7px; height: 7px;
+  background: #3da06e;
+  border-radius: 50%;
+  animation: pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: .45; transform: scale(.7); }
+}
+
+/* Divider */
+.divider { border: none; border-top: 1px solid #e3ede7; margin: 16px 0; }
+
+/* Scrollable card body */
+.card-scroll {
+  max-height: 240px;
+  overflow-y: auto;
+  margin: 0 -4px;
+  padding: 0 4px;
+}
+
+</style>
 </head>
-
 <body>
 
-    <!-- Parallax background -->
-    <div class="bg-wrap" id="bgWrap">
-        <div class="bg-image" id="bgImage"></div>
-        <div class="bg-overlay"></div>
+<!-- ============================================================
+     AUTH OVERLAY
+     ============================================================ -->
+<div id="authPanel">
+  <div class="auth-card">
+    <div class="auth-logo-row">
+      <div class="auth-logo"><i class="fa-solid fa-leaf"></i></div>
+      <div class="auth-logo-name">Agro<span>Tech</span></div>
     </div>
 
-    <div class="layout">
-        <!-- Sidebar -->
-        <aside class="sidebar" aria-hidden>
-            <div class="profile-circle" id="sidebarProfileIcon"><i class="fa-solid fa-leaf"></i></div>
-            <nav class="menu" role="navigation" aria-label="Main menu">
-                <div class="side-btn active" id="m-dashboard" title="Dashboard" onclick="navClick('dashboard')"><i
-                        class="fa-solid fa-house-chimney"></i></div>
-                <div class="side-btn" id="m-detect" title="Disease Detection" onclick="navClick('detect')"><i
-                        class="fa-solid fa-microscope"></i></div>
-                <div class="side-btn" id="m-seed" title="Seed Calculator" onclick="navClick('seed')"><i
-                        class="fa-solid fa-seedling"></i></div>
-                <div class="side-btn" id="m-moist" title="Moisture Monitor" onclick="navClick('moisture')"><i
-                        class="fa-solid fa-chart-line"></i></div>
-                <div class="side-btn" id="m-field" title="Field Analysis" onclick="navClick('field')">
-                <i class="fa-solid fa-map"></i>
-            </div>
-                <div class="side-btn" id="m-profile" title="Profile" onclick="navClick('profile')"><i
-                        class="fa-solid fa-user"></i></div>
-            </nav>
-            <div class="spacer"></div>
-            <div style="width:100%; display:flex; justify-content:center;">
-                <div class="side-btn" id="m-logout" title="Logout" onclick="logout()"><i
-                        class="fa-solid fa-arrow-right-from-bracket"></i></div>
-            </div>
-        </aside>
+    <!-- Sign In -->
+    <div id="signInForm">
+      <div class="auth-title">Welcome back</div>
+      <div class="auth-sub">Sign in to your smart farming dashboard</div>
 
-        <!-- Main -->
-        <div class="main">
-            <div class="topbar">
-                <div class="brand">
-                    <div class="logo" aria-hidden></div>
-                    <div class="title">AgroTech</div>
-                </div>
-                <div class="top-actions">
-                    <div id="userEmailTop" class="muted"></div>
-                </div>
-            </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" id="siEmail" type="email" placeholder="you@example.com"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" id="siPassword" type="password" placeholder="••••••••"/>
+      </div>
 
-            <div class="content" id="contentArea">
-                <!-- Dashboard -->
-                <section id="page-dashboard" class="dashboard-wrap">
-                    <div class="welcome-box">
-                        <div class="welcome-left">
-                            <h1 id="welcomeTitle">Welcome</h1>
-                            <p id="welcomeSub" class="muted">Select a tool from the left menu to get started</p>
-                        </div>
-                        <div class="welcome-right"><img
-                                src="https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=900&q=70"
-                                alt="plant" /></div>
-                    </div>
-                </section>
+      <button class="auth-btn auth-btn-primary" id="signInBtn">Sign In</button>
+      <button class="auth-btn auth-btn-google" id="googleSignInBtn">
+        <i class="fa-brands fa-google"></i> Continue with Google
+      </button>
 
-                <!-- ================= Disease Detection ================= -->
-                <section id="page-detect" class="page-card" aria-hidden>
-                    <h3>Plant Disease Detection</h3>
+      <div class="auth-msg" id="siMsg" style="color:#e05252"></div>
 
-                    <div style="display:flex; gap:16px; flex-wrap:wrap; margin-top:12px;">
+      <div class="auth-link">
+        Don't have an account?
+        <button id="switchToSignUp">Create one</button>
+      </div>
+      <div class="auth-link">
+        <button id="forgotBtn" style="color:#7d9a8a; font-weight:400;">Forgot password?</button>
+      </div>
+    </div>
 
-                        <!-- LEFT: Image input -->
-                        <div style="flex:1; min-width:260px;">
-                            <div
-                                style="border:2px dashed #e6efe8; padding:18px; border-radius:12px; text-align:center;">
-                                <p class="muted">Upload plant image or capture from ESP32-CAM</p>
+    <!-- Sign Up -->
+    <div id="signUpForm" style="display:none">
+      <div class="auth-title">Create account</div>
+      <div class="auth-sub">Start monitoring your farm today</div>
 
-                                <input type="file" id="fileInput" accept="image/*" style="display:none" />
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input class="form-input" id="suName" type="text" placeholder="Your name"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email</label>
+        <input class="form-input" id="suEmail" type="email" placeholder="you@example.com"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" id="suPassword" type="password" placeholder="Min 6 characters"/>
+      </div>
 
-                                <button class="primary-btn"
-                                    onclick="window.imageLoaded=false; document.getElementById('fileInput').click()">
-                                    Choose Image
-                                </button>
-
-                                <img id="preview"
-                                    style="display:none; margin-top:12px; border-radius:10px; max-width:100%;" />
-
-                                <div style="margin-top:12px;">
-                                    <button class="primary-btn" id="espCaptureBtn">
-                                        Capture from ESP32-CAM
-                                    </button>
-                                </div>
-
-                                <div style="margin-top:12px;">
-                                    <button class="primary-btn" id="processBtn">
-                                        Run Detection
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- RIGHT: Result -->
-                        <div style="width:320px;">
-                            <div style="background:#fbfff9; padding:14px; border-radius:12px;">
-                                <p class="muted">Result</p>
-
-                                <div id="detectResult" style="font-weight:700; margin-top:6px;">
-                                    Please upload or capture an image first.
-                                </div>
-
-                                <div id="diseaseSuggestion" class="muted" style="margin-top:8px;">
-                                    —
-                                </div>
-
-                                <p class="muted" style="font-size:12px; margin-top:10px;">
-                                    *Prototype / demo feature. Results are indicative and may require expert
-                                    verification.*
-                                </p>
-                            </div>
-                        </div>
-
-                    </div>
-                </section>
-
-
-                <!-- Seed Calculator -->
-                <section id="page-seed" class="page-card" aria-hidden>
-                    <h3>Seed Requirement Calculator</h3>
-                    <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:12px;">
-                        <div style="flex:1; min-width:260px;">
-                            <div class="field">
-                                <label class="muted">Crop</label>
-                                <!-- Dropdown with emoji icons (Style 2) -->
-                                <select id="cropSelect">
-                                    <option value="" data-w="0">🌾 Select crop</option>
-                                    <option value="Maize" data-w="25">🌽 Maize</option>
-                                    <option value="Wheat" data-w="4">🌾 Wheat</option>
-                                    <option value="Rice" data-w="2">🍚 Rice</option>
-                                    <option value="Mustard" data-w="0.5">🌼 Mustard</option>
-                                    <option value="Soybean" data-w="15">🫘 Soybean</option>
-                                    <option value="Groundnut" data-w="65">🥜 Groundnut</option>
-                                    <option value="Bajra" data-w="1">🌾 Bajra</option>
-                                    <option value="Sunflower" data-w="8">🌻 Sunflower</option>
-                                    <option value="Cotton" data-w="6">🧵 Cotton</option>
-                                    <option value="Chickpea" data-w="25">🥣 Chickpea</option>
-                                    <option value="Jowar" data-w="1.2">🌾 Jowar</option>
-                                    <option value="Barley" data-w="3.5">🌾 Barley</option>
-                                    <option value="Other" data-w="0">🔧 Other (enter weight below)</option>
-                                </select>
-                            </div>
-
-                            <div class="field">
-                                <label class="muted">Row spacing (cm)</label>
-                                <input id="spacingInp" type="number" placeholder="20">
-                            </div>
-                            <div class="field">
-                                <label class="muted">Field area (m²)</label>
-                                <input id="areaInp" type="number" placeholder="100">
-                            </div>
-
-                            <!-- if "Other" selected, user can enter weight per 100 seeds -->
-                            <div class="field" id="otherWeightWrap" style="display:none;">
-                                <label class="muted">Weight per 100 seeds (g) — for Other crop</label>
-                                <input id="otherWeightInput" type="number" step="0.01" placeholder="e.g. 10">
-                            </div>
-
-                            <button class="primary-btn" onclick="calcSeeds()">Calculate</button>
-                        </div>
-
-                        <div style="width:320px;">
-                            <div style="background:#fbfff9; padding:12px; border-radius:10px;">
-                                <p class="muted">Results</p>
-                                <div id="seedResult" style="font-weight:700; margin-top:8px;">Required Seeds: —</div>
-                                <div id="seedWeightResult" style="margin-top:6px; font-weight:700;"></div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Moisture Monitor -->
-                <section id="page-moisture" class="page-card" aria-hidden>
-                    <h3>Moisture Monitor</h3>
-                    <div style="margin-top:10px;">
-                        <div class="chart-wrap"><canvas id="moistureChart"></canvas></div>
-                        <div style="margin-top:12px; display:flex; gap:10px; align-items:center;">
-                            <div id="lastUpdated" class="muted">Last Updated: —</div>
-                        </div>
-                    </div>
-                    <div class="field" style="margin-bottom:12px;">
-                        <label class="muted">Crop Type</label>
-                        <select id="cropType-moisture">
-                        <option value="">🌾 Select crop</option>
-                        <option value="Wheat">🌾 Wheat</option>
-                        <option value="Rice">🍚 Rice</option>
-                        <option value="Maize">🌽 Maize</option>
-                        <option value="Mustard">🌼 Mustard</option>
-                        <option value="Soybean">🫘 Soybean</option>
-                        <option value="Groundnut">🥜 Groundnut</option>
-                        <option value="Bajra">🌾 Bajra</option>
-                        <option value="Sunflower">🌻 Sunflower</option>
-                        <option value="Cotton">🧵 Cotton</option>
-                        <option value="Chickpea">🫘 Chickpea</option>
-                        <option value="Jowar">🌾 Jowar</option>
-                        <option value="Barley">🌾 Barley</option>
-                        <option value="Other">🔧 Other</option>
-                        </select>
-
-                    </div>
-
-                    <!-- Sensor readings -->
-                    <div id="sensorReadings" style="margin-top:14px;">
-                        <div style="display:flex; gap:14px; flex-wrap:wrap;">
-                            <div style="flex:1; min-width:160px; background:#f7fffb; padding:12px; border-radius:10px;">
-                                <div class="muted">🌡 Temperature</div>
-                                <div id="s-temp" style="font-size:20px; font-weight:700;">—</div>
-                                <div class="muted">°C</div>
-                            </div>
-
-                            <div style="flex:1; min-width:160px; background:#f7fffb; padding:12px; border-radius:10px;">
-                                <div class="muted">💧 Humidity</div>
-                                <div id="s-hum" style="font-size:20px; font-weight:700;">—</div>
-                                <div class="muted">%</div>
-                            </div>
-
-                            <div style="flex:1; min-width:160px; background:#f7fffb; padding:12px; border-radius:10px;">
-                                <div class="muted">🌱 Soil Moisture</div>
-                                <div id="s-moist" style="font-size:20px; font-weight:700;">—</div>
-                                <div class="muted">%</div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Expert Help / Hotline -->
-                    <div
-                        style="margin-top:16px; padding:14px; background:#f7fffb; border-radius:10px; border:1px solid #e6efe8;">
-                        <div style="font-weight:700; color:#184c38;">📞 Need Expert Help?</div>
-                        <p class="muted" style="margin:6px 0;">
-                            If the issue persists or the analysis is unclear, contact an agricultural expert.
-                        </p>
-                        <a href="tel:18001801551" class="primary-btn"
-                            style="text-decoration:none; display:inline-block;">
-                            Call Kisan Helpline
-                        </a>
-                    </div>
-
-
-                </section>
-
-
-
-                <!-- Profile -->
-                <section id="page-profile" class="page-card" aria-hidden>
-                    <h3>Profile</h3>
-                    <div style="margin-top:12px;">
-                        <div class="profile-row">
-                            <div class="avatar" id="profileAvatar">U</div>
-                            <div>
-                                <div id="p-email" style="font-weight:700"></div>
-                                <div id="p-name" class="muted"></div>
-                            </div>
-                        </div>
-                        <div style="margin-top:16px;">
-                            <label class="muted">Change display name</label>
-                            <input id="editName" placeholder="New display name">
-                            <div style="display:flex; gap:8px; margin-top:10px;">
-                                <button class="primary-btn" onclick="updateName()">Update Name</button>
-                                <button class="primary-btn" style="background:#ff6b6b" onclick="deleteAccount()">Delete
-                                    Account</button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-                <section id="page-field" class="page-card" aria-hidden="true">
-    <h3>Field Analysis</h3>
-<div class="field" style="margin-top:16px;">
-  <label class="muted">Field Image</label>
-  <input type="file" id="fieldImage" accept="image/*" capture="environment">
+      <button class="auth-btn auth-btn-primary" id="signUpBtn">Create Account</button>
+      <div class="auth-msg" id="suMsg" style="color:#e05252"></div>
+      <div class="auth-link">
+        Already have an account? <button id="switchToSignIn">Sign in</button>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div id="imagePreview" style="margin-top:12px; display:none;">
-  <img id="previewImg" style="max-width:100%; border-radius:12px;">
-</div>
+<!-- ============================================================
+     APP SHELL
+     ============================================================ -->
+<div id="app">
 
-<button class="primary-btn" style="margin-top:12px;" onclick="analyzeFieldImage()">
-  Analyze Field Image
-</button>
-
-<div id="imageResult" style="margin-top:12px; font-weight:700;"></div>
-
-    <div style="margin-top:12px;">
-        <div class="field">
-            <label class="muted">Crop Type</label>
-            <select id="fieldCrop">
-            <option value="">🌾 Select crop</option>
-            <option>🌽 Maize</option>
-            <option>🌾 Wheat</option>
-            <option>🍚 Rice</option>
-            <option>🌼 Mustard</option>
-            <option>🫘 Soybean</option>
-            <option>🥜 Groundnut</option>
-             <option>🌾 Bajra</option>
-             <option>🌻 Sunflower</option>
-            <option>🧵 Cotton</option>
-            <option>🫘 Chickpea</option>
-            <option>🌾 Jowar</option>
-            <option>🌾 Barley</option>
-            <option>🔧 Other</option>
-            </select>
-
-        </div>
-
-        <div class="field">
-            <label class="muted">Soil Type</label>
-           <select id="soilType">
-  <option value="">🌱 Select soil type</option>
-  <option value="Loamy">🌿 Loamy Soil</option>
-  <option value="Clay">🧱 Clay Soil</option>
-  <option value="Sandy">🏖️ Sandy Soil</option>
-  <option value="Silty">🌾 Silty Soil</option>
-  <option value="Peaty">🌰 Peaty Soil</option>
-  <option value="Chalky">🪨 Chalky Soil</option>
-  <option value="Saline">💧 Saline Soil</option>
-  <option value="Red">🟥 Red Soil</option>
-  <option value="Black">⬛ Black Cotton Soil</option>
-  <option value="Alluvial">🌊 Alluvial Soil</option>
-  <option value="Laterite">🧱 Laterite Soil</option>
-</select>
-
-        </div>
-
-        <div class="field">
-            <label class="muted">Field Area (acres)</label>
-            <input id="fieldArea" type="number" placeholder="e.g. 2">
-        </div>
-
-        <button class="primary-btn" onclick="analyzeField()">Analyze Field</button>
-
-        <div id="fieldResult" style="margin-top:12px; font-weight:700;"></div>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="sidebar-logo"><i class="fa-solid fa-leaf"></i></div>
+      <div class="sidebar-brand-name">Agro<span>Tech</span></div>
     </div>
-</section>
 
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Overview</div>
+
+      <div class="nav-item active" id="m-dashboard" onclick="navClick('dashboard')">
+        <span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span>
+        <span class="nav-label">Dashboard</span>
+      </div>
+
+      <div class="nav-section-label" style="margin-top:8px;">Tools</div>
+
+      <div class="nav-item" id="m-detect" onclick="navClick('detect')">
+        <span class="nav-icon"><i class="fa-solid fa-microscope"></i></span>
+        <span class="nav-label">Disease Detection</span>
+        <span class="nav-badge">AI</span>
+      </div>
+
+      <div class="nav-item" id="m-seed" onclick="navClick('seed')">
+        <span class="nav-icon"><i class="fa-solid fa-seedling"></i></span>
+        <span class="nav-label">Seed Calculator</span>
+      </div>
+
+      <div class="nav-item" id="m-moisture" onclick="navClick('moisture')">
+        <span class="nav-icon"><i class="fa-solid fa-chart-line"></i></span>
+        <span class="nav-label">Moisture Monitor</span>
+      </div>
+
+      <div class="nav-item" id="m-field" onclick="navClick('field')">
+        <span class="nav-icon"><i class="fa-solid fa-map"></i></span>
+        <span class="nav-label">Field Analysis</span>
+      </div>
+
+      <div class="nav-section-label" style="margin-top:8px;">Account</div>
+
+      <div class="nav-item" id="m-profile" onclick="navClick('profile')">
+        <span class="nav-icon"><i class="fa-solid fa-user"></i></span>
+        <span class="nav-label">Profile</span>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="sidebar-user" onclick="logout()">
+        <div class="user-avatar" id="sidebarAvatar">U</div>
+        <div class="user-info">
+          <div class="user-name" id="sidebarName">User</div>
+          <div class="user-role">Smart Farmer</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main-wrap">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div>
+        <div class="topbar-title" id="topbarTitle">Dashboard</div>
+        <div class="topbar-subtitle" id="topbarSub">Real-time farm monitoring</div>
+      </div>
+      <div class="topbar-spacer"></div>
+      <div class="topbar-actions">
+        <div class="live-dot" style="margin-right:8px;">Live</div>
+        <button class="icon-btn" title="Notifications">
+          <i class="fa-solid fa-bell"></i>
+          <span class="notif-dot"></span>
+        </button>
+        <div class="topbar-user">
+          <div class="user-avatar" style="width:28px;height:28px;font-size:11px;" id="topbarAvatar">U</div>
+          <span class="topbar-user-email" id="userEmailTop">user@farm.com</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- SCROLL AREA -->
+    <div class="content-area">
+
+      <!-- ======================================================
+           PAGE: DASHBOARD
+           ====================================================== -->
+      <section class="page-section active" id="page-dashboard">
+
+        <!-- Stat Cards -->
+        <div class="stat-grid">
+          <div class="stat-card green">
+            <div class="stat-icon green"><i class="fa-solid fa-droplet"></i></div>
+            <div class="stat-value" id="dash-moist">—<span class="stat-unit"> %</span></div>
+            <div class="stat-label">Soil Moisture</div>
+            <div class="stat-trend up"><i class="fa-solid fa-arrow-up"></i> Normal</div>
+          </div>
+          <div class="stat-card blue">
+            <div class="stat-icon blue"><i class="fa-solid fa-temperature-half"></i></div>
+            <div class="stat-value" id="dash-temp">—<span class="stat-unit"> °C</span></div>
+            <div class="stat-label">Temperature</div>
+            <div class="stat-trend flat"><i class="fa-solid fa-minus"></i> Stable</div>
+          </div>
+          <div class="stat-card yellow">
+            <div class="stat-icon yellow"><i class="fa-solid fa-wind"></i></div>
+            <div class="stat-value" id="dash-hum">—<span class="stat-unit"> %</span></div>
+            <div class="stat-label">Humidity</div>
+            <div class="stat-trend flat" id="dash-hum-trend"><i class="fa-solid fa-minus"></i> Normal</div>
+          </div>
+          <div class="stat-card green">
+            <div class="stat-icon green"><i class="fa-solid fa-leaf"></i></div>
+            <div class="stat-value">Good</div>
+            <div class="stat-label">Crop Health</div>
+            <div class="stat-trend up"><i class="fa-solid fa-check"></i> Healthy</div>
+          </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="dashboard-grid">
+
+          <!-- Moisture Chart -->
+          <div class="card col-span-2">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Soil Moisture — Live Feed</div>
+                <div class="card-sub">Rolling 20-point sensor data</div>
+              </div>
+              <span class="badge badge-green">Live</span>
             </div>
+            <div class="chart-container">
+              <canvas id="moistureChart"></canvas>
+            </div>
+            <div style="margin-top:10px; font-size:12px; color:#7d9a8a;" id="lastUpdated">Last updated: —</div>
+          </div>
+
+          <!-- Weather Widget -->
+          <div class="weather-widget col-span-1">
+            <div class="weather-icon">🌤️</div>
+            <div class="weather-temp">32°C</div>
+            <div class="weather-desc">Partly cloudy · Vadodara, GJ</div>
+            <div class="weather-stats">
+              <div class="weather-stat-item">
+                <div class="weather-stat-val">68%</div>
+                <div class="weather-stat-lbl">Humidity</div>
+              </div>
+              <div class="weather-stat-item">
+                <div class="weather-stat-val">14 km/h</div>
+                <div class="weather-stat-lbl">Wind</div>
+              </div>
+              <div class="weather-stat-item">
+                <div class="weather-stat-val">Low</div>
+                <div class="weather-stat-lbl">Rain Risk</div>
+              </div>
+              <div class="weather-stat-item">
+                <div class="weather-stat-val">38°C</div>
+                <div class="weather-stat-lbl">Max Today</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Activity Feed -->
+          <div class="card col-span-1">
+            <div class="card-header">
+              <div class="card-title">Recent Activity</div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon"><i class="fa-solid fa-droplet"></i></div>
+              <div>
+                <div class="activity-label">Moisture reading logged</div>
+                <div class="activity-time">just now · Node 1</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon"><i class="fa-solid fa-microscope"></i></div>
+              <div>
+                <div class="activity-label">Disease scan completed</div>
+                <div class="activity-time">12 min ago · Wheat leaf</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon"><i class="fa-solid fa-seedling"></i></div>
+              <div>
+                <div class="activity-label">Seed calc — 3.4 kg Maize</div>
+                <div class="activity-time">1h ago · Zone D</div>
+              </div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-icon"><i class="fa-solid fa-cloud-sun"></i></div>
+              <div>
+                <div class="activity-label">Weather snapshot cached</div>
+                <div class="activity-time">2h ago · Vadodara</div>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /dashboard-grid -->
+      </section>
+
+      <!-- ======================================================
+           PAGE: DISEASE DETECTION
+           ====================================================== -->
+      <section class="page-section" id="page-detect">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Plant Disease Detection</div>
+            <div class="section-sub">Upload a leaf image for AI-powered diagnosis</div>
+          </div>
+          <span class="badge badge-green"><i class="fa-solid fa-robot"></i> &nbsp;AI Powered</span>
         </div>
-    </div>
 
-    <!-- Bottom navigation -->
-    <div class="bottom-nav" id="bottomNav" aria-hidden>
-        <div class="bbtn active" id="b-dashboard" title="Dashboard" onclick="navClick('dashboard')"><i
-                class="fa-solid fa-house"></i></div>
-        <div class="bbtn" id="b-detect" title="Detect" onclick="navClick('detect')"><i
-                class="fa-solid fa-microscope"></i></div>
-        <div class="bbtn" id="b-seed" title="Seeds" onclick="navClick('seed')"><i class="fa-solid fa-seedling"></i>
-        </div>
-        <div class="bbtn" id="b-field" title="Field Analysis" onclick="navClick('field')">
-        <i class="fa-solid fa-map"></i>
-    </div>
+        <div class="detect-layout">
 
-        <div class="bbtn" id="b-profile" title="Profile" onclick="navClick('profile')"><i class="fa-solid fa-user"></i>
-        </div>
-    </div>
-
-    <!-- AUTH PANEL (overlay) -->
-    <div id="authPanel">
-        <div class="authBox" role="dialog" aria-modal="true">
-            <h2>Welcome to AgroTech</h2>
-            <div class="muted">Sign in or create an account to continue</div>
-
-            <!-- Sign in form -->
-            <div id="signInForm">
-                <input id="siEmail" type="email" placeholder="Email" />
-                <input id="siPassword" type="password" placeholder="Password" />
-                <button class="btn" id="signInBtn">Sign In</button>
-                <button class="ghost" id="googleSignInBtn"><i class="fa-brands fa-google"></i> Sign in with
-                    Google</button>
-                <button class="ghost" id="switchToSignUp">Create an account</button>
-                <button class="ghost" id="forgotBtn">Forgot password?</button>
-                <div id="siMsg" class="msg"></div>
+          <!-- Left: Upload -->
+          <div>
+            <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInputDetect').click()">
+              <div class="processing-overlay" id="processingOverlay">
+                <div class="spinner"></div>
+                <div style="font-size:13px; color:#4a6858; font-weight:600;">Analyzing image…</div>
+              </div>
+              <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+              <div class="upload-title">Drop plant image here</div>
+              <div class="upload-sub">Supports JPG, PNG, WEBP · Max 10 MB<br>Works with ESP32-CAM captures too</div>
+              <img id="imagePreviewLarge" alt="Plant preview"/>
+              <div class="upload-actions" onclick="event.stopPropagation()">
+                <button class="btn btn-primary btn-sm" onclick="document.getElementById('fileInputDetect').click()">
+                  <i class="fa-solid fa-folder-open"></i> Choose File
+                </button>
+                <button class="btn btn-secondary btn-sm" id="espCaptureBtn">
+                  <i class="fa-solid fa-camera"></i> ESP32-CAM
+                </button>
+              </div>
+              <input type="file" id="fileInputDetect" accept="image/*" style="display:none"/>
             </div>
 
-            <!-- Sign up form -->
-            <div id="signUpForm" style="display:none;">
-                <input id="suName" type="text" placeholder="Full name" />
-                <input id="suEmail" type="email" placeholder="Email" />
-                <input id="suPassword" type="password" placeholder="Password (min 6)" />
-                <button class="btn" id="signUpBtn">Create Account</button>
-                <button class="ghost" id="switchToSignIn">Already have an account?</button>
-                <div id="suMsg" class="msg"></div>
+            <div style="margin-top:14px;">
+              <button class="btn btn-primary" style="width:100%" id="processBtn">
+                <i class="fa-solid fa-magnifying-glass"></i> Run Detection
+              </button>
             </div>
+          </div>
+
+          <!-- Right: Results -->
+          <div class="result-panel">
+
+            <div class="card">
+              <div class="card-header">
+                <div class="card-title">Diagnosis Result</div>
+                <span class="badge badge-gray" id="resultBadge">Awaiting scan</span>
+              </div>
+              <div id="detectResult" style="font-size:14px; color:#4a6858; line-height:1.6;">
+                Upload a plant image and click <strong>Run Detection</strong> to begin analysis.
+              </div>
+
+              <div class="severity-bar-wrap" id="severityWrap" style="display:none">
+                <div class="severity-label">
+                  <span>Severity</span>
+                  <span id="severityPct">0%</span>
+                </div>
+                <div class="severity-track">
+                  <div class="severity-fill" id="severityFill" style="width:0%"></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card" id="treatmentCard" style="display:none">
+              <div class="card-header">
+                <div class="card-title">Treatment Recommendations</div>
+              </div>
+              <div id="treatmentList"></div>
+            </div>
+
+            <div class="card" style="background:#f3fbf6; border-color:#a8dfc0">
+              <div style="font-size:13px; font-weight:700; color:#1a4d33; margin-bottom:6px;">
+                <i class="fa-solid fa-phone-volume"></i> &nbsp;Need Expert Help?
+              </div>
+              <div style="font-size:12.5px; color:#4a6858; margin-bottom:12px;">
+                If results are unclear, contact the Kisan agricultural helpline for professional advice.
+              </div>
+              <a href="tel:18001801551" class="btn btn-primary btn-sm" style="text-decoration:none">
+                <i class="fa-solid fa-phone"></i> Call Kisan Helpline
+              </a>
+            </div>
+
+          </div>
         </div>
-    </div>
+      </section>
 
-    <!-- SCRIPT: App logic + Firebase -->
-    <script>
-function analyzeField() {
-    const crop = document.getElementById('fieldCrop').value;
-    const soil = document.getElementById('soilType').value;
-    const area = Number(document.getElementById('fieldArea').value);
-    const resultBox = document.getElementById('fieldResult');
+      <!-- ======================================================
+           PAGE: SEED CALCULATOR
+           ====================================================== -->
+      <section class="page-section" id="page-seed">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Seed Requirement Calculator</div>
+            <div class="section-sub">Estimate seeds and weight for your field area</div>
+          </div>
+        </div>
 
-    if (!crop || !soil || !area) {
-        alert('Please select crop, soil type and field area');
-        return;
-    }
+        <div class="seed-layout">
 
-    let status = '';
-    let risk = '';
-    let recommendation = '';
+          <!-- Form -->
+          <div class="card">
+            <div class="form-group">
+              <label class="form-label">Crop Type</label>
+              <select id="cropSelect" class="form-select" onchange="onCropChange()">
+                <option value="" data-w="0">Select crop…</option>
+                <option value="Maize" data-w="25">🌽 Maize</option>
+                <option value="Wheat" data-w="4">🌾 Wheat</option>
+                <option value="Rice" data-w="2">🍚 Rice</option>
+                <option value="Mustard" data-w="0.5">🌼 Mustard</option>
+                <option value="Soybean" data-w="15">🫘 Soybean</option>
+                <option value="Groundnut" data-w="65">🥜 Groundnut</option>
+                <option value="Bajra" data-w="1">🌾 Bajra</option>
+                <option value="Sunflower" data-w="8">🌻 Sunflower</option>
+                <option value="Cotton" data-w="6">🧵 Cotton</option>
+                <option value="Chickpea" data-w="25">🥣 Chickpea</option>
+                <option value="Jowar" data-w="1.2">🌾 Jowar</option>
+                <option value="Barley" data-w="3.5">🌾 Barley</option>
+                <option value="Other" data-w="0">🔧 Other (enter weight below)</option>
+              </select>
+            </div>
 
-    /* ===================== RICE ===================== */
-    if (crop.includes('Rice')) {
-        if (soil === 'Alluvial' || soil === 'Loamy') {
-            status = '✅ Ideal Condition';
-            risk = 'Low';
-            recommendation =
-                'Rice performs best in alluvial/loamy soil. Maintain shallow standing water (3–5 cm), apply nitrogen in split doses, and monitor stem borer and leaf folder.';
-        } else if (soil === 'Clay') {
-            status = '⚠ Advisory Needed';
-            risk = 'Waterlogging risk';
-            recommendation =
-                'Clay soil retains excess water. Improve drainage and avoid prolonged flooding to prevent root rot.';
-        } else if (soil === 'Sandy') {
-            status = '⚠ Advisory Needed';
-            risk = 'Low water retention';
-            recommendation =
-                'Sandy soil drains quickly. Increase irrigation frequency and add organic matter to improve moisture holding.';
-        } else {
-            status = '❌ High Risk';
-            risk = 'Unsuitable soil';
-            recommendation =
-                'This soil type is not suitable for rice. Consider soil amendment or alternative crop.';
-        }
-    }
+            <div class="form-group" id="otherWeightWrap" style="display:none">
+              <label class="form-label">Weight per 100 seeds (g) — for Other crop</label>
+              <input class="form-input" id="otherWeightInput" type="number" step="0.01" placeholder="e.g. 10"/>
+            </div>
 
-    /* ===================== WHEAT ===================== */
-    else if (crop.includes('Wheat')) {
-        if (soil === 'Loamy' || soil === 'Alluvial') {
-            status = '✅ Ideal Condition';
-            risk = 'Low';
-            recommendation =
-                'Wheat grows well in loamy/alluvial soil. Ensure good drainage, timely irrigation, and balanced NPK application.';
-        } else if (soil === 'Clay') {
-            status = '⚠ Advisory Needed';
-            risk = 'Poor aeration';
-            recommendation =
-                'Clay soil may restrict root growth. Avoid over-irrigation and practice shallow tillage.';
-        } else {
-            status = '⚠ Advisory Needed';
-            risk = 'Sub-optimal soil';
-            recommendation =
-                'Improve soil structure using farmyard manure and proper irrigation scheduling.';
-        }
-    }
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+              <div class="form-group" style="margin-bottom:0">
+                <label class="form-label">Row Spacing (cm)</label>
+                <input class="form-input" id="spacingInp" type="number" placeholder="e.g. 20" oninput="calcSeeds()"/>
+                <span class="form-hint">Distance between rows</span>
+              </div>
+              <div class="form-group" style="margin-bottom:0">
+                <label class="form-label">Field Area (m²)</label>
+                <input class="form-input" id="areaInp" type="number" placeholder="e.g. 100" oninput="calcSeeds()"/>
+                <span class="form-hint">Total planting area</span>
+              </div>
+            </div>
 
-    /* ===================== MAIZE ===================== */
-    else if (crop.includes('Maize')) {
-        if (soil === 'Loamy' || soil === 'Alluvial') {
-            status = '✅ Ideal Condition';
-            risk = 'Low';
-            recommendation =
-                'Maize prefers well-drained loamy soil. Apply nitrogen in stages and avoid water stagnation.';
-        } else if (soil === 'Sandy') {
-            status = '⚠ Advisory Needed';
-            risk = 'Nutrient leaching';
-            recommendation =
-                'Sandy soil causes nutrient loss. Apply organic manure and split fertilizer doses.';
-        } else {
-            status = '⚠ Advisory Needed';
-            risk = 'Moisture stress';
-            recommendation =
-                'Monitor soil moisture carefully and irrigate during critical growth stages.';
-        }
-    }
+            <hr class="divider"/>
 
-    /* ===================== MUSTARD ===================== */
-    else if (crop.includes('Mustard')) {
-        if (soil === 'Loamy' || soil === 'Sandy') {
-            status = '✅ Ideal Condition';
-            risk = 'Low';
-            recommendation =
-                'Mustard grows well in light soils. Avoid waterlogging and monitor aphid infestation.';
-        } else {
-            status = '⚠ Advisory Needed';
-            risk = 'Excess moisture';
-            recommendation =
-                'Heavy soil may cause poor root growth. Ensure drainage and avoid excess irrigation.';
-        }
-    }
+            <button class="btn btn-primary" style="width:100%" onclick="calcSeeds()">
+              <i class="fa-solid fa-calculator"></i> Calculate Requirements
+            </button>
+          </div>
 
-    /* ===================== SOYBEAN ===================== */
-    else if (crop.includes('Soybean')) {
-        if (soil === 'Loamy' || soil === 'Black') {
-            status = '✅ Ideal Condition';
-            risk = 'Low';
-            recommendation =
-                'Soybean performs best in loamy/black soil. Ensure good drainage and watch for leaf yellowing.';
-        } else {
-            status = '⚠ Advisory Needed';
-            risk = 'Root rot risk';
-            recommendation =
-                'Avoid water stagnation and apply seed treatment before sowing.';
-        }
-    }
+          <!-- Results Panel -->
+          <div class="calc-result-box" id="calcResultBox">
+            <div class="calc-result-label">Seeds Required</div>
+            <div class="calc-result-value" id="seedResult">—</div>
+            <div class="calc-result-unit">seeds</div>
 
-    /* ===================== GROUNDNUT ===================== */
-    else if (crop.includes('Groundnut')) {
-        if (soil === 'Sandy' || soil === 'Loamy') {
-            status = '✅ Ideal Condition';
-            risk = 'Low';
-            recommendation =
-                'Loose sandy/loamy soil is ideal for pod development. Ensure calcium availability.';
-        } else {
-            status = '⚠ Advisory Needed';
-            risk = 'Poor pod formation';
-            recommendation =
-                'Heavy soil restricts pod growth. Improve soil aeration.';
-        }
-    }
+            <div class="calc-breakdown">
+              <div class="calc-breakdown-row">
+                <span>Estimated Weight</span>
+                <strong id="seedWeightResult">—</strong>
+              </div>
+              <div class="calc-breakdown-row">
+                <span>Row Spacing</span>
+                <strong id="breakdown-spacing">—</strong>
+              </div>
+              <div class="calc-breakdown-row">
+                <span>Field Area</span>
+                <strong id="breakdown-area">—</strong>
+              </div>
+              <div class="calc-breakdown-row">
+                <span>Crop</span>
+                <strong id="breakdown-crop">—</strong>
+              </div>
+            </div>
 
-    /* ===================== BAJRA ===================== */
-    else if (crop.includes('Bajra')) {
-        if (soil === 'Sandy' || soil === 'Loamy') {
-            status = '✅ Ideal Condition';
-            risk = 'Low';
-            recommendation =
-                'Bajra is drought-tolerant. Minimal irrigation required. Avoid excess fertilizers.';
-        } else {
-            status = '⚠ Advisory Needed';
-            risk = 'Water stress';
-            recommendation =
-                'Ensure proper drainage and avoid waterlogging.';
-        }
-    }
+            <div style="margin-top:20px; padding:14px; background:rgba(255,255,255,.1); border-radius:12px; font-size:12.5px; opacity:.8; line-height:1.6;" id="calcNote">
+              Select a crop and enter field details to see your seed requirements.
+            </div>
+          </div>
 
-    /* ===================== SUNFLOWER ===================== */
-    else if (crop.includes('Sunflower')) {
-        if (soil === 'Loamy') {
-            status = '✅ Ideal Condition';
-            risk = 'Low';
-            recommendation =
-                'Sunflower requires well-drained soil and full sunlight. Monitor for pests.';
-        } else {
-            status = '⚠ Advisory Needed';
-            risk = 'Poor root growth';
-            recommendation =
-                'Ensure soil aeration and balanced fertilization.';
-        }
-    }
+        </div>
+      </section>
 
-    /* ===================== COTTON ===================== */
-    else if (crop.includes('Cotton')) {
-        if (soil === 'Black') {
-            status = '✅ Ideal Condition';
-            risk = 'Low';
-            recommendation =
-                'Black soil is ideal for cotton. Monitor bollworm and avoid excess nitrogen.';
-        } else {
-            status = '⚠ Advisory Needed';
-            risk = 'Moisture imbalance';
-            recommendation =
-                'Maintain proper irrigation schedule and pest monitoring.';
-        }
-    }
+      <!-- ======================================================
+           PAGE: MOISTURE MONITOR
+           ====================================================== -->
+      <section class="page-section" id="page-moisture">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Moisture Monitor</div>
+            <div class="section-sub">Live ESP32 sensor readings and analysis</div>
+          </div>
+          <div class="live-dot">Live Feed</div>
+        </div>
 
-    /* ===================== CHICKPEA ===================== */
-    else if (crop.includes('Chickpea')) {
-        if (soil === 'Loamy') {
-            status = '✅ Ideal Condition';
-            risk = 'Low';
-            recommendation =
-                'Chickpea prefers well-drained loamy soil. Avoid excess irrigation.';
-        } else {
-            status = '⚠ Advisory Needed';
-            risk = 'Root rot risk';
-            recommendation =
-                'Ensure proper drainage and avoid water stagnation.';
-        }
-    }
+        <!-- Sensor Cards -->
+        <div class="sensor-grid">
+          <div class="sensor-card">
+            <div class="sensor-card-icon">🌡️</div>
+            <div class="sensor-card-value" id="s-temp">—</div>
+            <div class="sensor-card-unit">°C</div>
+            <div class="sensor-card-label">Temperature</div>
+          </div>
+          <div class="sensor-card">
+            <div class="sensor-card-icon">💧</div>
+            <div class="sensor-card-value" id="s-hum">—</div>
+            <div class="sensor-card-unit">%</div>
+            <div class="sensor-card-label">Humidity</div>
+          </div>
+          <div class="sensor-card">
+            <div class="sensor-card-icon">🌱</div>
+            <div class="sensor-card-value" id="s-moist">—</div>
+            <div class="sensor-card-unit">%</div>
+            <div class="sensor-card-label">Soil Moisture</div>
+          </div>
+        </div>
 
-    /* ===================== JOWAR ===================== */
-    else if (crop.includes('Jowar')) {
-        status = '✅ Suitable Condition';
-        risk = 'Low';
-        recommendation =
-            'Jowar tolerates varied soils. Requires moderate irrigation and timely weed control.';
-    }
+        <div class="moisture-layout">
 
-    /* ===================== BARLEY ===================== */
-    else if (crop.includes('Barley')) {
-        if (soil === 'Loamy' || soil === 'Alluvial') {
-            status = '✅ Ideal Condition';
-            risk = 'Low';
-            recommendation =
-                'Barley grows well in light soils. Avoid excess nitrogen and waterlogging.';
-        } else {
-            status = '⚠ Advisory Needed';
-            risk = 'Yield reduction';
-            recommendation =
-                'Improve soil fertility and drainage for better yield.';
-        }
-    }
+          <!-- Chart Card -->
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Moisture History</div>
+                <div class="card-sub" id="lastUpdated2">Last updated: —</div>
+              </div>
+              <div class="form-group" style="margin-bottom:0; min-width:160px;">
+                <select id="cropType-moisture" class="form-select" style="padding:6px 10px; font-size:12.5px;" onchange="reanalyzeMoisture()">
+                  <option value="">Select crop…</option>
+                  <option value="Wheat">🌾 Wheat</option>
+                  <option value="Rice">🍚 Rice</option>
+                  <option value="Maize">🌽 Maize</option>
+                  <option value="Mustard">🌼 Mustard</option>
+                  <option value="Soybean">🫘 Soybean</option>
+                  <option value="Groundnut">🥜 Groundnut</option>
+                  <option value="Bajra">🌾 Bajra</option>
+                  <option value="Sunflower">🌻 Sunflower</option>
+                  <option value="Cotton">🧵 Cotton</option>
+                  <option value="Chickpea">🫘 Chickpea</option>
+                  <option value="Jowar">🌾 Jowar</option>
+                  <option value="Barley">🌾 Barley</option>
+                  <option value="Other">🔧 Other</option>
+                </select>
+              </div>
+            </div>
+            <div class="chart-container">
+              <canvas id="moistureChartPage"></canvas>
+            </div>
+          </div>
 
-    /* ===================== DEFAULT ===================== */
-    else {
-        status = '⚠ Advisory Needed';
-        risk = 'Limited data';
-        recommendation =
-            'Crop-soil combination requires expert consultation.';
-    }
+          <!-- Analysis -->
+          <div class="card" style="display:flex; flex-direction:column; gap:14px;">
+            <div class="card-title">Crop Analysis</div>
 
-    /* ===================== AREA NOTE ===================== */
-    let areaNote = '';
-    if (area >= 5) {
-        areaNote =
-            '<br>🚜 Large field detected: Mechanized irrigation and scheduled monitoring recommended.';
-    }
+            <div>
+              <div class="form-label" style="margin-bottom:4px;">Detected Cause</div>
+              <div id="s-cause" style="font-size:13px; color:#0d2b1e; background:#f8faf9; border:1px solid #e3ede7; border-radius:8px; padding:10px 12px;">—</div>
+            </div>
 
-    /* ===================== DISPLAY ===================== */
-    resultBox.innerHTML = `
-        🌱 <b>Crop:</b> ${crop}<br>
-        🌍 <b>Soil:</b> ${soil}<br>
-        📐 <b>Area:</b> ${area} acres<br><br>
+            <div>
+              <div class="form-label" style="margin-bottom:4px;">Suggested Action</div>
+              <div id="s-suggest" style="font-size:13px; color:#0d2b1e; background:#f3fbf6; border:1px solid #a8dfc0; border-radius:8px; padding:10px 12px; line-height:1.6;">Select a crop and wait for sensor data.</div>
+            </div>
 
-        <b>Status:</b> ${status}<br>
-        <b>Risk:</b> ${risk}<br><br>
+            <a href="tel:18001801551" class="btn btn-primary btn-sm" style="text-decoration:none; margin-top:auto">
+              <i class="fa-solid fa-phone"></i> Kisan Helpline
+            </a>
+          </div>
 
-        <b>Practical Recommendation:</b><br>
-        ${recommendation}
-        ${areaNote}
-    `;
+        </div>
+      </section>
+
+      <!-- ======================================================
+           PAGE: FIELD ANALYSIS
+           ====================================================== -->
+      <section class="page-section" id="page-field">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Field Analysis</div>
+            <div class="section-sub">Image-based crop condition and soil compatibility check</div>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+          <div>
+            <div class="card" style="margin-bottom:16px;">
+              <div class="card-title" style="margin-bottom:14px;">Soil & Crop</div>
+              <div class="form-group">
+                <label class="form-label">Crop Type</label>
+                <select id="fieldCrop" class="form-select">
+                  <option value="">Select crop…</option>
+                  <option>🌽 Maize</option>
+                  <option>🌾 Wheat</option>
+                  <option>🍚 Rice</option>
+                  <option>🌼 Mustard</option>
+                  <option>🫘 Soybean</option>
+                  <option>🥜 Groundnut</option>
+                  <option>🌾 Bajra</option>
+                  <option>🌻 Sunflower</option>
+                  <option>🧵 Cotton</option>
+                  <option>🫘 Chickpea</option>
+                  <option>🌾 Jowar</option>
+                  <option>🌾 Barley</option>
+                  <option>🔧 Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Soil Type</label>
+                <select id="soilType" class="form-select">
+                  <option value="">Select soil type…</option>
+                  <option value="Loamy">🌿 Loamy Soil</option>
+                  <option value="Clay">🧱 Clay Soil</option>
+                  <option value="Sandy">🏖️ Sandy Soil</option>
+                  <option value="Silty">🌾 Silty Soil</option>
+                  <option value="Peaty">🌰 Peaty Soil</option>
+                  <option value="Chalky">🪨 Chalky Soil</option>
+                  <option value="Saline">💧 Saline Soil</option>
+                  <option value="Red">🟥 Red Soil</option>
+                  <option value="Black">⬛ Black Cotton Soil</option>
+                  <option value="Alluvial">🌊 Alluvial Soil</option>
+                  <option value="Laterite">🧱 Laterite Soil</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Field Area (acres)</label>
+                <input id="fieldArea" class="form-input" type="number" placeholder="e.g. 2"/>
+              </div>
+              <button class="btn btn-primary" style="width:100%" onclick="analyzeField()">
+                <i class="fa-solid fa-magnifying-glass-chart"></i> Analyze Field
+              </button>
+            </div>
+
+            <!-- Image Upload -->
+            <div class="card">
+              <div class="card-title" style="margin-bottom:14px;">Field Image</div>
+              <div class="form-group">
+                <input type="file" id="fieldImage" class="form-input" accept="image/*" capture="environment" onchange="previewFieldImage(event)"/>
+              </div>
+              <div id="imagePreview" style="display:none; margin-top:8px;">
+                <img id="previewImg" style="width:100%; border-radius:12px; max-height:220px; object-fit:cover;"/>
+              </div>
+              <button class="btn btn-secondary" style="margin-top:12px; width:100%;" onclick="analyzeFieldImage()">
+                <i class="fa-solid fa-camera"></i> Analyze Image
+              </button>
+            </div>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:16px;">
+            <div class="card" style="flex:1;">
+              <div class="card-title" style="margin-bottom:14px;">Field Report</div>
+              <div class="analysis-result-box" id="fieldResult">
+                Select your crop, soil type and field area, then click <strong>Analyze Field</strong> to receive a detailed recommendation.
+              </div>
+            </div>
+            <div class="card" style="flex:1;">
+              <div class="card-title" style="margin-bottom:12px;">Image Analysis</div>
+              <div class="analysis-result-box" id="imageResult">
+                Upload a field image and click <strong>Analyze Image</strong> to detect crop conditions based on color patterns.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ======================================================
+           PAGE: PROFILE
+           ====================================================== -->
+      <section class="page-section" id="page-profile">
+        <div class="section-header">
+          <div class="section-title">Profile</div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; max-width:720px;">
+          <div class="card col-span-2" style="grid-column:span 2;">
+            <div style="display:flex; align-items:center; gap:16px; margin-bottom:20px;">
+              <div class="profile-avatar-lg" id="profileAvatar">U</div>
+              <div>
+                <div style="font-size:17px; font-weight:700;" id="p-name">—</div>
+                <div style="font-size:13px; color:#7d9a8a;" id="p-email">—</div>
+                <span class="badge badge-green" style="margin-top:6px;">Smart Farmer</span>
+              </div>
+            </div>
+            <hr class="divider"/>
+            <div class="form-group">
+              <label class="form-label">Update Display Name</label>
+              <input id="editName" class="form-input" placeholder="Enter new display name"/>
+            </div>
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+              <button class="btn btn-primary" onclick="updateName()">
+                <i class="fa-solid fa-check"></i> Update Name
+              </button>
+              <button class="btn btn-secondary" onclick="logout()">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
+              </button>
+              <button class="btn btn-danger" onclick="deleteAccount()">
+                <i class="fa-solid fa-trash"></i> Delete Account
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /content-area -->
+  </div><!-- /main-wrap -->
+</div><!-- /app -->
+
+<!-- MOBILE BOTTOM NAV -->
+<nav class="bottom-nav">
+  <div class="bnav-item active" id="b-dashboard" onclick="navClick('dashboard')">
+    <i class="fa-solid fa-chart-pie"></i>
+    <span>Home</span>
+  </div>
+  <div class="bnav-item" id="b-detect" onclick="navClick('detect')">
+    <i class="fa-solid fa-microscope"></i>
+    <span>Detect</span>
+  </div>
+  <div class="bnav-item" id="b-seed" onclick="navClick('seed')">
+    <i class="fa-solid fa-seedling"></i>
+    <span>Seeds</span>
+  </div>
+  <div class="bnav-item" id="b-moisture" onclick="navClick('moisture')">
+    <i class="fa-solid fa-chart-line"></i>
+    <span>Monitor</span>
+  </div>
+  <div class="bnav-item" id="b-profile" onclick="navClick('profile')">
+    <i class="fa-solid fa-user"></i>
+    <span>Profile</span>
+  </div>
+</nav>
+
+<!-- ============================================================
+     SCRIPTS
+     ============================================================ -->
+<script>
+/* ====================================================
+   FIREBASE CONFIG
+   ==================================================== */
+const firebaseConfig = {
+  apiKey: "AIzaSyAaUOPKe4lvxqSbj_yZRXREOrLok9mmvRk",
+  authDomain: "agrotech-9b042.firebaseapp.com",
+  databaseURL: "https://agrotech-9b042-default-rtdb.firebaseio.com",
+  projectId: "agrotech-9b042",
+  storageBucket: "agrotech-9b042.appspot.com",
+  messagingSenderId: "722678725948",
+  appId: "1:722678725948:web:46d86af5eb3bdfaf61f239",
+  measurementId: "G-Z6E71FDC8H"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db   = firebase.database();
+
+/* ====================================================
+   NAVIGATION
+   ==================================================== */
+const PAGE_META = {
+  dashboard: { title: 'Dashboard',          sub: 'Real-time farm monitoring' },
+  detect:    { title: 'Disease Detection',   sub: 'AI-powered plant diagnosis' },
+  seed:      { title: 'Seed Calculator',     sub: 'Estimate crop seed requirements' },
+  moisture:  { title: 'Moisture Monitor',    sub: 'Live ESP32 sensor data' },
+  field:     { title: 'Field Analysis',      sub: 'Soil and image diagnostics' },
+  profile:   { title: 'Profile',             sub: 'Account settings' }
+};
+
+const pages = document.querySelectorAll('.page-section');
+const sideNavItems  = { dashboard:'m-dashboard', detect:'m-detect', seed:'m-seed', moisture:'m-moisture', field:'m-field', profile:'m-profile' };
+const bottomNavItems = { dashboard:'b-dashboard', detect:'b-detect', seed:'b-seed', moisture:'b-moisture', profile:'b-profile' };
+
+function navClick(target) {
+  pages.forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + target).classList.add('active');
+
+  Object.values(sideNavItems).forEach(id => document.getElementById(id)?.classList.remove('active'));
+  Object.values(bottomNavItems).forEach(id => document.getElementById(id)?.classList.remove('active'));
+  if (sideNavItems[target])   document.getElementById(sideNavItems[target]).classList.add('active');
+  if (bottomNavItems[target]) document.getElementById(bottomNavItems[target]).classList.add('active');
+
+  const meta = PAGE_META[target] || {};
+  document.getElementById('topbarTitle').textContent = meta.title || '';
+  document.getElementById('topbarSub').textContent   = meta.sub || '';
 }
 
+/* ====================================================
+   AUTH
+   ==================================================== */
+const authPanel = document.getElementById('authPanel');
 
+document.getElementById('switchToSignUp').onclick = () => {
+  document.getElementById('signInForm').style.display = 'none';
+  document.getElementById('signUpForm').style.display = 'block';
+};
+document.getElementById('switchToSignIn').onclick = () => {
+  document.getElementById('signUpForm').style.display = 'none';
+  document.getElementById('signInForm').style.display = 'block';
+};
 
-        /* ======================= FIREBASE CONFIG ======================= 
-           Replace these values with your Firebase project's config if different.
-        */
-        const firebaseConfig = {
-            apiKey: "AIzaSyAaUOPKe4lvxqSbj_yZRXREOrLok9mmvRk",
-            authDomain: "agrotech-9b042.firebaseapp.com",
-            databaseURL: "https://agrotech-9b042-default-rtdb.firebaseio.com", // Realtime DB URL
-            projectId: "agrotech-9b042",
-            storageBucket: "agrotech-9b042.appspot.com",
-            messagingSenderId: "722678725948",
-            appId: "1:722678725948:web:46d86af5eb3bdfaf61f239",
-            measurementId: "G-Z6E71FDC8H"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.database();
+document.getElementById('signUpBtn').onclick = async () => {
+  const name = document.getElementById('suName').value.trim();
+  const email = document.getElementById('suEmail').value.trim();
+  const pw  = document.getElementById('suPassword').value;
+  const msg = document.getElementById('suMsg');
+  msg.textContent = '';
+  if (!email || !pw) { msg.textContent = 'Email & password required'; return; }
+  if (pw.length < 6) { msg.textContent = 'Password must be at least 6 characters'; return; }
+  try {
+    const cred = await auth.createUserWithEmailAndPassword(email, pw);
+    if (name) await cred.user.updateProfile({ displayName: name });
+    msg.style.color = '#216040';
+    msg.textContent = 'Account created! Signing in…';
+  } catch(err) { msg.style.color = '#e05252'; msg.textContent = err.message; }
+};
 
-        /* ======================= UI References ======================= */
-        const pageDashboard = document.getElementById('page-dashboard');
-        const pageDetect = document.getElementById('page-detect');
-        const pageSeed = document.getElementById('page-seed');
-        const pageMoisture = document.getElementById('page-moisture');
-        const pageProfile = document.getElementById('page-profile');
-        const pageField = document.getElementById('page-field');
-        const allPages = [pageDashboard, pageDetect, pageSeed, pageMoisture, pageProfile, pageField];
+document.getElementById('signInBtn').onclick = async () => {
+  const email = document.getElementById('siEmail').value.trim();
+  const pw    = document.getElementById('siPassword').value;
+  const msg   = document.getElementById('siMsg');
+  msg.textContent = '';
+  if (!email || !pw) { msg.textContent = 'Email & password required'; return; }
+  try { await auth.signInWithEmailAndPassword(email, pw); }
+  catch(err) { msg.style.color='#e05252'; msg.textContent = err.message; }
+};
 
-        const sideButtons = {
-            dashboard: document.getElementById('m-dashboard'),
-            detect: document.getElementById('m-detect'),
-            seed: document.getElementById('m-seed'),
-            moisture: document.getElementById('m-moist'),
-            profile: document.getElementById('m-profile')
-            
-        };
-        const bottomButtons = {
-            dashboard: document.getElementById('b-dashboard'),
-            detect: document.getElementById('b-detect'),
-            seed: document.getElementById('b-seed'),
-            profile: document.getElementById('b-profile')
-        };
+document.getElementById('googleSignInBtn').onclick = async () => {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  try { await auth.signInWithPopup(provider); }
+  catch(err) { alert(err.message); }
+};
 
-        /* ======================= NAVIGATION (single-page display) ======================= */
-        function hideAllPages() {
-            allPages.forEach(p => { p.style.display = 'none'; p.setAttribute('aria-hidden', 'true'); });
-        }
-        function clearActive() {
-            Object.values(sideButtons).forEach(b => b.classList.remove('active'));
-            Object.values(bottomButtons).forEach(b => b.classList.remove('active'));
-        }
-        function setActive(menu) {
-            clearActive();
-            if (sideButtons[menu]) sideButtons[menu].classList.add('active');
-            if (bottomButtons[menu]) bottomButtons[menu].classList.add('active');
-        }
-        function navClick(target) {
-            hideAllPages();
-            setActive(target);
-            if (target === 'dashboard') pageDashboard.style.display = 'flex';
-            if (target === 'detect') pageDetect.style.display = 'block';
-            if (target === 'seed') pageSeed.style.display = 'block';
-            if (target === 'moisture') pageMoisture.style.display = 'block';
-            if (target === 'profile') pageProfile.style.display = 'block';
-            if (target === 'field') pageField.style.display = 'block';
+document.getElementById('forgotBtn').onclick = async () => {
+  const email = prompt('Enter your email for reset:');
+  if (!email) return;
+  try { await auth.sendPasswordResetEmail(email); alert('Reset email sent!'); }
+  catch(err) { alert(err.message); }
+};
 
-        }
-        /* initial */
-        hideAllPages();
-        navClick('dashboard');
+auth.onAuthStateChanged(user => {
+  if (user) {
+    authPanel.style.display = 'none';
+    const name = user.displayName || user.email;
+    const initial = name.charAt(0).toUpperCase();
+    document.getElementById('userEmailTop').textContent = user.email;
+    document.getElementById('topbarAvatar').textContent = initial;
+    document.getElementById('sidebarAvatar').textContent = initial;
+    document.getElementById('sidebarName').textContent = user.displayName || user.email.split('@')[0];
+    document.getElementById('profileAvatar').textContent = initial;
+    document.getElementById('p-email').textContent = user.email;
+    document.getElementById('p-name').textContent = user.displayName || 'No display name';
+    navClick('dashboard');
+  } else {
+    authPanel.style.display = 'flex';
+  }
+});
 
-        /* ======================= AUTH UI ======================= */
-        const authPanel = document.getElementById('authPanel');
-        const signInForm = document.getElementById('signInForm');
-        const signUpForm = document.getElementById('signUpForm');
+function logout() {
+  auth.signOut();
+}
 
-        document.getElementById('switchToSignUp').onclick = () => { signInForm.style.display = 'none'; signUpForm.style.display = 'block'; document.getElementById('siMsg').textContent = ''; };
-        document.getElementById('switchToSignIn').onclick = () => { signUpForm.style.display = 'none'; signInForm.style.display = 'block'; document.getElementById('suMsg').textContent = ''; };
+function updateName() {
+  const newName = document.getElementById('editName').value.trim();
+  if (!newName) { alert('Enter a name'); return; }
+  auth.currentUser.updateProfile({ displayName: newName })
+    .then(() => {
+      document.getElementById('p-name').textContent = newName;
+      document.getElementById('sidebarName').textContent = newName;
+      document.getElementById('sidebarAvatar').textContent = newName.charAt(0).toUpperCase();
+      document.getElementById('topbarAvatar').textContent  = newName.charAt(0).toUpperCase();
+      alert('Name updated!');
+    })
+    .catch(err => alert(err.message));
+}
 
-        /* SIGN UP */
-        document.getElementById('signUpBtn').onclick = async () => {
-            const name = document.getElementById('suName').value.trim();
-            const email = document.getElementById('suEmail').value.trim();
-            const password = document.getElementById('suPassword').value;
-            const msg = document.getElementById('suMsg');
-            msg.textContent = '';
-            if (!email || !password) { msg.textContent = 'Email & password required'; return; }
-            if (password.length < 6) { msg.textContent = 'Password must be >=6 chars'; return; }
-            try {
-                const userCred = await auth.createUserWithEmailAndPassword(email, password);
-                if (name) await userCred.user.updateProfile({ displayName: name });
-                msg.style.color = 'lightgreen'; msg.textContent = 'Account created. Signing in...';
-                // signed in automatically; onAuthStateChanged will handle UI
-            } catch (err) { msg.style.color = 'salmon'; msg.textContent = err.message; }
-        };
+function deleteAccount() {
+  if (!confirm('This will permanently delete your account. Continue?')) return;
+  auth.currentUser.delete()
+    .then(() => { alert('Account deleted.'); location.reload(); })
+    .catch(err => {
+      if (err.code === 'auth/requires-recent-login')
+        alert('Please sign out and sign in again before deleting your account.');
+      else alert(err.message);
+    });
+}
 
-        /* SIGN IN */
-        document.getElementById('signInBtn').onclick = async () => {
-            const email = document.getElementById('siEmail').value.trim();
-            const password = document.getElementById('siPassword').value;
-            const msg = document.getElementById('siMsg'); msg.textContent = '';
-            if (!email || !password) { msg.textContent = 'Email & password required'; return; }
-            try { await auth.signInWithEmailAndPassword(email, password); } catch (err) { msg.textContent = err.message; }
-        };
+/* ====================================================
+   CHARTS — Moisture (dashboard)
+   ==================================================== */
+let chartDataDash = new Array(10).fill(50);
 
-        /* GOOGLE SIGN-IN */
-        document.getElementById('googleSignInBtn').onclick = async () => {
-            const provider = new firebase.auth.GoogleAuthProvider();
-            try { await auth.signInWithPopup(provider); } catch (err) { alert(err.message); }
-        };
+const moistureChart = new Chart(
+  document.getElementById('moistureChart').getContext('2d'), {
+  type: 'line',
+  data: {
+    labels: chartDataDash.map((_,i) => i + 1),
+    datasets: [{
+      data: chartDataDash,
+      borderColor: '#3da06e',
+      backgroundColor: 'rgba(61,160,110,.10)',
+      borderWidth: 2,
+      tension: 0.4,
+      fill: true,
+      pointRadius: 3,
+      pointBackgroundColor: '#3da06e'
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: {
+      y: { min: 0, max: 100, grid: { color: '#f0f5f2' }, ticks: { color: '#7d9a8a', font: { size: 11 } } },
+      x: { grid: { display: false }, ticks: { color: '#7d9a8a', font: { size: 11 } } }
+    },
+    plugins: { legend: { display: false } }
+  }
+});
 
-        /* PASSWORD RESET */
-        document.getElementById('forgotBtn').onclick = async () => {
-            const email = prompt('Enter your email for reset:');
-            if (!email) return;
-            try { await auth.sendPasswordResetEmail(email); alert('Reset email sent'); } catch (err) { alert(err.message); }
-        };
+/* Charts — Moisture (page) */
+let chartDataPage = new Array(10).fill(50);
 
-        /* AUTH STATE CHANGE */
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                document.getElementById('userEmailTop').textContent = user.email;
-                document.getElementById('p-email').textContent = user.email;
-                document.getElementById('p-name').textContent = user.displayName || 'No display name';
-                document.getElementById('profileAvatar').textContent = (user.displayName || user.email).charAt(0).toUpperCase();
-                // hide overlay
-                authPanel.style.display = 'none';
-                // show app
-                navClick('dashboard');
-            } else {
-                // show overlay
-                authPanel.style.display = 'flex';
-                hideAllPages();
-            }
-        });
+const moistureChartPage = new Chart(
+  document.getElementById('moistureChartPage').getContext('2d'), {
+  type: 'line',
+  data: {
+    labels: chartDataPage.map((_,i) => i + 1),
+    datasets: [{
+      data: chartDataPage,
+      borderColor: '#3da06e',
+      backgroundColor: 'rgba(61,160,110,.08)',
+      borderWidth: 2,
+      tension: 0.4,
+      fill: true,
+      pointRadius: 3,
+      pointBackgroundColor: '#3da06e'
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    scales: {
+      y: { min: 0, max: 100, grid: { color: '#f0f5f2' }, ticks: { color: '#7d9a8a', font: { size: 11 } } },
+      x: { grid: { display: false }, ticks: { color: '#7d9a8a', font: { size: 11 } } }
+    },
+    plugins: { legend: { display: false } }
+  }
+});
 
-        /* LOGOUT */
-        function logout() { auth.signOut(); }
+function addMoisturePoint(val) {
+  [moistureChart, moistureChartPage].forEach(chart => {
+    chart.data.datasets[0].data.push(val);
+    if (chart.data.datasets[0].data.length > 20) chart.data.datasets[0].data.shift();
+    chart.update('none');
+  });
+}
 
-        /* ======================= Disease Detection Logic ======================= */
+/* ====================================================
+   FIREBASE SENSOR LISTENER
+   ==================================================== */
+let lastSensorData = {};
 
-        // GLOBAL state (important!)
-        window.imageLoaded = false;
+db.ref('/agrotech/sensors').limitToLast(1).on('child_added', snap => {
+  const d = snap.val();
+  if (!d) return;
+  lastSensorData = d;
 
-        // DOM refs
-        const fileInput = document.getElementById('fileInput');
-        const preview = document.getElementById('preview');
-        const detectResult = document.getElementById('detectResult');
-        const diseaseSuggestion = document.getElementById('diseaseSuggestion');
-        const espBtn = document.getElementById('espCaptureBtn');
-        const runBtn = document.getElementById('processBtn');
+  const temp  = d.temp  !== undefined ? d.temp  : '—';
+  const hum   = d.hum   !== undefined ? d.hum   : '—';
+  const moist = d.soil  !== undefined ? d.soil  : '—';
 
-        // ------------------ Laptop image upload ------------------
-        fileInput.addEventListener('change', e => {
-            const file = e.target.files[0];
-            if (!file) {
-                window.imageLoaded = false;
-                return;
-            }
+  /* Dashboard stats */
+  document.getElementById('dash-temp').innerHTML  = `${temp}<span class="stat-unit"> °C</span>`;
+  document.getElementById('dash-hum').innerHTML   = `${hum}<span class="stat-unit"> %</span>`;
+  document.getElementById('dash-moist').innerHTML = `${moist}<span class="stat-unit"> %</span>`;
 
-            const reader = new FileReader();
-            reader.onload = ev => {
-                preview.src = ev.target.result;
-                preview.style.display = 'block';
-
-                detectResult.textContent = 'Image loaded from device. Ready to analyze.';
-                diseaseSuggestion.textContent = '';
-                window.imageLoaded = true;
-            };
-            reader.readAsDataURL(file);
-        });
-
-        // ------------------ ESP32-CAM capture ------------------
-        const ESP_IP = '10.182.153.159';
-
-        espBtn.addEventListener('click', () => {
-
-            if (!ESP_IP) {
-                detectResult.textContent = 'ESP32 IP not set.';
-                return;
-            }
-
-            const espUrl = `http://${ESP_IP}/cam.jpg`; // ✅ correct endpoint
-
-            preview.onload = () => {
-                detectResult.textContent =
-                    'Image captured from ESP32-CAM. Ready to analyze.';
-                window.imageLoaded = true;
-            };
-
-            preview.onerror = () => {
-                preview.style.display = 'none';
-                detectResult.textContent = 'ESP32-CAM not reachable.';
-                window.imageLoaded = false;
-            };
-
-            preview.src = espUrl + '?t=' + Date.now(); // cache-bust
-            preview.style.display = 'block';
-        });
-
-        // ------------------ Run Detection ------------------
-        runBtn.addEventListener('click', () => {
-            if (!window.imageLoaded) {
-                detectResult.textContent = 'Please upload or capture an image first.';
-                diseaseSuggestion.textContent = '';
-                return;
-            }
-
-            detectResult.textContent = 'Analyzing image…';
-
-            // SIMULATED AI RESULT (demo purpose)
-           
-setTimeout(() => {
-
-    // ---------- SIMPLE PLANT DETECTION ----------
-    const img = preview;
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-
-    canvas.width = img.naturalWidth;
-    canvas.height = img.naturalHeight;
-    ctx.drawImage(img, 0, 0);
-
-    const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-    let greenPixels = 0;
-
-    for (let i = 0; i < pixels.length; i += 4) {
-        const r = pixels[i];
-        const g = pixels[i + 1];
-        const b = pixels[i + 2];
-
-        if (g > r + 20 && g > b + 20) {
-            greenPixels++;
-        }
+  /* Humidity trend badge */
+  if (!isNaN(hum)) {
+    const humTrend = document.getElementById('dash-hum-trend');
+    if (+hum > 80) {
+      humTrend.className = 'stat-trend down';
+      humTrend.innerHTML = '<i class="fa-solid fa-arrow-up"></i> High';
+    } else {
+      humTrend.className = 'stat-trend flat';
+      humTrend.innerHTML = '<i class="fa-solid fa-minus"></i> Normal';
     }
+  }
 
-    const greenRatio = greenPixels / (pixels.length / 4);
+  /* Sensor page */
+  document.getElementById('s-temp').textContent  = temp;
+  document.getElementById('s-hum').textContent   = hum;
+  document.getElementById('s-moist').textContent = moist;
 
-    // ---------- NO PLANT FOUND ----------
-    if (greenRatio < 0.15) {
-        detectResult.innerHTML = `
-            ❌ <b>No plant detected</b><br>
-            Please upload a clear image of a crop or plant leaf.
-        `;
-        diseaseSuggestion.textContent = '';
-        return;
-    }
+  /* Chart */
+  if (!isNaN(d.soil)) addMoisturePoint(Number(d.soil));
 
-    // ---------- PLANT FOUND → DISEASE LOGIC ----------
-    const diseases = [
-        'Healthy',
-        'Early Blight',
-        'Leaf Rust',
-        'Nutrient Deficiency',
-        'Bacterial Spot'
-    ];
+  const ts = 'Last updated: ' + new Date().toLocaleString();
+  document.getElementById('lastUpdated').textContent  = ts;
+  document.getElementById('lastUpdated2').textContent = ts;
 
-    const detectedDiseases = diseases.filter(() => Math.random() > 0.6);
-    if (detectedDiseases.length === 0) detectedDiseases.push('Healthy');
+  reanalyzeMoisture();
+});
 
-    const confidence = detectedDiseases.map(d => ({
-        name: d,
-        confidence: (70 + Math.random() * 25).toFixed(0)
-    }));
+function reanalyzeMoisture() {
+  const d = lastSensorData;
+  if (!d.temp && !d.hum && !d.soil) return;
+  const crop = document.getElementById('cropType-moisture').value;
+  if (!crop) return;
+  const analysis = analyzeReadings(crop, d.temp, d.hum, d.soil);
+  document.getElementById('s-cause').textContent   = analysis.cause;
+  document.getElementById('s-suggest').textContent = analysis.suggest;
+}
 
-    detectResult.innerHTML = `
-        <strong>Detected Issues:</strong>
-        <ul>
-            ${confidence.map(d =>
-                `<li>${d.name} <span class="muted">(${d.confidence}%)</span></li>`
-            ).join('')}
-        </ul>
-    `;
+function analyzeReadings(crop, temp, hum, moist) {
+  if (crop === 'Wheat') {
+    if (moist < 40) return { cause: 'Low soil moisture', suggest: 'Irrigate field immediately.' };
+    if (temp > 32)  return { cause: 'Heat stress', suggest: 'Light irrigation, avoid fertilizers.' };
+  }
+  if (crop === 'Rice')   { if (moist < 60) return { cause: 'Insufficient water', suggest: 'Maintain flooded condition.' }; }
+  if (crop === 'Maize')  { if (moist < 35) return { cause: 'Dry soil', suggest: 'Irrigation required for maize growth.' }; }
+  if (crop === 'Cotton') { if (hum > 80)   return { cause: 'High humidity', suggest: 'Risk of fungal disease — monitor leaves.' }; }
+  return { cause: 'Conditions normal', suggest: 'No action required. Continue monitoring.' };
+}
 
-    diseaseSuggestion.innerText = 'Suggestion: ' +
-        getDiseaseSuggestion(detectedDiseases);
+/* ====================================================
+   SEED CALCULATOR
+   ==================================================== */
+function onCropChange() {
+  const sel = document.getElementById('cropSelect');
+  document.getElementById('otherWeightWrap').style.display =
+    sel.value === 'Other' ? 'block' : 'none';
+  calcSeeds();
+}
 
-}, 1200);
-        });
+function calcSeeds() {
+  const sel       = document.getElementById('cropSelect');
+  const spacing   = parseFloat(document.getElementById('spacingInp').value);
+  const area      = parseFloat(document.getElementById('areaInp').value);
+  const cropName  = sel.value;
 
-        // ------------------ Disease suggestions ------------------
-        function getDiseaseSuggestion(diseases) {
-  const suggestions = {
-    'Healthy':
-      '🌱 Plant appears healthy. Continue regular monitoring and irrigation.',
+  let gramsPerSeed = parseFloat(sel.selectedOptions[0]?.getAttribute('data-w') || 0);
+  if (cropName === 'Other') {
+    const ow = parseFloat(document.getElementById('otherWeightInput').value);
+    gramsPerSeed = ow / 100 || 0;
+  } else {
+    gramsPerSeed = gramsPerSeed / 100;
+  }
 
-    'Early Blight':
-      '🍂 Remove affected leaves and apply recommended fungicide.',
+  document.getElementById('breakdown-crop').textContent    = cropName || '—';
+  document.getElementById('breakdown-spacing').textContent = isNaN(spacing) ? '—' : spacing + ' cm';
+  document.getElementById('breakdown-area').textContent    = isNaN(area) ? '—' : area + ' m²';
 
-    'Leaf Rust':
-      '🟠 Use rust-resistant varieties and apply sulfur-based fungicide.',
+  if (spacing > 0 && area > 0) {
+    const rows   = (area / (spacing / 100));
+    const seeds  = Math.round(rows * 5);
+    const totalKg = (seeds * gramsPerSeed) / 1000;
 
-    'Nutrient Deficiency':
-      '🧪 Apply balanced fertilizer and improve soil nutrition.',
+    document.getElementById('seedResult').textContent      = seeds.toLocaleString();
+    document.getElementById('seedWeightResult').textContent = totalKg > 0 ? totalKg.toFixed(2) + ' kg' : '—';
+    document.getElementById('calcNote').textContent =
+      `For ${cropName || 'the selected crop'} at ${spacing} cm row spacing across ${area} m², you need approximately ${seeds.toLocaleString()} seeds${totalKg > 0 ? ' (' + totalKg.toFixed(2) + ' kg)' : ''}.`;
+  } else {
+    document.getElementById('seedResult').textContent       = '—';
+    document.getElementById('seedWeightResult').textContent = '—';
+  }
+}
 
-    'Bacterial Spot':
-      '💧 Avoid overhead irrigation and use copper-based spray.'
+/* ====================================================
+   DISEASE DETECTION
+   ==================================================== */
+let imageLoaded = false;
+
+document.getElementById('fileInputDetect').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = document.getElementById('imagePreviewLarge');
+    img.src = ev.target.result;
+    img.style.display = 'block';
+    document.getElementById('uploadZone').classList.add('has-image');
+    imageLoaded = true;
+    document.getElementById('detectResult').innerHTML = 'Image loaded. Click <strong>Run Detection</strong>.';
+    document.getElementById('resultBadge').textContent = 'Ready';
+    document.getElementById('resultBadge').className = 'badge badge-blue';
   };
+  reader.readAsDataURL(file);
+});
 
-  // ensure array
-  if (!Array.isArray(diseases)) {
-    diseases = [diseases];
+/* Drag-and-drop */
+const uploadZone = document.getElementById('uploadZone');
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
+uploadZone.addEventListener('drop', e => {
+  e.preventDefault();
+  uploadZone.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) {
+    const dt = new DataTransfer();
+    dt.items.add(file);
+    document.getElementById('fileInputDetect').files = dt.files;
+    document.getElementById('fileInputDetect').dispatchEvent(new Event('change'));
+  }
+});
+
+document.getElementById('processBtn').onclick = () => {
+  if (!imageLoaded) {
+    document.getElementById('detectResult').innerHTML = '<span style="color:#e05252">Please upload a plant image first.</span>';
+    return;
   }
 
-  // if only Healthy
-  if (diseases.length === 1 && diseases[0] === 'Healthy') {
-    return suggestions['Healthy'];
+  const overlay = document.getElementById('processingOverlay');
+  overlay.style.display = 'flex';
+  document.getElementById('resultBadge').textContent = 'Scanning…';
+  document.getElementById('resultBadge').className = 'badge badge-yellow';
+
+  setTimeout(() => {
+    overlay.style.display = 'none';
+    runDetection();
+  }, 1800);
+};
+
+function runDetection() {
+  const img = document.getElementById('imagePreviewLarge');
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  canvas.width  = img.naturalWidth;
+  canvas.height = img.naturalHeight;
+  ctx.drawImage(img, 0, 0);
+  const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+
+  let green = 0, yellow = 0, brown = 0;
+  for (let i = 0; i < pixels.length; i += 4) {
+    const r = pixels[i], g = pixels[i+1], b = pixels[i+2];
+    if (g > r + 20 && g > b + 20) green++;
+    else if (r > 150 && g > 150 && b < 120) yellow++;
+    else if (r > 120 && g < 100 && b < 100) brown++;
   }
 
-  // build multi-disease output
-  return diseases
-    .filter(d => d !== 'Healthy')
-    .map(d => `• ${d}: ${suggestions[d] || 'Consult agricultural expert.'}`)
-    .join('\n');
+  const total = pixels.length / 4;
+  const gR = green / total, yR = yellow / total, bR = brown / total;
+
+  let condition, severity, badge, treatments;
+  if (gR < 0.12) {
+    condition = 'No crop detected'; severity = 0; badge = 'badge-gray';
+    treatments = ['Ensure the image contains a visible plant or leaf.', 'Try a closer shot under natural light.'];
+  } else if (gR > 0.6) {
+    condition = 'Healthy plant'; severity = 5; badge = 'badge-green';
+    treatments = ['Plant appears healthy.', 'Continue regular watering and fertilization schedule.', 'Monitor for any early signs of stress weekly.'];
+  } else if (bR > 0.15) {
+    condition = 'Dry / Burnt tissue'; severity = 72; badge = 'badge-red';
+    treatments = ['Irrigate immediately to restore moisture.', 'Check soil drainage — excess drainage causes fast drying.', 'Consider mulching to retain soil moisture longer.', 'Avoid fertilizer application until plant recovers.'];
+  } else if (yR > 0.15) {
+    condition = 'Nutrient deficiency (Chlorosis)'; severity = 55; badge = 'badge-yellow';
+    treatments = ['Apply nitrogen-rich fertilizer (NPK 20-20-20).', 'Check soil pH — chlorosis often linked to pH imbalance.', 'Consider foliar iron or magnesium spray.', 'Ensure adequate drainage to prevent waterlogging.'];
+  } else {
+    condition = 'General stress / Early disease'; severity = 40; badge = 'badge-yellow';
+    treatments = ['Inspect leaves for fungal patches or pest damage.', 'Apply appropriate fungicide if spots are visible.', 'Improve air circulation around plant.', 'Reduce watering frequency temporarily.'];
+  }
+
+  const conf = 75 + Math.floor(Math.random() * 20);
+
+  document.getElementById('detectResult').innerHTML = `
+    <div style="font-size:16px; font-weight:700; margin-bottom:6px;">${condition}</div>
+    <div style="font-size:12.5px; color:#7d9a8a">Confidence: <strong>${conf}%</strong> &nbsp;·&nbsp;
+    Green: ${(gR*100).toFixed(1)}% &nbsp;·&nbsp; Yellow: ${(yR*100).toFixed(1)}% &nbsp;·&nbsp; Brown: ${(bR*100).toFixed(1)}%</div>
+  `;
+
+  document.getElementById('resultBadge').textContent = condition;
+  document.getElementById('resultBadge').className   = 'badge ' + badge;
+
+  const sWrap = document.getElementById('severityWrap');
+  sWrap.style.display = 'block';
+  document.getElementById('severityPct').textContent  = severity + '%';
+  document.getElementById('severityFill').style.width = severity + '%';
+
+  const treatCard = document.getElementById('treatmentCard');
+  const treatList = document.getElementById('treatmentList');
+  treatCard.style.display = 'block';
+  treatList.innerHTML = treatments.map(t => `
+    <div class="treatment-item">
+      <i class="fa-solid fa-circle-check"></i>
+      <span>${t}</span>
+    </div>
+  `).join('');
 }
-        
 
+/* ====================================================
+   FIELD ANALYSIS
+   ==================================================== */
+function previewFieldImage(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    document.getElementById('previewImg').src = ev.target.result;
+    document.getElementById('imagePreview').style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
 
-        /* ======================= Seed Calculator (dropdown with icons) ======================= */
-        const cropSelect = document.getElementById('cropSelect');
-        const otherWeightWrap = document.getElementById('otherWeightWrap');
-        cropSelect.addEventListener('change', () => {
-            const selected = cropSelect.options[cropSelect.selectedIndex];
-            const weight100 = parseFloat(selected.dataset.w || 0);
-            if (selected.value === 'Other') { otherWeightWrap.style.display = 'block'; }
-            else { otherWeightWrap.style.display = 'none'; document.getElementById('otherWeightInput').value = ''; }
-        });
-
-        function calcSeeds() {
-            const spacing = parseFloat(document.getElementById('spacingInp').value);
-            const area = parseFloat(document.getElementById('areaInp').value);
-            const sel = cropSelect.options[cropSelect.selectedIndex];
-            const crop = sel.value || 'Crop';
-            let weight100 = parseFloat(sel.dataset.w || 0);
-
-            if (crop === 'Other') {
-                weight100 = parseFloat(document.getElementById('otherWeightInput').value);
-                if (!weight100) { alert('Enter weight per 100 seeds for the Other crop'); return; }
-            }
-
-            if (!spacing || !area) { alert('Please enter spacing & area'); return; }
-            const seeds = Math.round((area * 10000) / (spacing * spacing));
-            document.getElementById('seedResult').textContent = `${crop}: Required Seeds ≈ ${seeds.toLocaleString()}`;
-
-            if (weight100 && weight100 > 0) {
-                const gramsPerSeed = weight100 / 100.0;
-                const totalKg = (seeds * gramsPerSeed) / 1000.0;
-                document.getElementById('seedWeightResult').textContent = `Required Weight ≈ ${totalKg.toFixed(2)} kg`;
-            } else {
-                document.getElementById('seedWeightResult').textContent = 'Required Weight: —';
-            }
-        }
-
-        /* ======================= Moisture Monitor - Realtime via Firebase ======================= */
-        /* Chart setup */
-        const ctx = document.getElementById('moistureChart').getContext('2d');
-        let chartData = [50, 50, 50, 50, 50, 50, 50, 50, 50, 50];
-        const moistureChart = new Chart(ctx, {
-            type: 'line',
-            data: { labels: chartData.map((_, i) => i + 1), datasets: [{ data: chartData, borderColor: 'rgba(39,174,96,1)', backgroundColor: 'rgba(39,174,96,0.12)', tension: 0.35, fill: true }] },
-            options: { scales: { y: { min: 0, max: 100 } }, plugins: { legend: { display: false } }, maintainAspectRatio: false }
-        });
-        function addMoisturePoint(val) {
-            moistureChart.data.datasets[0].data.push(val);
-            if (moistureChart.data.datasets[0].data.length > 20) moistureChart.data.datasets[0].data.shift();
-            moistureChart.update();
-        }
-
-        // ===== Sensor readings + analysis (FINAL, SAFE) =====
-
-        const sensorRef = db
-            .ref('/agrotech/sensors')
-            .limitToLast(1);
-
-        sensorRef.on('child_added', snap => {
-            const d = snap.val();
-            if (!d) return;
-
-            // update sensor cards (SAFE, no ??)
-            document.getElementById('s-temp').textContent = d.temp !== undefined ? d.temp : '—';
-            document.getElementById('s-hum').textContent = d.hum !== undefined ? d.hum : '—';
-            document.getElementById('s-moist').textContent = d.soil !== undefined ? d.soil : '—';
-
-            // update chart
-            if (!isNaN(d.soil)) {
-                addMoisturePoint(Number(d.soil));
-            }
-
-            // update time
-            document.getElementById('lastUpdated').textContent =
-                'Last Updated: ' + new Date().toLocaleString();
-
-            // crop-based analysis
-            const cropSel = document.getElementById('cropType-moisture');
-            if (!cropSel) return;
-
-            const analysis = analyzeReadings(
-                cropSel.value,
-                d.temp,
-                d.hum,
-                d.soil
-            );
-
-            document.getElementById('s-cause').textContent = analysis.cause;
-            document.getElementById('s-suggest').textContent = analysis.suggest;
-        });
-
-        // debug message if nothing arrives
-        setTimeout(() => {
-            if (document.getElementById('s-temp').textContent === '—') {
-                console.log('ESP32 not sending data yet');
-            }
-        }, 3000);
-
-
-
-
-        /* ======================= Profile actions ======================= */
-        function updateName() {
-            const newName = document.getElementById('editName').value.trim();
-            if (!newName) return alert('Enter a name');
-            const user = auth.currentUser;
-            user.updateProfile({ displayName: newName }).then(() => {
-                document.getElementById('p-name').textContent = newName;
-                document.getElementById('welcomeTitle').textContent = `Welcome, ${newName}`;
-                document.getElementById('profileAvatar').textContent = newName.charAt(0).toUpperCase();
-                alert('Name updated');
-            }).catch(err => alert(err.message));
-        }
-        function deleteAccount() {
-            if (!confirm('Are you sure? This will permanently delete your account.')) return;
-            const user = auth.currentUser;
-            user.delete().then(() => { alert('Account deleted'); location.reload(); }).catch(err => {
-                if (err.code === 'auth/requires-recent-login') alert('Please sign out and sign in again before deleting your account.');
-                else alert(err.message);
-            });
-        }
-
-        /* ======================= Parallax mouse move ======================= */
-        const bgImage = document.getElementById('bgImage');
-        document.addEventListener('mousemove', (e) => {
-            const w = window.innerWidth, h = window.innerHeight;
-            const nx = (e.clientX - w / 2) / (w / 2);
-            const ny = (e.clientY - h / 2) / (h / 2);
-            bgImage.style.transform = `translate3d(${nx * 8}px, ${ny * 6}px, 0) scale(1.06)`;
-        });
-
-        /* ======================= Initial UI adjustments ======================= */
-        /* Hide auth overlay if already signed in is handled by auth listener */
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                authPanel.style.display = 'none';
-                // show default dashboard
-                navClick('dashboard');
-            }
-        });
-
-        /* ======================= Accessibility / keyboard helper ======================= */
-        document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') { /* could close overlays etc */ }
-        });
-
-        function analyzeReadings(crop, temp, hum, moist) {
-
-            if (crop === 'Wheat') {
-                if (moist < 40)
-                    return { cause: 'Low soil moisture', suggest: 'Irrigate field immediately.' };
-                if (temp > 32)
-                    return { cause: 'Heat stress', suggest: 'Light irrigation, avoid fertilizers.' };
-            }
-
-            if (crop === 'Rice') {
-                if (moist < 60)
-                    return { cause: 'Insufficient water', suggest: 'Maintain flooded condition.' };
-            }
-
-            if (crop === 'Maize') {
-                if (moist < 35)
-                    return { cause: 'Dry soil', suggest: 'Irrigation required for maize growth.' };
-            }
-
-            if (crop === 'Cotton') {
-                if (hum > 80)
-                    return { cause: 'High humidity', suggest: 'Risk of fungal disease, monitor leaves.' };
-            }
-
-            return {
-                cause: 'Conditions normal',
-                suggest: 'No action required. Continue monitoring.'
-            };
-        }
-
-    </script>
-    <script>
 function analyzeFieldImage() {
-  const crop = document.getElementById("fieldCrop").value;
-  const fileInput = document.getElementById("fieldImage");
-  const result = document.getElementById("imageResult");
-
+  const fileInput = document.getElementById('fieldImage');
+  const result    = document.getElementById('imageResult');
   if (!fileInput.files.length) {
-    result.innerHTML = "❌ Please upload a field image.";
+    result.innerHTML = '<span style="color:#e05252">Please upload a field image first.</span>';
     return;
   }
-
-  if (!crop) {
-    result.innerHTML = "❌ Please select crop type.";
+  const img = document.getElementById('previewImg');
+  if (!img.src || img.naturalWidth === 0) {
+    result.innerHTML = '<span style="color:#e05252">Image not loaded properly. Please re-upload.</span>';
     return;
   }
+  const canvas = document.createElement('canvas');
+  const ctx2   = canvas.getContext('2d');
+  canvas.width  = img.naturalWidth;
+  canvas.height = img.naturalHeight;
+  ctx2.drawImage(img, 0, 0);
+  const pixels = ctx2.getImageData(0, 0, canvas.width, canvas.height).data;
 
-  const fileName = fileInput.files[0].name.toLowerCase();
-
-  /* ===== Crop keyword validation ===== */
-  const cropKeywords = {
-    Rice: ["rice", "paddy"],
-    Wheat: ["wheat"],
-    Maize: ["maize", "corn"],
-    Bajra: ["bajra", "millet"],
-    Cotton: ["cotton"],
-    Groundnut: ["groundnut", "peanut"],
-    Mustard: ["mustard"],
-    Soybean: ["soybean", "soy"],
-    Sunflower: ["sunflower"],
-    Chickpea: ["chickpea", "gram"],
-    Jowar: ["jowar", "sorghum"],
-    Barley: ["barley"]
-  };
-
-  /* ===== Stress keywords ===== */
-  const stressKeywords = [
-    "burn",
-    "burnt",
-    "dry",
-    "drought",
-    "damaged",
-    "wilt",
-    "stress"
-  ];
-
-  const isCropMatch =
-    (cropKeywords[crop] || []).some(k => fileName.includes(k));
-
-  const isStressed =
-    stressKeywords.some(k => fileName.includes(k));
-
-  /* ===== Invalid image ===== */
-  if (!isCropMatch && !isStressed) {
-    result.innerHTML = `
-      ❌ <b>Invalid Image</b><br>
-      The uploaded image does not appear to be a <b>${crop}</b> field.<br>
-      📷 Please upload a proper crop/field image.
-    `;
-    return;
+  let green = 0, yellow = 0, brown = 0;
+  for (let i = 0; i < pixels.length; i += 4) {
+    const r = pixels[i], g = pixels[i+1], b = pixels[i+2];
+    if (g > r + 20 && g > b + 20) green++;
+    else if (r > 150 && g > 150 && b < 120) yellow++;
+    else if (r > 120 && g < 100 && b < 100) brown++;
   }
 
-  /* ===== Stressed / Burnt crop ===== */
-  if (isStressed) {
-    result.innerHTML = `
-      ⚠️ <b>Crop Stress Detected</b><br><br>
+  const total = pixels.length / 4;
+  const gR = green/total, yR = yellow/total, bR = brown/total;
 
-      🔍 <b>Observed Condition:</b><br>
-      The crop shows signs of dryness or burning, which may reduce yield.<br><br>
+  let cond;
+  if      (gR < 0.12)  cond = '🔴 NO_CROP — Very little green detected. Verify image.';
+  else if (gR > 0.6)   cond = '🟢 HEALTHY — High green coverage. Crop looks vigorous.';
+  else if (bR > 0.15)  cond = '🟠 DRY / BURNT — Brown tissue dominant. Irrigation needed.';
+  else if (yR > 0.15)  cond = '🟡 NUTRIENT STRESS — Yellow tones indicate deficiency.';
+  else                  cond = '🟡 GENERAL STRESS — Mixed condition, monitor closely.';
 
-      🧪 <b>Possible Causes:</b>
-      <ul>
-        <li>Insufficient irrigation or drought condition</li>
-        <li>High temperature / heat stress</li>
-        <li>Nutrient deficiency or soil imbalance</li>
-      </ul>
-
-      🩺 <b>Treatment & Corrective Measures:</b>
-      <ul>
-        <li>🚿 Increase irrigation frequency (avoid flooding)</li>
-        <li>🌱 Apply organic mulch to retain soil moisture</li>
-        <li>🧪 Conduct soil testing before fertilizer application</li>
-        <li>🧂 Apply micronutrients if deficiency is confirmed</li>
-        <li>⏳ Monitor crop recovery for 7–10 days</li>
-      </ul>
-
-      📌 <i>If stress persists, consult an agricultural expert.</i>
-    `;
-    return;
-  }
-
-  /* ===== Healthy crop ===== */
   result.innerHTML = `
-    ✅ <b>Crop Looks Healthy</b><br>
-    🌱 No visible stress detected in the field image.<br>
-    ✔ Continue regular irrigation, nutrient management, and monitoring.
+    <strong>Image Color Analysis</strong><br><br>
+    🟢 Green: ${(gR*100).toFixed(1)}%<br>
+    🟡 Yellow: ${(yR*100).toFixed(1)}%<br>
+    🟤 Brown: ${(bR*100).toFixed(1)}%<br><br>
+    <strong>Detected Condition:</strong><br>${cond}
+  `;
+}
+
+function analyzeField() {
+  const crop   = document.getElementById('fieldCrop').value;
+  const soil   = document.getElementById('soilType').value;
+  const area   = Number(document.getElementById('fieldArea').value);
+  const box    = document.getElementById('fieldResult');
+
+  if (!crop || !soil || !area) {
+    box.innerHTML = '<span style="color:#e05252">Please select crop, soil type and field area.</span>';
+    return;
+  }
+
+  let status = '', risk = '', recommendation = '';
+
+  if (crop.includes('Rice')) {
+    if (soil === 'Alluvial' || soil === 'Loamy') { status='✅ Ideal Condition'; risk='Low'; recommendation='Rice performs best in alluvial/loamy soil. Maintain shallow standing water (3–5 cm), apply nitrogen in split doses, and monitor stem borer.'; }
+    else if (soil === 'Clay')  { status='⚠ Advisory'; risk='Waterlogging risk'; recommendation='Clay soil retains excess water. Improve drainage and avoid prolonged flooding.'; }
+    else if (soil === 'Sandy') { status='⚠ Advisory'; risk='Low water retention'; recommendation='Sandy soil drains quickly. Increase irrigation frequency and add organic matter.'; }
+    else { status='❌ High Risk'; risk='Unsuitable soil'; recommendation='This soil type is not suitable for rice. Consider soil amendment or alternative crop.'; }
+  } else if (crop.includes('Wheat')) {
+    if (soil === 'Loamy' || soil === 'Alluvial') { status='✅ Ideal Condition'; risk='Low'; recommendation='Wheat grows well in loamy/alluvial soil. Ensure good drainage and balanced NPK.'; }
+    else if (soil === 'Clay') { status='⚠ Advisory'; risk='Poor aeration'; recommendation='Clay soil may restrict root growth. Avoid over-irrigation and practice shallow tillage.'; }
+    else { status='⚠ Advisory'; risk='Sub-optimal soil'; recommendation='Improve soil structure using farmyard manure and proper irrigation scheduling.'; }
+  } else if (crop.includes('Maize')) {
+    if (soil === 'Loamy' || soil === 'Alluvial') { status='✅ Ideal Condition'; risk='Low'; recommendation='Maize prefers well-drained loamy soil. Apply nitrogen in stages and avoid water stagnation.'; }
+    else if (soil === 'Sandy') { status='⚠ Advisory'; risk='Nutrient leaching'; recommendation='Sandy soil causes nutrient loss. Apply organic manure and split fertilizer doses.'; }
+    else { status='⚠ Advisory'; risk='Moisture stress'; recommendation='Monitor soil moisture carefully and irrigate during critical growth stages.'; }
+  } else if (crop.includes('Cotton')) {
+    if (soil === 'Black') { status='✅ Ideal Condition'; risk='Low'; recommendation='Black soil is ideal for cotton. Monitor bollworm and avoid excess nitrogen.'; }
+    else { status='⚠ Advisory'; risk='Moisture imbalance'; recommendation='Maintain proper irrigation schedule and pest monitoring.'; }
+  } else if (crop.includes('Groundnut') || crop.includes('Bajra') || crop.includes('Mustard')) {
+    if (soil === 'Sandy' || soil === 'Loamy') { status='✅ Ideal Condition'; risk='Low'; recommendation='Loose sandy/loamy soil suits this crop well. Ensure calcium availability.'; }
+    else { status='⚠ Advisory'; risk='Drainage concern'; recommendation='Ensure soil aeration and balanced fertilization.'; }
+  } else {
+    status='⚠ Advisory'; risk='Limited data'; recommendation='Crop-soil combination requires expert consultation for best results.';
+  }
+
+  const areaNote = area >= 5 ? '<br><br>🚜 <strong>Large field detected:</strong> Mechanized irrigation and scheduled monitoring recommended.' : '';
+
+  box.innerHTML = `
+    <strong>Crop:</strong> ${crop} &nbsp;·&nbsp; <strong>Soil:</strong> ${soil} &nbsp;·&nbsp; <strong>Area:</strong> ${area} acres<br><br>
+    <strong>Status:</strong> ${status}<br>
+    <strong>Risk Level:</strong> ${risk}<br><br>
+    <strong>Recommendation:</strong><br>${recommendation}${areaNote}
   `;
 }
 </script>
 
-</script>
-
-
 </body>
-
 </html>
