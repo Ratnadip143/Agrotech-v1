@@ -1,10 +1,10 @@
-🌱 AgroTech — Smart Farming Dashboard
+## 🌱 AgroTech — Smart Farming Dashboard
 
 > 🚀 A Smart Agriculture System combining IoT + Web App + Android APK to improve crop monitoring, disease detection, and farm decision-making.
 
 ---
 
-📌 Overview
+## 📌 Overview
 
 AgroTech is a full-stack smart farming solution that integrates:
 
@@ -16,10 +16,37 @@ AgroTech is a full-stack smart farming solution that integrates:
 This system enables farmers to **monitor crops in real-time, detect issues early, and make data-driven decisions.
 
 ---
-
+## 🧩 Project Structure
+```
+AGROTECH-V1/
+├── .firebaserc
+├── README.md
+├── firebase.json
+├── data/   
+│   ├── 404.html
+│   ├── andriod-chrome-192X192.png
+│   └── andriod-chrome-512X195.png
+│   └── apple-touch-icon.png
+│   └── demo.html
+│   └── favicon-16X16.png
+│   └── favicon-32X32.png
+│   └── favicon.ico
+│   └── index.html
+│   └── LICENSE
+│   └── README.md
+│   └── SECURITY.md
+│   └── site.webmanifest
+├── .gitignore
+├── Agrotech app Password.png
+├── Preview-1.png
+├── Preview-2.png
+├── Preview-3.png
+├── Preview-4.png
+```
+---
 ## 🔥 Key Features
 
- 🌿 Plant Disease Detection
+### 🌿 Plant Disease Detection
 
 * Upload image OR capture via ESP32-CAM
 * Detects plant conditions
@@ -28,7 +55,7 @@ This system enables farmers to **monitor crops in real-time, detect issues early
 
 ---
 
- 📷 ESP32-CAM Integration
+### 📷 ESP32-CAM Integration
 
 * Real-time image capture
 * Works on local WiFi network
@@ -36,7 +63,7 @@ This system enables farmers to **monitor crops in real-time, detect issues early
 
 ---
 
-💧 Smart Moisture Monitoring
+### 💧 Smart Moisture Monitoring
 
 * Displays:
 
@@ -49,7 +76,7 @@ This system enables farmers to **monitor crops in real-time, detect issues early
 
 ---
 
- 🌱 Seed Requirement Calculator
+### 🌱 Seed Requirement Calculator
 
 * Calculates:
 
@@ -60,7 +87,7 @@ This system enables farmers to **monitor crops in real-time, detect issues early
 
 ---
 
-🧠 Field Analysis System
+### 🧠 Field Analysis System
 
 * Crop + Soil based analysis
 * Detects:
@@ -71,7 +98,7 @@ This system enables farmers to **monitor crops in real-time, detect issues early
 
 ---
 
-🔐 Authentication System
+### 🔐 Authentication System
 
 * Firebase Authentication
 * Email & Password login
@@ -79,11 +106,13 @@ This system enables farmers to **monitor crops in real-time, detect issues early
 
 ---
 
- 📱 Android Application (APK)
+### 📱 Android Application (APK)
 
 AgroTech is also deployed as a native Android application using Android Studio.
 
-⚙️ Architecture
+---
+
+## ⚙️ Architecture
 
 * Uses WebView technology
 * Loads the AgroTech web app inside mobile app
@@ -93,9 +122,9 @@ AgroTech is also deployed as a native Android application using Android Studio.
   * Real-time sensor data
   * ESP32-CAM image capture
 
----
 
- 🛠️ Android Studio Setup
+
+## 🛠️ Android Studio Setup
 
  Requirements
 
@@ -104,8 +133,26 @@ AgroTech is also deployed as a native Android application using Android Studio.
 * Java (JDK)
 
 ---
+## Preview of front page 
+<p align="center">
+  <img src="Preview-1.png" width="600">
+</p>
 
- Implementation Steps
+---
+
+## Preview
+<p align="center">
+  <img src="Preview-2.png" width="600">
+</p>
+<p align="center">
+  <img src="Preview-3.png" width="600">
+</p>
+<p align="center">
+  <img src="Preview-4.png" width="600">
+</p>
+---
+
+## Implementation Steps
 
 1. Create new project (Empty Activity)
 2. Add WebView in `MainActivity.java`
@@ -115,7 +162,7 @@ AgroTech is also deployed as a native Android application using Android Studio.
 
 ---
 
- 💻 WebView Code
+## 💻 WebView Code
 
 ```java id="code1"
 WebView webView = new WebView(this);
@@ -126,18 +173,16 @@ webView.setWebViewClient(new WebViewClient());
 
 webView.loadUrl("https://your-website-link.com");
 ```
-
 ---
 
-🔐 Required Permission
+## 🔐 Required Permission
 
 ```xml id="code2"
 <uses-permission android:name="android.permission.INTERNET"/>
 ```
-
 ---
 
- 📦 APK Generation
+## 📦 APK Generation
 
 * Build → Generate Signed Bundle / APK
 * Output:
@@ -145,10 +190,10 @@ webView.loadUrl("https://your-website-link.com");
 ```
 app-release.apk
 ```
-
 ---
 
-🛠️ Technologies Used
+
+## 🛠️ Technologies Used
 
 | Category   | Technology Used               |
 | ---------- | ----------------------------- |
@@ -161,7 +206,7 @@ app-release.apk
 
 ---
 
- ⚙️ System Workflow
+## ⚙️ System Workflow
 
 ```
 ESP32 Sensors → Firebase → Web App → Android App
@@ -172,10 +217,10 @@ ESP32 Sensors → Firebase → Web App → Android App
 3. Web app fetches & displays data
 4. Android app loads same system
 5. User receives insights & recommendations
-
 ---
 
- 📡 IoT Integration
+
+## 📡 IoT Integration
 
 * Soil Moisture
 * Temperature
@@ -186,37 +231,93 @@ Data path:
 ```
 /agrotech/sensors
 ```
+---
+
+### 💻 Local Development
+
+1. **Clone the repository:**
+   ```bash
+   # Using Git
+   git clone https://github.com/Ratnadip143/Agrotech-v1
+   
+   # Or use GitHub Desktop for GUI cloning
+   ```
+
+2. **Navigate to project directory:**
+   ```bash
+   cd AGROTECH-V1
+   ```
+3. **Open the main website:**
+   - Simply open `index.html` in your browser
+   - Or use a local server (recommended):
+   ```bash
+   # Using Python
+   python -m http.server 8000
+
+   # Using VS Code Live Server extension
+   ```
+
+4. **For individual projects:**
+   - Open the project's `index.html` file
 
 ---
 
-⚠️ Important Notes
+### 🐛 Bug Fixes & Improvements
+1. **Fork** the repository
+2. **Create** a new branch: `git checkout -b fix-bug-name`
+3. **Make** your changes
+4. **Test** thoroughly
+5. **Submit** a pull request
 
+---
+
+## Contribution
+Contributions are welcome.
+- Fork the repository
+- Create a new branch
+- Commit changes
+- Open a Pull Request
+
+---
+
+### 📋 Contribution Guidelines
+- Follow existing code style and structure
+- Add appropriate comments to your code  
+- Test your changes before submitting
+- Include a clear commit message
+- Update documentation if needed
+
+---
+
+## ⚠️ Important Notes
 * ⚠️ This is a prototype system
 * 🤖 AI detection is currently simulated
 * 📶 ESP32 must be on same WiFi network
 * 📱 APK uses WebView architecture
-
 ---
-🔮 Future Scope
 
+
+## 🔮 Future Scope
 * Real AI model integration (TensorFlow)
 * Native Android UI
 * Offline mode for rural areas
 * Automated irrigation system
 * Cloud-based analytics
-
 ---
-👨‍💻 Author
+
+## 👨‍💻 Author
 
 Ratnadip Roy
 
 ---
 
- 📄 License
+## 📄 License
 
 This project is for educational and research purposes only.
 
 ---
 
-⭐ Final Note
+## ⭐ Final Note
 AgroTech demonstrates how IoT + Web + Mobile + AI can be combined to build a smart farming ecosystem.
+
+---
