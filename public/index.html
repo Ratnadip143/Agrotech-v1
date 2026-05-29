@@ -338,30 +338,50 @@
             transform: translateX(-50%);
             bottom: 18px;
             z-index: 40;
-            background: rgba(16, 20, 18, 0.9);
-            padding: 8px 12px;
-            border-radius: 40px;
-            display: flex;
-            gap: 12px;
-            box-shadow: 0 10px 30px rgba(4, 8, 6, 0.3);
-        }
 
-        .bbtn {
-            color: #dbeee0;
-            width: 48px;
-            height: 48px;
+            background: rgba(16, 20, 18, 0.95);
+
+            padding: 10px 16px;
+
+            border-radius: 50px;
+
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 12px;
+
+            gap: 14px;
+
+            box-shadow: 0 10px 30px rgba(4, 8, 6, 0.3);
+
+            min-width: 420px;
+}
+        .bbtn {
+            color: #dbeee0;
+
+            width: 50px;
+            height: 50px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            border-radius: 14px;
+
             cursor: pointer;
+
             font-size: 18px;
+
+            transition: 0.3s ease;
         }
 
         .bbtn.active {
-            background: linear-gradient(90deg, var(--accent-dark), var(--accent));
+            background: linear-gradient(135deg, #1db954, #34d399);
             color: #fff;
-        }
+
+            box-shadow: 0 0 15px rgba(52, 211, 153, 0.5);
+
+            transform: translateY(-2px);
+}
 
         /* Auth overlay (login/signup) */
         #authPanel {
@@ -514,9 +534,12 @@
                         class="fa-solid fa-chart-line"></i></div>
                 <div class="side-btn" id="m-field" title="Field Analysis" onclick="navClick('field')">
                 <i class="fa-solid fa-map"></i>
-            </div>
+                </div>
                 <div class="side-btn" id="m-profile" title="Profile" onclick="navClick('profile')"><i
                         class="fa-solid fa-user"></i></div>
+                <div class="side-btn" id="m-about" title="About Us" onclick="navClick('about')">
+                  <i class="fa-solid fa-circle-info"></i>
+                </div>
             </nav>
             <div class="spacer"></div>
             <div style="width:100%; display:flex; justify-content:center;">
@@ -756,6 +779,62 @@
                             </div>
                         </div>
                     </div>
+                    
+                </section>
+                <!--about page -->
+                <section id="page-about" class="page-card" aria-hidden="true">
+                    <h3>About AgroTech</h3>
+
+                    <div style="margin-top:12px; line-height:1.8;">
+
+                        <div class="profile-row">
+                            <div class="avatar">
+                                <i class="fa-solid fa-leaf"></i>
+                            </div>
+
+                            <div>
+                                <div style="font-weight:700; font-size:18px;">
+                                    AgroTech
+                                </div>
+
+                                <div class="muted">
+                                    Smart Agriculture Assistance Platform
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top:20px;">
+
+                            <p>
+                                AgroTech is an innovative smart farming platform designed
+                                to assist farmers using modern technology and intelligent monitoring systems.
+                            </p>
+
+                            <p>
+                                The platform provides features such as:
+                            </p>
+
+                            <ul style="padding-left:20px;">
+                                <li>Crop Disease Detection</li>
+                                <li>Seed Rate Calculation</li>
+                                <li>Soil Moisture Monitoring</li>
+                                <li>Field Analysis</li>
+                                <li>Farmer Dashboard Management</li>
+                            </ul>
+
+                            <p>
+                                AgroTech aims to improve agricultural productivity,
+                                reduce crop loss, and support farmers with data-driven insights.
+                            </p>
+
+                            <p>
+                                This project combines technology and agriculture
+                                to create smarter and more sustainable farming solutions.
+                            </p>
+
+                        </div>
+
+                    </div>
                 </section>
                 <section id="page-field" class="page-card" aria-hidden="true">
     <h3>Field Analysis</h3>
@@ -840,11 +919,14 @@
         </div>
         <div class="bbtn" id="b-field" title="Field Analysis" onclick="navClick('field')">
         <i class="fa-solid fa-map"></i>
-    </div>
-
+        </div>
+   
         <div class="bbtn" id="b-profile" title="Profile" onclick="navClick('profile')"><i class="fa-solid fa-user"></i>
         </div>
-    </div>
+        <div class="bbtn" id="b-about" title="About Us" onclick="navClick('about')">
+         <i class="fa-solid fa-circle-info"></i>
+         </div>  
+</div>
 
     <!-- AUTH PANEL (overlay) -->
     <div id="authPanel">
@@ -1142,31 +1224,40 @@ function analyzeField() {
         const pageMoisture = document.getElementById('page-moisture');
         const pageProfile = document.getElementById('page-profile');
         const pageField = document.getElementById('page-field');
-        const allPages = [pageDashboard, pageDetect, pageSeed, pageMoisture, pageProfile, pageField];
+        const pageAbout = document.getElementById('page-about');
+        const allPages = [pageDashboard, pageDetect, pageSeed, pageMoisture, pageProfile, pageField,pageAbout];
 
         const sideButtons = {
             dashboard: document.getElementById('m-dashboard'),
             detect: document.getElementById('m-detect'),
             seed: document.getElementById('m-seed'),
             moisture: document.getElementById('m-moist'),
-            profile: document.getElementById('m-profile')
+            profile: document.getElementById('m-profile'),
+            about: document.getElementById('m-about')
             
         };
         const bottomButtons = {
             dashboard: document.getElementById('b-dashboard'),
             detect: document.getElementById('b-detect'),
             seed: document.getElementById('b-seed'),
-            profile: document.getElementById('b-profile')
+            profile: document.getElementById('b-profile'),
+            about: document.getElementById('b-about')
         };
 
         /* ======================= NAVIGATION (single-page display) ======================= */
         function hideAllPages() {
             allPages.forEach(p => { p.style.display = 'none'; p.setAttribute('aria-hidden', 'true'); });
         }
-        function clearActive() {
-            Object.values(sideButtons).forEach(b => b.classList.remove('active'));
-            Object.values(bottomButtons).forEach(b => b.classList.remove('active'));
-        }
+      
+           function clearActive() {
+                Object.values(sideButtons).forEach(b => {
+                if (b) b.classList.remove('active');             });
+
+                    Object.values(bottomButtons).forEach(b => {
+                        if (b) b.classList.remove('active');
+                    });
+                }
+        
         function setActive(menu) {
             clearActive();
             if (sideButtons[menu]) sideButtons[menu].classList.add('active');
@@ -1181,7 +1272,7 @@ function analyzeField() {
             if (target === 'moisture') pageMoisture.style.display = 'block';
             if (target === 'profile') pageProfile.style.display = 'block';
             if (target === 'field') pageField.style.display = 'block';
-
+            if (target === 'about') pageAbout.style.display = 'block';
         }
         /* initial */
         hideAllPages();
