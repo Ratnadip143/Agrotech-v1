@@ -55,6 +55,58 @@ AGROTECH-V1/
 
 ---
 
+# 🚀 Feature Preview
+
+---
+
+## 🌿 Smart Farming Dashboard
+
+<p align="center">
+  <img src="Preview-2.png" width="800"/>
+</p>
+
+- 📊 Real-time soil moisture monitoring  
+- 🌡 Temperature tracking  
+- 💧 Humidity analysis  
+- 📈 Live charts with Firebase sync  
+
+---
+
+## 🧠 Crop Intelligence System
+
+<p align="center">
+  <img src="Preview-3.png" width="800"/>
+</p>
+
+- 🌱 Crop health insights  
+- ⚠ Basic disease detection  
+- 💡 Smart farming recommendations  
+- 🌾 Field condition analysis  
+
+---
+
+## 📡 IoT Monitoring System
+
+<p align="center">
+  <img src="Preview-4.png" width="800"/>
+</p>
+
+- 📡 ESP32 sensor integration  
+- ☁ Firebase real-time data sync  
+- 🌍 Live field monitoring  
+- 🔄 Continuous updates from farm  
+
+---
+
+## 📱 Cross-Platform Access
+
+- 🌐 Web Dashboard  
+- 📱 Android App (WebView)  
+- 📡 IoT Device Support  
+- ☁ Cloud-based system  
+
+---
+
 ### 📷 ESP32-CAM Integration
 
 * Real-time image capture
@@ -133,24 +185,21 @@ AgroTech is also deployed as a native Android application using Android Studio.
 * Java (JDK)
 
 ---
-## Preview of front page 
-<p align="center">
-  <img src="Preview-1.png" width="600">
-</p>
+📸 Product Screenshots
 
----
+A visual walkthrough of the AgroTech smart farming ecosystem.
 
-## Preview
-<p align="center">
-  <img src="Preview-2.png" width="600">
-</p>
-<p align="center">
-  <img src="Preview-3.png" width="600">
-</p>
-<p align="center">
-  <img src="Preview-4.png" width="600">
-</p>
----
+🌿 1. Smart Farming Dashboard (Main Control Panel)
+<p align="center"> <img src="Preview-1.png" width="900"/> </p> <p align="center"> <b>Real-time IoT dashboard showing live agricultural conditions powered by Firebase + ESP32 sensors.</b> </p>
+
+📊 2. Live Sensor Analytics & Monitoring
+<p align="center"> <img src="Preview-2.png" width="900"/> </p> <p align="center"> <b>Interactive charts displaying temperature, humidity, and soil moisture trends in real time.</b> </p>
+
+🌱 3. Crop Intelligence & Field Insights
+<p align="center"> <img src="Preview-3.png" width="900"/> </p> <p align="center"> <b>Smart recommendation engine analyzing soil conditions and crop health for better farming decisions.</b> </p>
+
+📡 4. Advanced Analytics & System Output
+<p align="center"> <img src="Preview-4.png" width="900"/> </p> <p align="center"> <b>System-generated insights including risk detection, crop suggestions, and environmental analysis.</b> </p>
 
 ## Implementation Steps
 
@@ -228,6 +277,8 @@ Firebase Realtime Database
      Android Application
       ↓
  Farmers & Farm Managers
+
+ 
 ```
 
 
