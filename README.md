@@ -206,8 +206,6 @@ app-release.apk
 
 ---
 
-## ⚙️ System Workflow
-
 ```
 ESP32 Sensors → Firebase → Web App → Android App
 ```
@@ -218,6 +216,19 @@ ESP32 Sensors → Firebase → Web App → Android App
 4. Android app loads same system
 5. User receives insights & recommendations
 ---
+## 🔄 System Workflow
+
+```text
+ESP32 Sensors
+      ↓
+Firebase Realtime Database
+      ↓
+     AgroTech Web App
+      ↓
+     Android Application
+      ↓
+ Farmers & Farm Managers
+```
 
 
 ## 📡 IoT Integration
@@ -318,6 +329,7 @@ This project is for educational and research purposes only.
 ---
 
 ## ⭐ Final Note
+
 AgroTech demonstrates how IoT + Web + Mobile + AI can be combined to build a smart farming ecosystem.
 
 ---
