@@ -321,5 +321,3 @@ This project is for educational and research purposes only.
 AgroTech demonstrates how IoT + Web + Mobile + AI can be combined to build a smart farming ecosystem.
 
 ---
-# TEST CHANGE Wed Jun  3 00:07:44 IST 2026
-# TEST
