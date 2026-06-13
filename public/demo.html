@@ -292,6 +292,9 @@
             cursor: pointer;
             font-weight: 600;
         }
+        .delete-btn {
+            background: #ff6b6b;
+        }
 
         .muted {
             color: var(--muted);
@@ -330,6 +333,29 @@
             font-size: 26px;
             color: #1a553f;
         }
+        .user-info {
+    background: #f7fffb;
+    padding: 15px;
+    border-radius: 12px;
+    flex: 1;
+        }
+
+.user-info p {
+    margin: 6px 0;
+    color: #184c38;
+}
+
+#editName {
+    width: 100%;
+    padding: 10px 12px;
+    margin-top: 8px;
+    border-radius: 10px;
+    border: 1px solid #dfe7e2;
+}
+
+.profile-row {
+    align-items: flex-start;
+}
 
         /* Bottom nav */
         .bottom-nav {
@@ -740,10 +766,11 @@
                     <h3>Profile</h3>
                     <div style="margin-top:12px;">
                         <div class="profile-row">
-                            <div class="avatar" id="profileAvatar">U</div>
-                            <div>
-                                <div id="p-email" style="font-weight:700"></div>
-                                <div id="p-name" class="muted"></div>
+                            <div class="avatar" id="profileAvatar"></div>
+                            <div class="user-info">
+                                <p><b>Email:</b> <span id="profileEmail">Loading...</span></p>
+                                <p><b>Username:</b> <span id="profileUsername">User</span></p>
+                                <p><b>Joined:</b> <span id="profileDate">2026</span></p>
                             </div>
                         </div>
                         <div style="margin-top:16px;">
@@ -751,8 +778,9 @@
                             <input id="editName" placeholder="New display name">
                             <div style="display:flex; gap:8px; margin-top:10px;">
                                 <button class="primary-btn" onclick="updateName()">Update Name</button>
-                                <button class="primary-btn" style="background:#ff6b6b" onclick="deleteAccount()">Delete
-                                    Account</button>
+                                <button class="primary-btn delete-btn" onclick="deleteAccount()">
+                                    Delete Account
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -1238,9 +1266,16 @@ function analyzeField() {
         auth.onAuthStateChanged(user => {
             if (user) {
                 document.getElementById('userEmailTop').textContent = user.email;
-                document.getElementById('p-email').textContent = user.email;
-                document.getElementById('p-name').textContent = user.displayName || 'No display name';
+                document.getElementById('profileEmail').textContent = user.email;
+                document.getElementById('profileUsername').textContent =
+                user.displayName || user.email.split("@")[0];
                 document.getElementById('profileAvatar').textContent = (user.displayName || user.email).charAt(0).toUpperCase();
+                document.getElementById('profileUsername').textContent =
+                user.displayName || user.email.split("@")[0];
+                document.getElementById('profileDate').textContent =
+                user.metadata.creationTime 
+                     ? new Date(user.metadata.creationTime).toDateString()
+                : "Unknown";
                 // hide overlay
                 authPanel.style.display = 'none';
                 // show app
@@ -1534,17 +1569,27 @@ setTimeout(() => {
 
 
         /* ======================= Profile actions ======================= */
-        function updateName() {
-            const newName = document.getElementById('editName').value.trim();
-            if (!newName) return alert('Enter a name');
-            const user = auth.currentUser;
-            user.updateProfile({ displayName: newName }).then(() => {
-                document.getElementById('p-name').textContent = newName;
-                document.getElementById('welcomeTitle').textContent = `Welcome, ${newName}`;
-                document.getElementById('profileAvatar').textContent = newName.charAt(0).toUpperCase();
-                alert('Name updated');
-            }).catch(err => alert(err.message));
-        }
+       function updateName() {
+    const newName = document.getElementById('editName').value.trim();
+
+    if (!newName) return alert('Enter a name');
+
+    const user = auth.currentUser;
+
+    user.updateProfile({ displayName: newName }).then(() => {
+
+        document.getElementById('profileUsername').textContent = newName;
+
+        document.getElementById('welcomeTitle').textContent =
+        `Welcome, ${newName}`;
+
+        document.getElementById('profileAvatar').textContent =
+        newName.charAt(0).toUpperCase();
+
+        alert('Name updated');
+
+    }).catch(err => alert(err.message));
+}
         function deleteAccount() {
             if (!confirm('Are you sure? This will permanently delete your account.')) return;
             const user = auth.currentUser;
