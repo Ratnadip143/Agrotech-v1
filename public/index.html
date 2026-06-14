@@ -537,19 +537,40 @@
                 </div>
             </div>
 
+
             <div class="content" id="contentArea">
                 <!-- Dashboard -->
                 <section id="page-dashboard" class="dashboard-wrap">
                     <div class="welcome-box">
                         <div class="welcome-left">
-                            <h1 id="welcomeTitle">Welcome</h1>
-                            <p id="welcomeSub" class="muted">Select a tool from the left menu to get started</p>
-                        </div>
+                            <h1 id="welcomeTitle">Welcome to AgroTech</h1>
+                            <p id="welcomeSub" class="muted">Smart Farming Dashboard for Disease detection,
+                                 Seed Calculation ,  Moisture Monitoring and Field Analysis . 
+                            </p>
+
+                            <ul style = "color : #3d6552;">
+                               <li>Plant Disease Detection </li>
+                               <li> Seed Calculator </li>
+                               <li> Moisture Monitor</li>
+                               <li> Field Analysis</li>
+                            </ul>
+
+                            <div style = "margin-top: 18px;">
+                            <button class = "primary-btn" onclick="showSignIn()">
+                                Sign In
+                            </button>
+                            <button class = "primary-btn" style = " margin-left: 10px;" onclick="showSignUp()">
+                                Sign Up
+                            </button>
+
+                            </div>
+                        
                         <div class="welcome-right"><img
                                 src="https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=900&q=70"
                                 alt="plant" /></div>
                     </div>
-                </section>
+                    </div>
+                 </section>
 
                 <!-- ================= Disease Detection ================= -->
                 <section id="page-detect" class="page-card" aria-hidden>
@@ -847,7 +868,7 @@
     </div>
 
     <!-- AUTH PANEL (overlay) -->
-    <div id="authPanel">
+    <div id="authPanel" style="display: none;">
         <div class="authBox" role="dialog" aria-modal="true">
             <h2>Welcome to AgroTech</h2>
             <div class="muted">Sign in or create an account to continue</div>
@@ -1187,7 +1208,22 @@ function analyzeField() {
         hideAllPages();
         navClick('dashboard');
 
+        function showSignIn(){
+            authPanel.style.display='flex';
+            signInForm.style.display='block';
+            signUpForm.style.display='none';
+        }
+        
+        function showSignUp(){
+            authPanel.style.display='flex';
+            signInForm.style.display='none';
+            signUpForm.style.display='block';
+        }
+
+
+
         /* ======================= AUTH UI ======================= */
+
         const authPanel = document.getElementById('authPanel');
         const signInForm = document.getElementById('signInForm');
         const signUpForm = document.getElementById('signUpForm');
@@ -1247,8 +1283,8 @@ function analyzeField() {
                 navClick('dashboard');
             } else {
                 // show overlay
-                authPanel.style.display = 'flex';
-                hideAllPages();
+                authPanel.style.display = 'none';
+                navClick('dashboard');
             }
         });
 
