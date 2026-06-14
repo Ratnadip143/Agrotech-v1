@@ -260,7 +260,317 @@
             box-shadow: 0 18px 50px rgba(10, 20, 12, 0.06);
             display: none;
         }
+        /* ABOUT PAGE */
 
+.about-container{
+max-width:1200px;
+margin:auto;
+padding:40px 20px;
+}
+
+/* HERO */
+
+.hero{
+display:flex;
+justify-content:center;
+align-items:center;
+gap:60px;
+flex-wrap:wrap;
+margin-bottom:90px;
+}
+
+.hero-left{
+flex:1;
+min-width:400px;
+}
+
+.hero-left h1{
+
+font-size:58px;
+
+line-height:1.2;
+
+color:#184c38;
+
+margin-bottom:20px;
+
+}
+
+.hero-left p{
+
+font-size:20px;
+
+color:#555;
+
+line-height:1.8;
+
+}
+
+.explore-btn{
+
+padding:14px 32px;
+
+background:#2ecc71;
+
+border:none;
+
+border-radius:40px;
+
+color:white;
+
+font-size:18px;
+
+font-weight:600;
+
+margin-top:25px;
+
+cursor:pointer;
+
+}
+
+.hero-right{
+
+position:relative;
+
+flex:1;
+
+min-width:400px;
+
+}
+
+.hero-right img{
+
+width:100%;
+
+border-radius:30px;
+
+box-shadow:0 20px 45px rgba(0,0,0,.15);
+
+}
+
+.float-card{
+
+position:absolute;
+
+background:white;
+
+padding:14px 24px;
+
+border-radius:40px;
+
+font-weight:700;
+
+box-shadow:0 10px 25px rgba(0,0,0,.15);
+
+}
+
+.card1{
+
+top:20px;
+
+left:-20px;
+
+}
+
+.card2{
+
+bottom:30px;
+
+left:-20px;
+
+}
+
+.card3{
+
+top:50%;
+
+right:-20px;
+
+}
+
+
+/* HEADINGS */
+
+.section-title{
+
+text-align:center;
+
+font-size:45px;
+
+color:#184c38;
+
+margin-top:70px;
+
+margin-bottom:50px;
+
+}
+
+
+/* FEATURES */
+
+.features{
+
+display:flex;
+
+justify-content:center;
+
+gap:30px;
+
+flex-wrap:wrap;
+
+}
+
+.feature-card{
+
+width:320px;
+
+background:white;
+
+padding:35px;
+
+border-radius:25px;
+
+text-align:center;
+
+box-shadow:0 12px 30px rgba(0,0,0,.1);
+
+transition:.3s;
+
+}
+
+.feature-card:hover{
+
+transform:translateY(-12px);
+
+}
+
+.feature-card h2{
+
+color:#184c38;
+
+margin-bottom:20px;
+
+}
+
+.feature-card p{
+
+font-size:18px;
+
+color:#555;
+
+line-height:1.8;
+
+}
+
+
+/* IMPACT */
+
+.impact{
+
+display:flex;
+
+justify-content:center;
+
+gap:30px;
+
+flex-wrap:wrap;
+
+}
+
+.impact-box{
+
+width:250px;
+
+height:190px;
+
+background:linear-gradient(135deg,#2ecc71,#27ae60);
+
+border-radius:30px;
+
+display:flex;
+
+flex-direction:column;
+
+justify-content:center;
+
+align-items:center;
+
+color:white;
+
+box-shadow:0 15px 35px rgba(46,204,113,.35);
+
+}
+
+.impact-box h1{
+
+font-size:50px;
+
+margin:0;
+
+}
+
+.impact-box p{
+
+font-size:20px;
+
+}
+
+
+/* TIMELINE */
+
+.timeline{
+display:flex;
+justify-content:center;
+align-items:center;
+gap:25px;
+flex-wrap:wrap;
+margin-top:50px;
+width:100%;
+}
+
+.step{
+width:220px;
+height:160px;
+
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+
+background:white;
+
+border-radius:25px;
+
+box-shadow:0 10px 25px rgba(0,0,0,.1);
+
+transition:.3s;
+}
+
+.step:hover{
+
+transform:translateY(-10px);
+
+}
+
+.step h3{
+
+margin-top:15px;
+
+font-size:28px;
+
+color:#184c38;
+
+}
+
+.arrow{
+
+font-size:45px;
+
+color:#2ecc71;
+
+font-weight:bold;
+
+}
         /* Form fields */
         .row {
             display: flex;
@@ -298,7 +608,9 @@
             font-size: 13px;
         }
 
-        /* image preview */
+        /* image x 35px rgba(39,174,96,.35);
+
+transition:.3s;preview */
         #preview {
             max-width: 100%;
             border-radius: 8px;
@@ -514,6 +826,9 @@
                         class="fa-solid fa-chart-line"></i></div>
                 <div class="side-btn" id="m-field" title="Field Analysis" onclick="navClick('field')">
                 <i class="fa-solid fa-map"></i>
+                <div class="side-btn" id="m-about" title="About Me" onclick="navClick('about')">
+    <i class="fa-solid fa-circle-info"></i>
+</div>
             </div>
                 <div class="side-btn" id="m-profile" title="Profile" onclick="navClick('profile')"><i
                         class="fa-solid fa-user"></i></div>
@@ -732,8 +1047,262 @@
 
 
                 </section>
+                
 
 
+
+
+<section id="page-about" class="page-card" aria-hidden>
+
+<div class="about-container">
+
+<div class="hero">
+
+<div class="hero-left">
+
+<h1>
+
+🌾 Empowering Farmers
+
+with Smart Technology
+
+</h1>
+
+<p>
+
+AgroTech combines AI and smart farming techniques to help farmers increase productivity, detect crop diseases and make smarter decisions.
+
+</p>
+
+<button class="explore-btn">
+
+Explore Features
+
+</button>
+
+</div>
+
+
+
+<div class="hero-right">
+
+<img src="https://images.unsplash.com/photo-1464226184884-fa280b87c399?auto=format&fit=crop&w=1400&q=100"
+style="
+width:100%;
+height:420px;
+object-fit:cover;
+border-radius:30px;
+box-shadow:0 20px 50px rgba(0,0,0,.15);
+">
+
+<div class="float-card card1">
+
+🚜 Smart Farming
+
+</div>
+
+<div class="float-card card2">
+
+🌱 AI Powered
+
+</div>
+
+<div class="float-card card3">
+
+📈 Better Yield
+
+</div>
+
+</div>
+
+</div>
+
+
+
+<h1 class="section-title">
+
+🌱 Our Features
+
+</h1>
+
+
+<div class="features">
+
+<div class="feature-card">
+
+<h2>🔬 Disease Detection</h2>
+
+<p>
+
+Identify plant diseases instantly using AI-powered image analysis.
+
+</p>
+
+</div>
+
+
+
+<div class="feature-card">
+
+<h2>🌱 Seed Calculator</h2>
+
+<p>
+
+Calculate exact seed requirements quickly and accurately.
+
+</p>
+
+</div>
+
+
+
+<div class="feature-card">
+
+<h2>💧 Moisture Monitor</h2>
+
+<p>
+
+Track soil moisture in real time for better crop management.
+
+</p>
+
+</div>
+
+</div>
+
+
+
+
+<h1 class="section-title">
+
+📈 Our Impact
+
+</h1>
+
+
+<div class="impact">
+
+<div class="impact-box">
+
+<h1>10K+</h1>
+
+<p>Farmers Benefited</p>
+
+</div>
+
+
+
+<div class="impact-box">
+
+<h1>95%</h1>
+
+<p>Prediction Accuracy</p>
+
+</div>
+
+
+
+<div class="impact-box">
+
+<h1>24/7</h1>
+
+<p>Smart Monitoring</p>
+
+</div>
+
+</div>
+
+
+<h1 class="section-title">
+🚀 Journey
+</h1>
+
+<div class="timeline">
+
+<div class="step">
+
+<div style="font-size:40px;">💡</div>
+
+<h3>Idea</h3>
+
+</div>
+
+
+
+<div class="step">
+
+<div style="font-size:40px;">⚙️</div>
+
+<h3>Development</h3>
+
+</div>
+
+
+<div class="step">
+
+<div style="font-size:40px;">🧪</div>
+
+<h3>Testing</h3>
+
+</div>
+
+
+<div class="step">
+
+<div style="font-size:40px;">🚀</div>
+
+<h3>Deployment</h3>
+
+</div>
+
+</div>
+<h1 class="section-title">
+
+🎯 Mission & Vision
+
+</h1>
+
+
+<div class="mv">
+
+<div class="mv-card">
+
+<h2>
+
+🎯 Mission
+
+</h2>
+
+<p>
+
+Empower farmers with AI-powered tools, increase productivity and promote sustainable agriculture.
+
+</p>
+
+</div>
+
+
+
+<div class="mv-card">
+
+<h2>
+
+💚 Vision
+
+</h2>
+
+<p>
+
+Create a future where technology and farming work together for smarter and more efficient agriculture.
+
+</p>
+
+</div>
+
+</div>
+
+</div>
+</section>
 
                 <!-- Profile -->
                 <section id="page-profile" class="page-card" aria-hidden>
@@ -841,6 +1410,9 @@
         <div class="bbtn" id="b-field" title="Field Analysis" onclick="navClick('field')">
         <i class="fa-solid fa-map"></i>
     </div>
+    <div class="bbtn" id="b-about" title="About" onclick="navClick('about')">
+    <i class="fa-solid fa-circle-info"></i>
+</div>
 
         <div class="bbtn" id="b-profile" title="Profile" onclick="navClick('profile')"><i class="fa-solid fa-user"></i>
         </div>
@@ -1141,6 +1713,7 @@ function analyzeField() {
         const pageSeed = document.getElementById('page-seed');
         const pageMoisture = document.getElementById('page-moisture');
         const pageProfile = document.getElementById('page-profile');
+        const pageAbout = document.getElementById('page-about');
         const pageField = document.getElementById('page-field');
         const allPages = [pageDashboard, pageDetect, pageSeed, pageMoisture, pageProfile, pageField];
 
@@ -1181,6 +1754,7 @@ function analyzeField() {
             if (target === 'moisture') pageMoisture.style.display = 'block';
             if (target === 'profile') pageProfile.style.display = 'block';
             if (target === 'field') pageField.style.display = 'block';
+            if (target === 'about') pageAbout.style.display = 'block';
 
         }
         /* initial */
