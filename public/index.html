@@ -5,6 +5,17 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>AgroTech — Smart Farming Dashboard</title>
+    <!-- Prevent Flash of Unstyled Content (FOUC) -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+        })();
+    </script>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZP5JD05KH3"></script>
     <script>
@@ -42,6 +53,66 @@
             --accent-dark: #27ae60;
             --muted: #6b7280;
             --dark: #0f1720;
+
+            /* Light theme colors */
+            --bg-overlay-color: linear-gradient(rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.85));
+            --text-color: #0b2e21;
+            --text-muted: #3d6552;
+            --text-title: #163b2e;
+            --text-welcome-h1: #184c38;
+            --topbar-bg: rgba(255, 255, 255, 0.72);
+            --topbar-border: rgba(0, 0, 0, 0.04);
+            --welcome-box-bg: rgba(255, 255, 255, 0.88);
+            --welcome-box-shadow: 0 30px 70px rgba(14, 22, 18, 0.12);
+            --page-card-bg: rgba(255, 255, 255, 0.95);
+            --page-card-shadow: 0 18px 50px rgba(10, 20, 12, 0.06);
+            --input-border: #dfe7e2;
+            --input-bg: #ffffff;
+            --input-text: #0b2e21;
+            --card-sub-bg: #fbfff9;
+            --card-sub-bg-alt: #f7fffb;
+            --card-sub-border: #e6efe8;
+            --avatar-bg: #e8f7ee;
+            --avatar-color: #1a553f;
+            --bottom-nav-bg: rgba(16, 20, 18, 0.9);
+            --transition-speed: 0.3s;
+        }
+
+        [data-theme="dark"] {
+            /* Dark theme colors */
+            --muted: #9ca3af;
+            --dark: #070b0f;
+
+            --bg-overlay-color: linear-gradient(rgba(15, 23, 32, 0.88), rgba(15, 23, 32, 0.92));
+            --text-color: #e2f0ea;
+            --text-muted: #a3c9b8;
+            --text-title: #2ecc71;
+            --text-welcome-h1: #ffffff;
+            --topbar-bg: rgba(15, 23, 32, 0.75);
+            --topbar-border: rgba(255, 255, 255, 0.08);
+            --welcome-box-bg: rgba(26, 36, 48, 0.85);
+            --welcome-box-shadow: 0 30px 70px rgba(0, 0, 0, 0.4);
+            --page-card-bg: rgba(20, 30, 43, 0.95);
+            --page-card-shadow: 0 18px 50px rgba(0, 0, 0, 0.3);
+            --input-border: #2d3b4e;
+            --input-bg: #16222f;
+            --input-text: #e2f0ea;
+            --card-sub-bg: #16222f;
+            --card-sub-bg-alt: #1a2836;
+            --card-sub-border: #2d3b4e;
+            --avatar-bg: #11221a;
+            --avatar-color: #2ecc71;
+            --bottom-nav-bg: rgba(8, 12, 16, 0.95);
+        }
+
+        /* Smooth transitions on theme switch */
+        body, .topbar, .welcome-box, .welcome-left h1, .welcome-left p, .page-card, .field input, .field select, .avatar, .bg-overlay, .theme-toggle-btn {
+            transition: background var(--transition-speed) ease, 
+                        background-color var(--transition-speed) ease, 
+                        color var(--transition-speed) ease, 
+                        border-color var(--transition-speed) ease, 
+                        box-shadow var(--transition-speed) ease,
+                        transform var(--transition-speed) ease;
         }
 
         * {
@@ -51,7 +122,7 @@
         body {
             margin: 0;
             font-family: 'Poppins', sans-serif;
-            color: #0b2e21;
+            color: var(--text-color);
             height: 100vh;
             overflow: hidden;
         }
@@ -78,7 +149,7 @@
         .bg-overlay {
             position: absolute;
             inset: 0;
-            background: linear-gradient(rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.85));
+            background: var(--bg-overlay-color);
         }
 
         /* Layout */
@@ -165,9 +236,9 @@
             align-items: center;
             gap: 12px;
             padding: 0 18px;
-            background: rgba(255, 255, 255, 0.72);
+            background: var(--topbar-bg);
             backdrop-filter: blur(8px);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+            border-bottom: 1px solid var(--topbar-border);
             position: sticky;
             top: 0;
             z-index: 10;
@@ -189,7 +260,7 @@
 
         .title {
             font-weight: 700;
-            color: #163b2e;
+            color: var(--text-title);
             font-size: 18px;
         }
 
@@ -224,10 +295,10 @@
         .welcome-box {
             width: 760px;
             max-width: 92%;
-            background: rgba(255, 255, 255, 0.88);
+            background: var(--welcome-box-bg);
             border-radius: 16px;
             padding: 28px 30px;
-            box-shadow: 0 30px 70px rgba(14, 22, 18, 0.12);
+            box-shadow: var(--welcome-box-shadow);
             display: flex;
             gap: 22px;
             align-items: center;
@@ -236,12 +307,12 @@
         .welcome-left h1 {
             margin: 0;
             font-size: 28px;
-            color: #184c38;
+            color: var(--text-welcome-h1);
         }
 
         .welcome-left p {
             margin: 8px 0 0 0;
-            color: #3d6552;
+            color: var(--text-muted);
         }
 
         .welcome-right img {
@@ -254,10 +325,10 @@
         .page-card {
             width: 760px;
             max-width: 92%;
-            background: rgba(255, 255, 255, 0.95);
+            background: var(--page-card-bg);
             border-radius: 14px;
             padding: 22px;
-            box-shadow: 0 18px 50px rgba(10, 20, 12, 0.06);
+            box-shadow: var(--page-card-shadow);
             display: none;
         }
 
@@ -279,7 +350,9 @@
         .field select {
             padding: 10px 12px;
             border-radius: 8px;
-            border: 1px solid #dfe7e2;
+            border: 1px solid var(--input-border);
+            background: var(--input-bg);
+            color: var(--input-text);
             font-size: 14px;
         }
 
@@ -323,12 +396,34 @@
             width: 72px;
             height: 72px;
             border-radius: 12px;
-            background: #e8f7ee;
+            background: var(--avatar-bg);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 26px;
-            color: #1a553f;
+            color: var(--avatar-color);
+        }
+
+        .theme-toggle-btn {
+            background: transparent;
+            border: 1px solid var(--topbar-border);
+            color: var(--text-color);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+
+        .theme-toggle-btn:hover {
+            background: rgba(46, 204, 113, 0.1);
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: scale(1.05);
         }
 
         /* Bottom nav */
@@ -534,6 +629,9 @@
                 </div>
                 <div class="top-actions">
                     <div id="userEmailTop" class="muted"></div>
+                    <button id="themeToggle" class="theme-toggle-btn" aria-label="Toggle theme" title="Toggle theme">
+                        <i class="fa-solid fa-moon"></i>
+                    </button>
                 </div>
             </div>
 
@@ -560,7 +658,7 @@
                         <!-- LEFT: Image input -->
                         <div style="flex:1; min-width:260px;">
                             <div
-                                style="border:2px dashed #e6efe8; padding:18px; border-radius:12px; text-align:center;">
+                                style="border:2px dashed var(--card-sub-border); padding:18px; border-radius:12px; text-align:center;">
                                 <p class="muted">Upload plant image or capture from ESP32-CAM</p>
 
                                 <input type="file" id="fileInput" accept="image/*" style="display:none" />
@@ -589,7 +687,7 @@
 
                         <!-- RIGHT: Result -->
                         <div style="width:320px;">
-                            <div style="background:#fbfff9; padding:14px; border-radius:12px;">
+                            <div style="background:var(--card-sub-bg); padding:14px; border-radius:12px;">
                                 <p class="muted">Result</p>
 
                                 <div id="detectResult" style="font-weight:700; margin-top:6px;">
@@ -656,7 +754,7 @@
                         </div>
 
                         <div style="width:320px;">
-                            <div style="background:#fbfff9; padding:12px; border-radius:10px;">
+                            <div style="background:var(--card-sub-bg); padding:12px; border-radius:10px;">
                                 <p class="muted">Results</p>
                                 <div id="seedResult" style="font-weight:700; margin-top:8px;">Required Seeds: —</div>
                                 <div id="seedWeightResult" style="margin-top:6px; font-weight:700;"></div>
@@ -698,19 +796,19 @@
                     <!-- Sensor readings -->
                     <div id="sensorReadings" style="margin-top:14px;">
                         <div style="display:flex; gap:14px; flex-wrap:wrap;">
-                            <div style="flex:1; min-width:160px; background:#f7fffb; padding:12px; border-radius:10px;">
+                            <div style="flex:1; min-width:160px; background:var(--card-sub-bg-alt); padding:12px; border-radius:10px;">
                                 <div class="muted">🌡 Temperature</div>
                                 <div id="s-temp" style="font-size:20px; font-weight:700;">—</div>
                                 <div class="muted">°C</div>
                             </div>
 
-                            <div style="flex:1; min-width:160px; background:#f7fffb; padding:12px; border-radius:10px;">
+                            <div style="flex:1; min-width:160px; background:var(--card-sub-bg-alt); padding:12px; border-radius:10px;">
                                 <div class="muted">💧 Humidity</div>
                                 <div id="s-hum" style="font-size:20px; font-weight:700;">—</div>
                                 <div class="muted">%</div>
                             </div>
 
-                            <div style="flex:1; min-width:160px; background:#f7fffb; padding:12px; border-radius:10px;">
+                            <div style="flex:1; min-width:160px; background:var(--card-sub-bg-alt); padding:12px; border-radius:10px;">
                                 <div class="muted">🌱 Soil Moisture</div>
                                 <div id="s-moist" style="font-size:20px; font-weight:700;">—</div>
                                 <div class="muted">%</div>
@@ -719,8 +817,8 @@
                     </div>
                     <!-- Expert Help / Hotline -->
                     <div
-                        style="margin-top:16px; padding:14px; background:#f7fffb; border-radius:10px; border:1px solid #e6efe8;">
-                        <div style="font-weight:700; color:#184c38;">📞 Need Expert Help?</div>
+                        style="margin-top:16px; padding:14px; background:var(--card-sub-bg-alt); border-radius:10px; border:1px solid var(--card-sub-border);">
+                        <div style="font-weight:700; color:var(--text-welcome-h1);">📞 Need Expert Help?</div>
                         <p class="muted" style="margin:6px 0;">
                             If the issue persists or the analysis is unclear, contact an agricultural expert.
                         </p>
@@ -1473,11 +1571,12 @@ setTimeout(() => {
         /* Chart setup */
         const ctx = document.getElementById('moistureChart').getContext('2d');
         let chartData = [50, 50, 50, 50, 50, 50, 50, 50, 50, 50];
-        const moistureChart = new Chart(ctx, {
+        let moistureChart = new Chart(ctx, {
             type: 'line',
             data: { labels: chartData.map((_, i) => i + 1), datasets: [{ data: chartData, borderColor: 'rgba(39,174,96,1)', backgroundColor: 'rgba(39,174,96,0.12)', tension: 0.35, fill: true }] },
             options: { scales: { y: { min: 0, max: 100 } }, plugins: { legend: { display: false } }, maintainAspectRatio: false }
         });
+        window.moistureChart = moistureChart;
         function addMoisturePoint(val) {
             moistureChart.data.datasets[0].data.push(val);
             if (moistureChart.data.datasets[0].data.length > 20) moistureChart.data.datasets[0].data.shift();
@@ -1519,8 +1618,10 @@ setTimeout(() => {
                 d.soil
             );
 
-            document.getElementById('s-cause').textContent = analysis.cause;
-            document.getElementById('s-suggest').textContent = analysis.suggest;
+            const causeEl = document.getElementById('s-cause');
+            if (causeEl) causeEl.textContent = analysis.cause;
+            const suggestEl = document.getElementById('s-suggest');
+            if (suggestEl) suggestEl.textContent = analysis.suggest;
         });
 
         // debug message if nothing arrives
@@ -1607,6 +1708,52 @@ setTimeout(() => {
                 suggest: 'No action required. Continue monitoring.'
             };
         }
+
+        // Theme Toggle Script
+        document.addEventListener('DOMContentLoaded', () => {
+            const themeToggle = document.getElementById('themeToggle');
+            if (themeToggle) {
+                const icon = themeToggle.querySelector('i');
+                
+                function updateIcon(theme) {
+                    if (theme === 'dark') {
+                        icon.className = 'fa-solid fa-sun';
+                    } else {
+                        icon.className = 'fa-solid fa-moon';
+                    }
+                }
+                
+                function updateChartColors(theme) {
+                    if (window.moistureChart && window.moistureChart.options && window.moistureChart.options.scales) {
+                        const isDark = theme === 'dark';
+                        const gridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)';
+                        const textColor = isDark ? '#a3c9b8' : '#6b7280';
+                        
+                        if (!window.moistureChart.options.scales.x) window.moistureChart.options.scales.x = {};
+                        if (!window.moistureChart.options.scales.y) window.moistureChart.options.scales.y = {};
+                        
+                        window.moistureChart.options.scales.x.grid = { color: gridColor };
+                        window.moistureChart.options.scales.y.grid = { color: gridColor };
+                        window.moistureChart.options.scales.x.ticks = { color: textColor };
+                        window.moistureChart.options.scales.y.ticks = { color: textColor };
+                        window.moistureChart.update();
+                    }
+                }
+                
+                const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+                updateIcon(currentTheme);
+                // Delay slightly to ensure chart is initialized
+                setTimeout(() => updateChartColors(currentTheme), 100);
+                
+                themeToggle.addEventListener('click', () => {
+                    const targetTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+                    document.documentElement.setAttribute('data-theme', targetTheme);
+                    localStorage.setItem('theme', targetTheme);
+                    updateIcon(targetTheme);
+                    updateChartColors(targetTheme);
+                });
+            }
+        });
 
     </script>
     <script>
