@@ -313,12 +313,31 @@
         }
 
         /* Profile card */
-        .profile-row {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        .profile-details-card{
+    margin-top:20px;
+    padding:20px;
+    background:#f7fffb;
+    border-radius:12px;
+    border:1px solid #e6efe8;
+    align-items: center;
+}
 
+.profile-info-item{
+    display:flex;
+    justify-content:space-between;
+    padding:10px 0;
+    border-bottom:1px solid #e6efe8;
+}
+
+.profile-info-item:last-child{
+    border-bottom:none;
+}
+.profile-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-top: 20px;
+}
         .avatar {
             width: 72px;
             height: 72px;
@@ -330,7 +349,14 @@
             font-size: 26px;
             color: #1a553f;
         }
-
+        .profile-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+.profile-details-card {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
         /* Bottom nav */
         .bottom-nav {
             position: fixed;
@@ -739,9 +765,28 @@
                 <section id="page-profile" class="page-card" aria-hidden>
                     <h3>Profile</h3>
                     <div style="margin-top:12px;">
-                        <div class="profile-row">
+                        <div class="profile-details-card">
+                        <div class="profile-info-item">
+                          <strong>Email:</strong>
+                          <span id="p-email-info"></span>
+                        </div>
+
+                        <div class="profile-info-item">
+                             <strong>Username:</strong>
+                             <span id="p-username"></span>
+                       </div>
+
+                       <div class="profile-info-item">
+                           <strong>Member Since:</strong>
+                           <span id="p-joined"></span>
+                           </div>
+                           </div>
                             <div class="avatar" id="profileAvatar">U</div>
                             <div>
+                                <div class="profile-info-item">
+                                <strong>Username:</strong>
+                                <span id="p-username">-</span>
+                               </div>
                                 <div id="p-email" style="font-weight:700"></div>
                                 <div id="p-name" class="muted"></div>
                             </div>
@@ -750,6 +795,10 @@
                             <label class="muted">Change display name</label>
                             <input id="editName" placeholder="New display name">
                             <div style="display:flex; gap:8px; margin-top:10px;">
+                            <div class="profile-info-item">
+                            <strong>Joined On:</strong>
+                            <span id="p-joined">-</span>
+                            </div>
                                 <button class="primary-btn" onclick="updateName()">Update Name</button>
                                 <button class="primary-btn" style="background:#ff6b6b" onclick="deleteAccount()">Delete
                                     Account</button>
@@ -1250,7 +1299,15 @@ function analyzeField() {
                 authPanel.style.display = 'flex';
                 hideAllPages();
             }
-        });
+            document.getElementById("p-username").textContent =
+              user.displayName || user.email.split("@")[0];;
+
+            document.getElementById("p-email-info").textContent =
+               user.email;
+            
+            document.getElementById("p-joined").textContent =
+              new Date(user.metadata.creationTime).toLocaleDateString();
+            });
 
         /* LOGOUT */
         function logout() { auth.signOut(); }
