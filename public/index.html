@@ -363,6 +363,12 @@
             color: #fff;
         }
 
+        .bbtn.listening,
+        .side-btn.listening {
+        background: linear-gradient(90deg, #e74c3c, #c0392b);
+        color: white;
+    }
+
         /* Auth overlay (login/signup) */
         #authPanel {
             position: fixed;
@@ -517,6 +523,8 @@
             </div>
                 <div class="side-btn" id="m-profile" title="Profile" onclick="navClick('profile')"><i
                         class="fa-solid fa-user"></i></div>
+                    <div class="side-btn" id="m-voice" title="AgroTech Voice Help" onclick="navClick('voice')"><i class="fa-solid fa-microphone"></i>
+                    </div>                
             </nav>
             <div class="spacer"></div>
             <div style="width:100%; display:flex; justify-content:center;">
@@ -550,7 +558,50 @@
                                 alt="plant" /></div>
                     </div>
                 </section>
+                
+            <!-- Voice Command -->
+           <section id="page-voice" class="page-card" aria-hidden="true">
+    <h3>AgroTech Voice Help</h3>
 
+    <p class="muted">
+        Choose a language, click the button, and say a command like dashboard, disease, seed, moisture, field, or profile.
+    </p>
+
+    <div class="field" style="margin-top:14px;">
+        <label class="muted">Voice Language</label>
+        <select id="voiceLang" onchange="changeVoiceLanguage()">
+            <option value="en-IN">English India</option>
+            <option value="hi-IN">Hindi India</option>
+            <option value="en-US">English US</option>
+            <option value="ta-IN">Tamil India</option>
+            <option value="bn-IN">Bengali India</option>
+            <option value="mr-IN">Marathi India</option>
+        </select>
+    </div>
+
+    <div style="margin-top:18px; text-align:center;">
+        <button class="primary-btn" onclick="startListening()" style="font-size:18px; padding:14px 22px;">
+            <i class="fa-solid fa-microphone"></i>
+            Start Voice Command
+        </button>
+    </div>
+
+    <div id="voiceStatus" style="margin-top:18px; font-weight:700;">
+       Ready for voice command.
+    </div>
+
+    <div style="margin-top:14px; background:#f7fffb; padding:12px; border-radius:10px;">
+        <p class="muted">Try saying:</p>
+        <div>Hello</div>
+        <div>Dashboard</div>
+        <div>Disease detection</div>
+        <div>Seed calculator</div>
+        <div>Moisture monitor</div>
+        <div>Field analysis</div>
+        <div>Profile</div>
+        <div>Logout</div>
+    </div>
+</section>
                 <!-- ================= Disease Detection ================= -->
                 <section id="page-detect" class="page-card" aria-hidden>
                     <h3>Plant Disease Detection</h3>
@@ -844,6 +895,10 @@
 
         <div class="bbtn" id="b-profile" title="Profile" onclick="navClick('profile')"><i class="fa-solid fa-user"></i>
         </div>
+
+        <div class="bbtn" id="b-voice" title="Voice Command" onclick="startListening()">
+    <i class="fa-solid fa-microphone"></i>
+</div>
     </div>
 
     <!-- AUTH PANEL (overlay) -->
@@ -1142,30 +1197,42 @@ function analyzeField() {
         const pageMoisture = document.getElementById('page-moisture');
         const pageProfile = document.getElementById('page-profile');
         const pageField = document.getElementById('page-field');
-        const allPages = [pageDashboard, pageDetect, pageSeed, pageMoisture, pageProfile, pageField];
-
+        const pageVoice = document.getElementById('page-voice');
+        const allPages = [pageDashboard,pageDetect,pageSeed,pageMoisture,pageProfile,pageField,pageVoice];
         const sideButtons = {
             dashboard: document.getElementById('m-dashboard'),
             detect: document.getElementById('m-detect'),
             seed: document.getElementById('m-seed'),
             moisture: document.getElementById('m-moist'),
-            profile: document.getElementById('m-profile')
-            
+            profile: document.getElementById('m-profile'),
+            voice: document.getElementById('m-voice')
         };
         const bottomButtons = {
             dashboard: document.getElementById('b-dashboard'),
             detect: document.getElementById('b-detect'),
             seed: document.getElementById('b-seed'),
-            profile: document.getElementById('b-profile')
+            moisture: document.getElementById('b-moist'),
+            profile: document.getElementById('b-profile'),
+            voice: document.getElementById('b-voice')
         };
 
         /* ======================= NAVIGATION (single-page display) ======================= */
         function hideAllPages() {
-            allPages.forEach(p => { p.style.display = 'none'; p.setAttribute('aria-hidden', 'true'); });
+            allPages.forEach(p => {
+        if (p) {
+            p.style.display = 'none';
+            p.setAttribute('aria-hidden', 'true');
         }
+    });
+}
         function clearActive() {
-            Object.values(sideButtons).forEach(b => b.classList.remove('active'));
-            Object.values(bottomButtons).forEach(b => b.classList.remove('active'));
+            Object.values(sideButtons).forEach(b => {
+                if (b) b.classList.remove('active');
+            });
+            
+            Object.values(bottomButtons).forEach(b => {
+                if (b) b.classList.remove('active');
+            });
         }
         function setActive(menu) {
             clearActive();
@@ -1181,7 +1248,7 @@ function analyzeField() {
             if (target === 'moisture') pageMoisture.style.display = 'block';
             if (target === 'profile') pageProfile.style.display = 'block';
             if (target === 'field') pageField.style.display = 'block';
-
+            if (target === 'voice' && pageVoice) pageVoice.style.display = 'block';
         }
         /* initial */
         hideAllPages();
@@ -1708,8 +1775,169 @@ function analyzeFieldImage() {
 }
 </script>
 
-</script>
+<script>
 
+/* Voice Command Feature */
+let mic = document.getElementById("b-voice");
+let sideMic = document.getElementById("m-voice");
+
+let SpeechTool = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+let isListening = false;
+
+if (SpeechTool) {
+    recognition = new SpeechTool();
+    recognition.lang = "en-IN";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+} else {
+    if (mic) mic.style.opacity = "0.5";
+    if (sideMic) sideMic.style.opacity = "0.5";
+}
+
+function speakText(text) {
+    if (!window.speechSynthesis) return;
+
+    window.speechSynthesis.cancel();
+
+    let voice = new SpeechSynthesisUtterance(text);
+    voice.lang = "en-IN";
+    voice.rate = 0.95;
+
+    window.speechSynthesis.speak(voice);
+}
+
+function setMicColor(on) {
+    if (mic) mic.classList.toggle("listening", on);
+    if (sideMic) sideMic.classList.toggle("active", on);
+}
+
+function startListening() {
+    if (!recognition) {
+        alert("Voice command is not supported. Please use Google Chrome.");
+        return;
+    }
+
+    if (isListening) return;
+
+    try {
+        isListening = true;
+        setMicColor(true);
+        recognition.start();
+    } catch (error) {
+        isListening = false;
+        setMicColor(false);
+    }
+}
+
+if (recognition) {
+    recognition.onresult = function(event) {
+        let text = event.results[0][0].transcript;
+        checkCommand(text);
+    };
+
+    recognition.onend = function() {
+        isListening = false;
+        setMicColor(false);
+    };
+
+    recognition.onerror = function(event) {
+        isListening = false;
+        setMicColor(false);
+
+        if (event.error === "not-allowed") {
+            alert("Please allow microphone permission in Chrome.");
+        } 
+        else if (event.error === "no-speech") {
+            speakText("I did not hear anything. Please speak again.");
+        } 
+        else if (event.error === "audio-capture") {
+            alert("Microphone not found. Please check your mic.");
+        } 
+        else if (event.error === "network") {
+            alert("Voice needs internet connection in Chrome.");
+        } 
+        else {
+            alert("Voice error: " + event.error);
+        }
+    };
+}
+
+function checkCommand(words) {
+    let text = words.toLowerCase().trim();
+    let command = "";
+
+    if (text.includes("hello") || text.includes("hey there")|| text.includes("namaste")) {
+        command = "greeting";
+    } else if (text.includes("dashboard") || text.includes("home")) {
+        command = "dashboard";
+    } else if (text.includes("disease") || text.includes("detect") || text.includes("bimari")) {
+        command = "disease";
+    } else if (text.includes("seed") || text.includes("calculator") || text.includes("dana")) {
+        command = "seed";
+    } else if (text.includes("moisture") || text.includes("sensor") || text.includes("nami")) {
+        command = "moisture";
+    } else if (text.includes("field") || text.includes("analysis")){
+        command = "field";
+    } else if (text.includes("profile")) {
+        command = "profile";
+    } else if (text.includes("help") || text.includes("madad")) {
+        command = "help";
+    } else if (text.includes("logout") || text.includes("sign out")) {
+        command = "logout";
+    } else {
+        command = "unknown";
+    }
+
+    switch (command) {
+        case "greeting":
+            speakText("Hello, welcome to AgroTech. How can I help you?");
+            break;
+
+        case "dashboard":
+            navClick("dashboard");
+            speakText("Opening dashboard.");
+            break;
+
+        case "disease":
+            navClick("detect");
+            speakText("Opening disease detection.");
+            break;
+
+        case "seed":
+            navClick("seed");
+            speakText("Opening seed calculator.");
+            break;
+
+        case "moisture":
+            navClick("moisture");
+            speakText("Opening moisture monitor.");
+            break;
+
+        case "field":
+            navClick("field");
+            speakText("Opening field analysis.");
+            break;
+
+        case "profile":
+            navClick("profile");
+            speakText("Opening profile.");
+            break;
+
+        case "help":
+            speakText("You can say dashboard, disease, seed, moisture, field, profile, or logout.");
+            break;
+
+        case "logout":
+            speakText("Signing out.");
+            setTimeout(logout, 1200);
+            break;
+
+        default:
+            speakText("Command not found. Say help to hear available commands.");
+    }
+}
+</script>
 
 </body>
 
