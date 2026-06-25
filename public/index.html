@@ -690,11 +690,11 @@
 
                             <div class="field">
                                 <label class="muted">Row spacing (cm)</label>
-                                <input id="spacingInp" type="number" placeholder="20">
+                                <input id="spacingInp" type="number" min="1" placeholder="20">
                             </div>
                             <div class="field">
                                 <label class="muted">Field area (m²)</label>
-                                <input id="areaInp" type="number" placeholder="100">
+                                <input id="areaInp" type="number" min="1" placeholder="100">
                             </div>
 
                             <!-- if "Other" selected, user can enter weight per 100 seeds -->
@@ -1511,30 +1511,49 @@ setTimeout(() => {
             else { otherWeightWrap.style.display = 'none'; document.getElementById('otherWeightInput').value = ''; }
         });
 
-        function calcSeeds() {
-            const spacing = parseFloat(document.getElementById('spacingInp').value);
-            const area = parseFloat(document.getElementById('areaInp').value);
-            const sel = cropSelect.options[cropSelect.selectedIndex];
-            const crop = sel.value || 'Crop';
-            let weight100 = parseFloat(sel.dataset.w || 0);
+    function calcSeeds() {
+    const spacing = parseFloat(document.getElementById('spacingInp').value);
+    const area = parseFloat(document.getElementById('areaInp').value);
+    const sel = cropSelect.options[cropSelect.selectedIndex];
+    const crop = sel.value || 'Crop';
+    let weight100 = parseFloat(sel.dataset.w || 0);
 
-            if (crop === 'Other') {
-                weight100 = parseFloat(document.getElementById('otherWeightInput').value);
-                if (!weight100) { alert('Enter weight per 100 seeds for the Other crop'); return; }
-            }
+    if (crop === 'Other') {
+        weight100 = parseFloat(document.getElementById('otherWeightInput').value);
 
-            if (!spacing || !area) { alert('Please enter spacing & area'); return; }
-            const seeds = Math.round((area * 10000) / (spacing * spacing));
-            document.getElementById('seedResult').textContent = `${crop}: Required Seeds ≈ ${seeds.toLocaleString()}`;
-
-            if (weight100 && weight100 > 0) {
-                const gramsPerSeed = weight100 / 100.0;
-                const totalKg = (seeds * gramsPerSeed) / 1000.0;
-                document.getElementById('seedWeightResult').textContent = `Required Weight ≈ ${totalKg.toFixed(2)} kg`;
-            } else {
-                document.getElementById('seedWeightResult').textContent = 'Required Weight: —';
-            }
+        if (isNaN(weight100) || weight100 <= 0) {
+            alert('Enter a valid weight per 100 seeds greater than 0.');
+            return;
         }
+    }
+
+    // Validate inputs
+    if (isNaN(spacing) || isNaN(area)) {
+        alert('Please enter valid numeric values for spacing and area.');
+        return;
+    }
+
+    if (spacing <= 0 || area <= 0) {
+        alert('Row spacing and field area must be greater than 0.');
+        return;
+    }
+
+    const seeds = Math.round((area * 10000) / (spacing * spacing));
+
+    document.getElementById('seedResult').textContent =
+        `${crop}: Required Seeds ≈ ${seeds.toLocaleString()}`;
+
+    if (weight100 && weight100 > 0) {
+        const gramsPerSeed = weight100 / 100.0;
+        const totalKg = (seeds * gramsPerSeed) / 1000.0;
+
+        document.getElementById('seedWeightResult').textContent =
+            `Required Weight ≈ ${totalKg.toFixed(2)} kg`;
+    } else {
+        document.getElementById('seedWeightResult').textContent =
+            'Required Weight: —';
+    }
+}
 
         /* ======================= Moisture Monitor - Realtime via Firebase ======================= */
         /* Chart setup */
