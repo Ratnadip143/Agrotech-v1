@@ -809,6 +809,7 @@
                     </div>
                 </section>
                 <section id="page-field" class="page-card" aria-hidden="true">
+                    <!--Field Analysis-->
     <h3>Field Analysis</h3>
 <div class="field" style="margin-top:16px;">
   <label class="muted">Field Image</label>
@@ -872,8 +873,11 @@
         </div>
 
         <button class="primary-btn" onclick="analyzeField()">Analyze Field</button>
+        <button class="primary-btn" onclick="report()">Download Report</button>
+        
 
         <div id="fieldResult" style="margin-top:12px; font-weight:700;"></div>
+
     </div>
 </section>
 
@@ -933,6 +937,7 @@
 
     <!-- SCRIPT: App logic + Firebase -->
     <script>
+
 function analyzeField() {
     const crop = document.getElementById('fieldCrop').value;
     const soil = document.getElementById('soilType').value;
@@ -1170,6 +1175,26 @@ function analyzeField() {
         ${areaNote}
     `;
 }
+function report(){
+    const result=document.getElementById("fieldResult").innerText;
+    const text=` Agrotech Field Analysis Report
+
+    ${result}
+
+    Thank you 
+    `;
+    const file = new Blob([text], {
+        type: "text/plain"
+    });
+    const link=document.createElement("a");
+    link.href=URL.createObjectURL(file);
+    link.download="Agrotech-Report.txt";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
+}
+
 
 
 
