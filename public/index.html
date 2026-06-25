@@ -1586,8 +1586,11 @@ setTimeout(() => {
                 d.soil
             );
 
-            document.getElementById('s-cause').textContent = analysis.cause;
-            document.getElementById('s-suggest').textContent = analysis.suggest;
+            const causeEl = document.getElementById('s-cause');
+            const suggestEl = document.getElementById('s-suggest');
+
+            if (causeEl) causeEl.textContent = analysis.cause;
+            if (suggestEl) suggestEl.textContent = analysis.suggest;
         });
 
         // debug message if nothing arrives
