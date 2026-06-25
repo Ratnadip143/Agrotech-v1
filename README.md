@@ -55,6 +55,13 @@ AGROTECH-V1/
 
 ---
 
+
+## DASHBOARD
+<img width="1416" height="741" alt="image" src="https://github.com/user-attachments/assets/64353c8c-8bc7-4564-9f37-f923d6780bc1" />
+
+
+
+
 ### 📷 ESP32-CAM Integration
 
 * Real-time image capture
