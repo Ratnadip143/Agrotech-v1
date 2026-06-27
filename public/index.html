@@ -18,7 +18,7 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-     <link rel="icon" href="favicon.ico" >
+    <link rel="icon" href="favicon.ico">
     <!-- Android Chrome Icons -->
     <link rel="icon" type="image/png" sizes="192x192" href="/android-chrome-192x192.png">
     <link rel="icon" type="image/png" sizes="512x512" href="/android-chrome-512x512.png">
@@ -30,6 +30,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- PDF Generation Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
     <!-- Firebase COMPAT libs (Auth + Realtime DB) -->
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
@@ -291,6 +296,18 @@
             border-radius: 10px;
             cursor: pointer;
             font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.3);
+        }
+
+        .primary-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
         }
 
         .muted {
@@ -365,9 +382,9 @@
 
         .bbtn.listening,
         .side-btn.listening {
-        background: linear-gradient(90deg, #e74c3c, #c0392b);
-        color: white;
-    }
+            background: linear-gradient(90deg, #e74c3c, #c0392b);
+            color: white;
+        }
 
         /* Auth overlay (login/signup) */
         #authPanel {
@@ -397,7 +414,6 @@
                 opacity: 0;
                 transform: scale(.78)
             }
-
             to {
                 opacity: 1;
                 transform: scale(1)
@@ -453,24 +469,81 @@
             margin-top: 6px;
         }
 
+        /* Report Modal */
+        #reportModal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        #reportModal .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: zoomIn .3s ease;
+        }
+
+        #reportModal .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        #reportModal .checkbox-label:hover {
+            background: #f0f7f3;
+        }
+
+        #reportModal input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent);
+        }
+
+        .report-btn {
+            background: linear-gradient(90deg, #2ecc71, #27ae60);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .report-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.3);
+        }
+
         /* Responsive */
         @media(max-width:900px) {
             .sidebar {
                 width: 64px
             }
-
             .side-btn {
                 width: 48px;
                 height: 48px
             }
-
             .welcome-box {
                 width: 92%;
                 flex-direction: column;
                 gap: 12px;
                 align-items: flex-start
             }
-
             .main {
                 padding-bottom: 90px
             }
@@ -480,18 +553,19 @@
             .welcome-right img {
                 display: none
             }
-
             .page-card {
                 padding: 16px
             }
-
             .authBox {
                 width: 92%;
                 padding: 18px
             }
-
             .content {
                 padding: 8px
+            }
+            #reportModal .modal-content {
+                padding: 20px;
+                width: 95%;
             }
         }
     </style>
@@ -519,12 +593,13 @@
                 <div class="side-btn" id="m-moist" title="Moisture Monitor" onclick="navClick('moisture')"><i
                         class="fa-solid fa-chart-line"></i></div>
                 <div class="side-btn" id="m-field" title="Field Analysis" onclick="navClick('field')">
-                <i class="fa-solid fa-map"></i>
-            </div>
+                    <i class="fa-solid fa-map"></i>
+                </div>
                 <div class="side-btn" id="m-profile" title="Profile" onclick="navClick('profile')"><i
                         class="fa-solid fa-user"></i></div>
-                    <div class="side-btn" id="m-voice" title="AgroTech Voice Help" onclick="navClick('voice')"><i class="fa-solid fa-microphone"></i>
-                    </div>                
+                <div class="side-btn" id="m-voice" title="AgroTech Voice Help" onclick="navClick('voice')"><i
+                        class="fa-solid fa-microphone"></i>
+                </div>
             </nav>
             <div class="spacer"></div>
             <div style="width:100%; display:flex; justify-content:center;">
@@ -552,84 +627,76 @@
                         <div class="welcome-left">
                             <h1 id="welcomeTitle">Welcome</h1>
                             <p id="welcomeSub" class="muted">Select a tool from the left menu to get started</p>
+                            <!-- Report Button -->
+                            <button class="report-btn" onclick="openReportModal()">
+                                <i class="fa-solid fa-file-pdf"></i> Generate Full Report
+                            </button>
                         </div>
                         <div class="welcome-right"><img
                                 src="https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=900&q=70"
                                 alt="plant" /></div>
                     </div>
                 </section>
-                
-            <!-- Voice Command -->
-           <section id="page-voice" class="page-card" aria-hidden="true">
-    <h3>AgroTech Voice Help</h3>
 
-    <p class="muted">
-        Choose a language, click the button, and say a command like dashboard, disease, seed, moisture, field, or profile.
-    </p>
+                <!-- Voice Command -->
+                <section id="page-voice" class="page-card" aria-hidden="true">
+                    <h3>AgroTech Voice Help</h3>
+                    <p class="muted">
+                        Choose a language, click the button, and say a command like dashboard, disease, seed, moisture, field, or profile.
+                    </p>
+                    <div class="field" style="margin-top:14px;">
+                        <label class="muted">Voice Language</label>
+                        <select id="voiceLang" onchange="changeVoiceLanguage()">
+                            <option value="en-IN">English India</option>
+                            <option value="hi-IN">Hindi India</option>
+                            <option value="en-US">English US</option>
+                            <option value="ta-IN">Tamil India</option>
+                            <option value="bn-IN">Bengali India</option>
+                            <option value="mr-IN">Marathi India</option>
+                        </select>
+                    </div>
+                    <div style="margin-top:18px; text-align:center;">
+                        <button class="primary-btn" onclick="startListening()" style="font-size:18px; padding:14px 22px;">
+                            <i class="fa-solid fa-microphone"></i>
+                            Start Voice Command
+                        </button>
+                    </div>
+                    <div id="voiceStatus" style="margin-top:18px; font-weight:700;">
+                        Ready for voice command.
+                    </div>
+                    <div style="margin-top:14px; background:#f7fffb; padding:12px; border-radius:10px;">
+                        <p class="muted">Try saying:</p>
+                        <div>Hello</div>
+                        <div>Dashboard</div>
+                        <div>Disease detection</div>
+                        <div>Seed calculator</div>
+                        <div>Moisture monitor</div>
+                        <div>Field analysis</div>
+                        <div>Profile</div>
+                        <div>Logout</div>
+                    </div>
+                </section>
 
-    <div class="field" style="margin-top:14px;">
-        <label class="muted">Voice Language</label>
-        <select id="voiceLang" onchange="changeVoiceLanguage()">
-            <option value="en-IN">English India</option>
-            <option value="hi-IN">Hindi India</option>
-            <option value="en-US">English US</option>
-            <option value="ta-IN">Tamil India</option>
-            <option value="bn-IN">Bengali India</option>
-            <option value="mr-IN">Marathi India</option>
-        </select>
-    </div>
-
-    <div style="margin-top:18px; text-align:center;">
-        <button class="primary-btn" onclick="startListening()" style="font-size:18px; padding:14px 22px;">
-            <i class="fa-solid fa-microphone"></i>
-            Start Voice Command
-        </button>
-    </div>
-
-    <div id="voiceStatus" style="margin-top:18px; font-weight:700;">
-       Ready for voice command.
-    </div>
-
-    <div style="margin-top:14px; background:#f7fffb; padding:12px; border-radius:10px;">
-        <p class="muted">Try saying:</p>
-        <div>Hello</div>
-        <div>Dashboard</div>
-        <div>Disease detection</div>
-        <div>Seed calculator</div>
-        <div>Moisture monitor</div>
-        <div>Field analysis</div>
-        <div>Profile</div>
-        <div>Logout</div>
-    </div>
-</section>
-                <!-- ================= Disease Detection ================= -->
+                <!-- Disease Detection -->
                 <section id="page-detect" class="page-card" aria-hidden>
                     <h3>Plant Disease Detection</h3>
-
                     <div style="display:flex; gap:16px; flex-wrap:wrap; margin-top:12px;">
-
                         <!-- LEFT: Image input -->
                         <div style="flex:1; min-width:260px;">
-                            <div
-                                style="border:2px dashed #e6efe8; padding:18px; border-radius:12px; text-align:center;">
+                            <div style="border:2px dashed #e6efe8; padding:18px; border-radius:12px; text-align:center;">
                                 <p class="muted">Upload plant image or capture from ESP32-CAM</p>
-
                                 <input type="file" id="fileInput" accept="image/*" style="display:none" />
-
                                 <button class="primary-btn"
                                     onclick="window.imageLoaded=false; document.getElementById('fileInput').click()">
                                     Choose Image
                                 </button>
-
                                 <img id="preview"
                                     style="display:none; margin-top:12px; border-radius:10px; max-width:100%;" />
-
                                 <div style="margin-top:12px;">
                                     <button class="primary-btn" id="espCaptureBtn">
                                         Capture from ESP32-CAM
                                     </button>
                                 </div>
-
                                 <div style="margin-top:12px;">
                                     <button class="primary-btn" id="processBtn">
                                         Run Detection
@@ -637,30 +704,24 @@
                                 </div>
                             </div>
                         </div>
-
                         <!-- RIGHT: Result -->
                         <div style="width:320px;">
                             <div style="background:#fbfff9; padding:14px; border-radius:12px;">
                                 <p class="muted">Result</p>
-
                                 <div id="detectResult" style="font-weight:700; margin-top:6px;">
                                     Please upload or capture an image first.
                                 </div>
-
                                 <div id="diseaseSuggestion" class="muted" style="margin-top:8px;">
                                     —
                                 </div>
-
                                 <p class="muted" style="font-size:12px; margin-top:10px;">
                                     *Prototype / demo feature. Results are indicative and may require expert
                                     verification.*
                                 </p>
                             </div>
                         </div>
-
                     </div>
                 </section>
-
 
                 <!-- Seed Calculator -->
                 <section id="page-seed" class="page-card" aria-hidden>
@@ -669,7 +730,6 @@
                         <div style="flex:1; min-width:260px;">
                             <div class="field">
                                 <label class="muted">Crop</label>
-                                <!-- Dropdown with emoji icons (Style 2) -->
                                 <select id="cropSelect">
                                     <option value="" data-w="0">🌾 Select crop</option>
                                     <option value="Maize" data-w="25">🌽 Maize</option>
@@ -687,7 +747,6 @@
                                     <option value="Other" data-w="0">🔧 Other (enter weight below)</option>
                                 </select>
                             </div>
-
                             <div class="field">
                                 <label class="muted">Row spacing (cm)</label>
                                 <input id="spacingInp" type="number" placeholder="20">
@@ -696,16 +755,12 @@
                                 <label class="muted">Field area (m²)</label>
                                 <input id="areaInp" type="number" placeholder="100">
                             </div>
-
-                            <!-- if "Other" selected, user can enter weight per 100 seeds -->
                             <div class="field" id="otherWeightWrap" style="display:none;">
                                 <label class="muted">Weight per 100 seeds (g) — for Other crop</label>
                                 <input id="otherWeightInput" type="number" step="0.01" placeholder="e.g. 10">
                             </div>
-
                             <button class="primary-btn" onclick="calcSeeds()">Calculate</button>
                         </div>
-
                         <div style="width:320px;">
                             <div style="background:#fbfff9; padding:12px; border-radius:10px;">
                                 <p class="muted">Results</p>
@@ -728,24 +783,22 @@
                     <div class="field" style="margin-bottom:12px;">
                         <label class="muted">Crop Type</label>
                         <select id="cropType-moisture">
-                        <option value="">🌾 Select crop</option>
-                        <option value="Wheat">🌾 Wheat</option>
-                        <option value="Rice">🍚 Rice</option>
-                        <option value="Maize">🌽 Maize</option>
-                        <option value="Mustard">🌼 Mustard</option>
-                        <option value="Soybean">🫘 Soybean</option>
-                        <option value="Groundnut">🥜 Groundnut</option>
-                        <option value="Bajra">🌾 Bajra</option>
-                        <option value="Sunflower">🌻 Sunflower</option>
-                        <option value="Cotton">🧵 Cotton</option>
-                        <option value="Chickpea">🫘 Chickpea</option>
-                        <option value="Jowar">🌾 Jowar</option>
-                        <option value="Barley">🌾 Barley</option>
-                        <option value="Other">🔧 Other</option>
+                            <option value="">🌾 Select crop</option>
+                            <option value="Wheat">🌾 Wheat</option>
+                            <option value="Rice">🍚 Rice</option>
+                            <option value="Maize">🌽 Maize</option>
+                            <option value="Mustard">🌼 Mustard</option>
+                            <option value="Soybean">🫘 Soybean</option>
+                            <option value="Groundnut">🥜 Groundnut</option>
+                            <option value="Bajra">🌾 Bajra</option>
+                            <option value="Sunflower">🌻 Sunflower</option>
+                            <option value="Cotton">🧵 Cotton</option>
+                            <option value="Chickpea">🫘 Chickpea</option>
+                            <option value="Jowar">🌾 Jowar</option>
+                            <option value="Barley">🌾 Barley</option>
+                            <option value="Other">🔧 Other</option>
                         </select>
-
                     </div>
-
                     <!-- Sensor readings -->
                     <div id="sensorReadings" style="margin-top:14px;">
                         <div style="display:flex; gap:14px; flex-wrap:wrap;">
@@ -754,13 +807,11 @@
                                 <div id="s-temp" style="font-size:20px; font-weight:700;">—</div>
                                 <div class="muted">°C</div>
                             </div>
-
                             <div style="flex:1; min-width:160px; background:#f7fffb; padding:12px; border-radius:10px;">
                                 <div class="muted">💧 Humidity</div>
                                 <div id="s-hum" style="font-size:20px; font-weight:700;">—</div>
                                 <div class="muted">%</div>
                             </div>
-
                             <div style="flex:1; min-width:160px; background:#f7fffb; padding:12px; border-radius:10px;">
                                 <div class="muted">🌱 Soil Moisture</div>
                                 <div id="s-moist" style="font-size:20px; font-weight:700;">—</div>
@@ -769,8 +820,7 @@
                         </div>
                     </div>
                     <!-- Expert Help / Hotline -->
-                    <div
-                        style="margin-top:16px; padding:14px; background:#f7fffb; border-radius:10px; border:1px solid #e6efe8;">
+                    <div style="margin-top:16px; padding:14px; background:#f7fffb; border-radius:10px; border:1px solid #e6efe8;">
                         <div style="font-weight:700; color:#184c38;">📞 Need Expert Help?</div>
                         <p class="muted" style="margin:6px 0;">
                             If the issue persists or the analysis is unclear, contact an agricultural expert.
@@ -780,11 +830,7 @@
                             Call Kisan Helpline
                         </a>
                     </div>
-
-
                 </section>
-
-
 
                 <!-- Profile -->
                 <section id="page-profile" class="page-card" aria-hidden>
@@ -808,75 +854,66 @@
                         </div>
                     </div>
                 </section>
+
+                <!-- Field Analysis -->
                 <section id="page-field" class="page-card" aria-hidden="true">
-    <h3>Field Analysis</h3>
-<div class="field" style="margin-top:16px;">
-  <label class="muted">Field Image</label>
-  <input type="file" id="fieldImage" accept="image/*" capture="environment">
-</div>
-
-<div id="imagePreview" style="margin-top:12px; display:none;">
-  <img id="previewImg" style="max-width:100%; border-radius:12px;">
-</div>
-
-<button class="primary-btn" style="margin-top:12px;" onclick="analyzeFieldImage()">
-  Analyze Field Image
-</button>
-
-<div id="imageResult" style="margin-top:12px; font-weight:700;"></div>
-
-    <div style="margin-top:12px;">
-        <div class="field">
-            <label class="muted">Crop Type</label>
-            <select id="fieldCrop">
-            <option value="">🌾 Select crop</option>
-            <option>🌽 Maize</option>
-            <option>🌾 Wheat</option>
-            <option>🍚 Rice</option>
-            <option>🌼 Mustard</option>
-            <option>🫘 Soybean</option>
-            <option>🥜 Groundnut</option>
-             <option>🌾 Bajra</option>
-             <option>🌻 Sunflower</option>
-            <option>🧵 Cotton</option>
-            <option>🫘 Chickpea</option>
-            <option>🌾 Jowar</option>
-            <option>🌾 Barley</option>
-            <option>🔧 Other</option>
-            </select>
-
-        </div>
-
-        <div class="field">
-            <label class="muted">Soil Type</label>
-           <select id="soilType">
-  <option value="">🌱 Select soil type</option>
-  <option value="Loamy">🌿 Loamy Soil</option>
-  <option value="Clay">🧱 Clay Soil</option>
-  <option value="Sandy">🏖️ Sandy Soil</option>
-  <option value="Silty">🌾 Silty Soil</option>
-  <option value="Peaty">🌰 Peaty Soil</option>
-  <option value="Chalky">🪨 Chalky Soil</option>
-  <option value="Saline">💧 Saline Soil</option>
-  <option value="Red">🟥 Red Soil</option>
-  <option value="Black">⬛ Black Cotton Soil</option>
-  <option value="Alluvial">🌊 Alluvial Soil</option>
-  <option value="Laterite">🧱 Laterite Soil</option>
-</select>
-
-        </div>
-
-        <div class="field">
-            <label class="muted">Field Area (acres)</label>
-            <input id="fieldArea" type="number" placeholder="e.g. 2">
-        </div>
-
-        <button class="primary-btn" onclick="analyzeField()">Analyze Field</button>
-
-        <div id="fieldResult" style="margin-top:12px; font-weight:700;"></div>
-    </div>
-</section>
-
+                    <h3>Field Analysis</h3>
+                    <div class="field" style="margin-top:16px;">
+                        <label class="muted">Field Image</label>
+                        <input type="file" id="fieldImage" accept="image/*" capture="environment">
+                    </div>
+                    <div id="imagePreview" style="margin-top:12px; display:none;">
+                        <img id="previewImg" style="max-width:100%; border-radius:12px;">
+                    </div>
+                    <button class="primary-btn" style="margin-top:12px;" onclick="analyzeFieldImage()">
+                        Analyze Field Image
+                    </button>
+                    <div id="imageResult" style="margin-top:12px; font-weight:700;"></div>
+                    <div style="margin-top:12px;">
+                        <div class="field">
+                            <label class="muted">Crop Type</label>
+                            <select id="fieldCrop">
+                                <option value="">🌾 Select crop</option>
+                                <option>🌽 Maize</option>
+                                <option>🌾 Wheat</option>
+                                <option>🍚 Rice</option>
+                                <option>🌼 Mustard</option>
+                                <option>🫘 Soybean</option>
+                                <option>🥜 Groundnut</option>
+                                <option>🌾 Bajra</option>
+                                <option>🌻 Sunflower</option>
+                                <option>🧵 Cotton</option>
+                                <option>🫘 Chickpea</option>
+                                <option>🌾 Jowar</option>
+                                <option>🌾 Barley</option>
+                                <option>🔧 Other</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label class="muted">Soil Type</label>
+                            <select id="soilType">
+                                <option value="">🌱 Select soil type</option>
+                                <option value="Loamy">🌿 Loamy Soil</option>
+                                <option value="Clay">🧱 Clay Soil</option>
+                                <option value="Sandy">🏖️ Sandy Soil</option>
+                                <option value="Silty">🌾 Silty Soil</option>
+                                <option value="Peaty">🌰 Peaty Soil</option>
+                                <option value="Chalky">🪨 Chalky Soil</option>
+                                <option value="Saline">💧 Saline Soil</option>
+                                <option value="Red">🟥 Red Soil</option>
+                                <option value="Black">⬛ Black Cotton Soil</option>
+                                <option value="Alluvial">🌊 Alluvial Soil</option>
+                                <option value="Laterite">🧱 Laterite Soil</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label class="muted">Field Area (acres)</label>
+                            <input id="fieldArea" type="number" placeholder="e.g. 2">
+                        </div>
+                        <button class="primary-btn" onclick="analyzeField()">Analyze Field</button>
+                        <div id="fieldResult" style="margin-top:12px; font-weight:700;"></div>
+                    </div>
+                </section>
             </div>
         </div>
     </div>
@@ -890,15 +927,13 @@
         <div class="bbtn" id="b-seed" title="Seeds" onclick="navClick('seed')"><i class="fa-solid fa-seedling"></i>
         </div>
         <div class="bbtn" id="b-field" title="Field Analysis" onclick="navClick('field')">
-        <i class="fa-solid fa-map"></i>
-    </div>
-
+            <i class="fa-solid fa-map"></i>
+        </div>
         <div class="bbtn" id="b-profile" title="Profile" onclick="navClick('profile')"><i class="fa-solid fa-user"></i>
         </div>
-
         <div class="bbtn" id="b-voice" title="Voice Command" onclick="startListening()">
-    <i class="fa-solid fa-microphone"></i>
-</div>
+            <i class="fa-solid fa-microphone"></i>
+        </div>
     </div>
 
     <!-- AUTH PANEL (overlay) -->
@@ -906,7 +941,6 @@
         <div class="authBox" role="dialog" aria-modal="true">
             <h2>Welcome to AgroTech</h2>
             <div class="muted">Sign in or create an account to continue</div>
-
             <!-- Sign in form -->
             <div id="signInForm">
                 <input id="siEmail" type="email" placeholder="Email" />
@@ -918,7 +952,6 @@
                 <button class="ghost" id="forgotBtn">Forgot password?</button>
                 <div id="siMsg" class="msg"></div>
             </div>
-
             <!-- Sign up form -->
             <div id="signUpForm" style="display:none;">
                 <input id="suName" type="text" placeholder="Full name" />
@@ -931,255 +964,57 @@
         </div>
     </div>
 
+    <!-- REPORT MODAL -->
+    <div id="reportModal">
+        <div class="modal-content">
+            <h3>📄 Generate Farm Report</h3>
+            <p class="muted">Select what to include in your farm report</p>
+
+            <div style="margin-top:20px;">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="includeMoisture" checked>
+                    <span>🌱 Soil Moisture Data</span>
+                </label>
+
+                <label class="checkbox-label">
+                    <input type="checkbox" id="includeDisease" checked>
+                    <span>🩺 Disease Detection Results</span>
+                </label>
+
+                <label class="checkbox-label">
+                    <input type="checkbox" id="includeField" checked>
+                    <span>🌾 Field Analysis</span>
+                </label>
+
+                <label class="checkbox-label">
+                    <input type="checkbox" id="includeCrops" checked>
+                    <span>🌿 Crop Details</span>
+                </label>
+
+                <label class="checkbox-label">
+                    <input type="checkbox" id="includeRecommendations" checked>
+                    <span>💡 Recommendations</span>
+                </label>
+            </div>
+
+            <div style="margin-top:20px; display:flex; gap:10px;">
+                <button class="primary-btn" onclick="generatePDF()" style="flex:1; padding:12px;">
+                    <i class="fa-solid fa-file-pdf"></i> Generate PDF
+                </button>
+                <button onclick="closeReportModal()" style="flex:1; padding:12px; border-radius:10px; border:1px solid #ddd; background:white; cursor:pointer;">
+                    Cancel
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- SCRIPT: App logic + Firebase -->
     <script>
-function analyzeField() {
-    const crop = document.getElementById('fieldCrop').value;
-    const soil = document.getElementById('soilType').value;
-    const area = Number(document.getElementById('fieldArea').value);
-    const resultBox = document.getElementById('fieldResult');
-
-    if (!crop || !soil || !area) {
-        alert('Please select crop, soil type and field area');
-        return;
-    }
-
-    let status = '';
-    let risk = '';
-    let recommendation = '';
-
-    /* ===================== RICE ===================== */
-    if (crop.includes('Rice')) {
-        if (soil === 'Alluvial' || soil === 'Loamy') {
-            status = '✅ Ideal Condition';
-            risk = 'Low';
-            recommendation =
-                'Rice performs best in alluvial/loamy soil. Maintain shallow standing water (3–5 cm), apply nitrogen in split doses, and monitor stem borer and leaf folder.';
-        } else if (soil === 'Clay') {
-            status = '⚠ Advisory Needed';
-            risk = 'Waterlogging risk';
-            recommendation =
-                'Clay soil retains excess water. Improve drainage and avoid prolonged flooding to prevent root rot.';
-        } else if (soil === 'Sandy') {
-            status = '⚠ Advisory Needed';
-            risk = 'Low water retention';
-            recommendation =
-                'Sandy soil drains quickly. Increase irrigation frequency and add organic matter to improve moisture holding.';
-        } else {
-            status = '❌ High Risk';
-            risk = 'Unsuitable soil';
-            recommendation =
-                'This soil type is not suitable for rice. Consider soil amendment or alternative crop.';
-        }
-    }
-
-    /* ===================== WHEAT ===================== */
-    else if (crop.includes('Wheat')) {
-        if (soil === 'Loamy' || soil === 'Alluvial') {
-            status = '✅ Ideal Condition';
-            risk = 'Low';
-            recommendation =
-                'Wheat grows well in loamy/alluvial soil. Ensure good drainage, timely irrigation, and balanced NPK application.';
-        } else if (soil === 'Clay') {
-            status = '⚠ Advisory Needed';
-            risk = 'Poor aeration';
-            recommendation =
-                'Clay soil may restrict root growth. Avoid over-irrigation and practice shallow tillage.';
-        } else {
-            status = '⚠ Advisory Needed';
-            risk = 'Sub-optimal soil';
-            recommendation =
-                'Improve soil structure using farmyard manure and proper irrigation scheduling.';
-        }
-    }
-
-    /* ===================== MAIZE ===================== */
-    else if (crop.includes('Maize')) {
-        if (soil === 'Loamy' || soil === 'Alluvial') {
-            status = '✅ Ideal Condition';
-            risk = 'Low';
-            recommendation =
-                'Maize prefers well-drained loamy soil. Apply nitrogen in stages and avoid water stagnation.';
-        } else if (soil === 'Sandy') {
-            status = '⚠ Advisory Needed';
-            risk = 'Nutrient leaching';
-            recommendation =
-                'Sandy soil causes nutrient loss. Apply organic manure and split fertilizer doses.';
-        } else {
-            status = '⚠ Advisory Needed';
-            risk = 'Moisture stress';
-            recommendation =
-                'Monitor soil moisture carefully and irrigate during critical growth stages.';
-        }
-    }
-
-    /* ===================== MUSTARD ===================== */
-    else if (crop.includes('Mustard')) {
-        if (soil === 'Loamy' || soil === 'Sandy') {
-            status = '✅ Ideal Condition';
-            risk = 'Low';
-            recommendation =
-                'Mustard grows well in light soils. Avoid waterlogging and monitor aphid infestation.';
-        } else {
-            status = '⚠ Advisory Needed';
-            risk = 'Excess moisture';
-            recommendation =
-                'Heavy soil may cause poor root growth. Ensure drainage and avoid excess irrigation.';
-        }
-    }
-
-    /* ===================== SOYBEAN ===================== */
-    else if (crop.includes('Soybean')) {
-        if (soil === 'Loamy' || soil === 'Black') {
-            status = '✅ Ideal Condition';
-            risk = 'Low';
-            recommendation =
-                'Soybean performs best in loamy/black soil. Ensure good drainage and watch for leaf yellowing.';
-        } else {
-            status = '⚠ Advisory Needed';
-            risk = 'Root rot risk';
-            recommendation =
-                'Avoid water stagnation and apply seed treatment before sowing.';
-        }
-    }
-
-    /* ===================== GROUNDNUT ===================== */
-    else if (crop.includes('Groundnut')) {
-        if (soil === 'Sandy' || soil === 'Loamy') {
-            status = '✅ Ideal Condition';
-            risk = 'Low';
-            recommendation =
-                'Loose sandy/loamy soil is ideal for pod development. Ensure calcium availability.';
-        } else {
-            status = '⚠ Advisory Needed';
-            risk = 'Poor pod formation';
-            recommendation =
-                'Heavy soil restricts pod growth. Improve soil aeration.';
-        }
-    }
-
-    /* ===================== BAJRA ===================== */
-    else if (crop.includes('Bajra')) {
-        if (soil === 'Sandy' || soil === 'Loamy') {
-            status = '✅ Ideal Condition';
-            risk = 'Low';
-            recommendation =
-                'Bajra is drought-tolerant. Minimal irrigation required. Avoid excess fertilizers.';
-        } else {
-            status = '⚠ Advisory Needed';
-            risk = 'Water stress';
-            recommendation =
-                'Ensure proper drainage and avoid waterlogging.';
-        }
-    }
-
-    /* ===================== SUNFLOWER ===================== */
-    else if (crop.includes('Sunflower')) {
-        if (soil === 'Loamy') {
-            status = '✅ Ideal Condition';
-            risk = 'Low';
-            recommendation =
-                'Sunflower requires well-drained soil and full sunlight. Monitor for pests.';
-        } else {
-            status = '⚠ Advisory Needed';
-            risk = 'Poor root growth';
-            recommendation =
-                'Ensure soil aeration and balanced fertilization.';
-        }
-    }
-
-    /* ===================== COTTON ===================== */
-    else if (crop.includes('Cotton')) {
-        if (soil === 'Black') {
-            status = '✅ Ideal Condition';
-            risk = 'Low';
-            recommendation =
-                'Black soil is ideal for cotton. Monitor bollworm and avoid excess nitrogen.';
-        } else {
-            status = '⚠ Advisory Needed';
-            risk = 'Moisture imbalance';
-            recommendation =
-                'Maintain proper irrigation schedule and pest monitoring.';
-        }
-    }
-
-    /* ===================== CHICKPEA ===================== */
-    else if (crop.includes('Chickpea')) {
-        if (soil === 'Loamy') {
-            status = '✅ Ideal Condition';
-            risk = 'Low';
-            recommendation =
-                'Chickpea prefers well-drained loamy soil. Avoid excess irrigation.';
-        } else {
-            status = '⚠ Advisory Needed';
-            risk = 'Root rot risk';
-            recommendation =
-                'Ensure proper drainage and avoid water stagnation.';
-        }
-    }
-
-    /* ===================== JOWAR ===================== */
-    else if (crop.includes('Jowar')) {
-        status = '✅ Suitable Condition';
-        risk = 'Low';
-        recommendation =
-            'Jowar tolerates varied soils. Requires moderate irrigation and timely weed control.';
-    }
-
-    /* ===================== BARLEY ===================== */
-    else if (crop.includes('Barley')) {
-        if (soil === 'Loamy' || soil === 'Alluvial') {
-            status = '✅ Ideal Condition';
-            risk = 'Low';
-            recommendation =
-                'Barley grows well in light soils. Avoid excess nitrogen and waterlogging.';
-        } else {
-            status = '⚠ Advisory Needed';
-            risk = 'Yield reduction';
-            recommendation =
-                'Improve soil fertility and drainage for better yield.';
-        }
-    }
-
-    /* ===================== DEFAULT ===================== */
-    else {
-        status = '⚠ Advisory Needed';
-        risk = 'Limited data';
-        recommendation =
-            'Crop-soil combination requires expert consultation.';
-    }
-
-    /* ===================== AREA NOTE ===================== */
-    let areaNote = '';
-    if (area >= 5) {
-        areaNote =
-            '<br>🚜 Large field detected: Mechanized irrigation and scheduled monitoring recommended.';
-    }
-
-    /* ===================== DISPLAY ===================== */
-    resultBox.innerHTML = `
-        🌱 <b>Crop:</b> ${crop}<br>
-        🌍 <b>Soil:</b> ${soil}<br>
-        📐 <b>Area:</b> ${area} acres<br><br>
-
-        <b>Status:</b> ${status}<br>
-        <b>Risk:</b> ${risk}<br><br>
-
-        <b>Practical Recommendation:</b><br>
-        ${recommendation}
-        ${areaNote}
-    `;
-}
-
-
-
-        /* ======================= FIREBASE CONFIG ======================= 
-           Replace these values with your Firebase project's config if different.
-        */
+        // ======================= FIREBASE CONFIG =======================
         const firebaseConfig = {
             apiKey: "AIzaSyAaUOPKe4lvxqSbj_yZRXREOrLok9mmvRk",
             authDomain: "agrotech-9b042.firebaseapp.com",
-            databaseURL: "https://agrotech-9b042-default-rtdb.firebaseio.com", // Realtime DB URL
+            databaseURL: "https://agrotech-9b042-default-rtdb.firebaseio.com",
             projectId: "agrotech-9b042",
             storageBucket: "agrotech-9b042.appspot.com",
             messagingSenderId: "722678725948",
@@ -1190,7 +1025,7 @@ function analyzeField() {
         const auth = firebase.auth();
         const db = firebase.database();
 
-        /* ======================= UI References ======================= */
+        // ======================= UI References =======================
         const pageDashboard = document.getElementById('page-dashboard');
         const pageDetect = document.getElementById('page-detect');
         const pageSeed = document.getElementById('page-seed');
@@ -1198,7 +1033,7 @@ function analyzeField() {
         const pageProfile = document.getElementById('page-profile');
         const pageField = document.getElementById('page-field');
         const pageVoice = document.getElementById('page-voice');
-        const allPages = [pageDashboard,pageDetect,pageSeed,pageMoisture,pageProfile,pageField,pageVoice];
+        const allPages = [pageDashboard, pageDetect, pageSeed, pageMoisture, pageProfile, pageField, pageVoice];
         const sideButtons = {
             dashboard: document.getElementById('m-dashboard'),
             detect: document.getElementById('m-detect'),
@@ -1216,29 +1051,31 @@ function analyzeField() {
             voice: document.getElementById('b-voice')
         };
 
-        /* ======================= NAVIGATION (single-page display) ======================= */
+        // ======================= NAVIGATION =======================
         function hideAllPages() {
             allPages.forEach(p => {
-        if (p) {
-            p.style.display = 'none';
-            p.setAttribute('aria-hidden', 'true');
+                if (p) {
+                    p.style.display = 'none';
+                    p.setAttribute('aria-hidden', 'true');
+                }
+            });
         }
-    });
-}
+
         function clearActive() {
             Object.values(sideButtons).forEach(b => {
                 if (b) b.classList.remove('active');
             });
-            
             Object.values(bottomButtons).forEach(b => {
                 if (b) b.classList.remove('active');
             });
         }
+
         function setActive(menu) {
             clearActive();
             if (sideButtons[menu]) sideButtons[menu].classList.add('active');
             if (bottomButtons[menu]) bottomButtons[menu].classList.add('active');
         }
+
         function navClick(target) {
             hideAllPages();
             setActive(target);
@@ -1250,19 +1087,386 @@ function analyzeField() {
             if (target === 'field') pageField.style.display = 'block';
             if (target === 'voice' && pageVoice) pageVoice.style.display = 'block';
         }
-        /* initial */
+
+        // initial
         hideAllPages();
         navClick('dashboard');
 
-        /* ======================= AUTH UI ======================= */
+        // ======================= REPORT MODAL =======================
+        function openReportModal() {
+            document.getElementById('reportModal').style.display = 'flex';
+        }
+
+        function closeReportModal() {
+            document.getElementById('reportModal').style.display = 'none';
+        }
+
+        // Close modal on click outside
+        document.getElementById('reportModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeReportModal();
+            }
+        });
+
+        // ======================= FIXED PDF GENERATION =======================
+        async function generatePDF() {
+            const btn = document.querySelector('#reportModal .primary-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating...';
+            btn.disabled = true;
+
+            try {
+                const user = auth.currentUser;
+                const userName = user.displayName || user.email || 'Farmer';
+                const timestamp = new Date().toLocaleString('en-IN', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                // Get selected options
+                const includeMoisture = document.getElementById('includeMoisture').checked;
+                const includeDisease = document.getElementById('includeDisease').checked;
+                const includeField = document.getElementById('includeField').checked;
+                const includeCrops = document.getElementById('includeCrops').checked;
+                const includeRecommendations = document.getElementById('includeRecommendations').checked;
+
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF('p', 'mm', 'a4');
+                const pageWidth = doc.internal.pageSize.width;
+                let yOffset = 20;
+
+                // ---------- HEADER ----------
+                doc.setFontSize(24);
+                doc.setTextColor(46, 204, 113);
+                doc.text('AgroTech', pageWidth / 2, yOffset, { align: 'center' });
+
+                yOffset += 10;
+                doc.setFontSize(16);
+                doc.setTextColor(44, 62, 80);
+                doc.text('Smart Farming Report', pageWidth / 2, yOffset, { align: 'center' });
+
+                yOffset += 10;
+                doc.setFontSize(11);
+                doc.setTextColor(100, 100, 100);
+                doc.text(`Generated for: ${userName}`, pageWidth / 2, yOffset, { align: 'center' });
+
+                yOffset += 7;
+                doc.text(`Date: ${timestamp}`, pageWidth / 2, yOffset, { align: 'center' });
+
+                yOffset += 7;
+                doc.text(`Report ID: AGT-${Date.now().toString().slice(-8)}`, pageWidth / 2, yOffset, { align: 'center' });
+
+                yOffset += 12;
+                doc.setDrawColor(46, 204, 113);
+                doc.setLineWidth(1);
+                doc.line(30, yOffset, pageWidth - 30, yOffset);
+                yOffset += 8;
+
+                // ---------- FARMER DETAILS ----------
+                doc.setFontSize(14);
+                doc.setTextColor(46, 204, 113);
+                doc.text('Farmer Details', 20, yOffset);
+                yOffset += 8;
+
+                doc.setFontSize(10);
+                doc.setTextColor(44, 62, 80);
+                const details = [
+                    ['Name', userName],
+                    ['Email', user.email || 'Not provided'],
+                    ['Farm Location', 'Not specified'],
+                    ['Report Date', timestamp]
+                ];
+
+                details.forEach(([label, value]) => {
+                    doc.text(`${label}:`, 25, yOffset);
+                    doc.setTextColor(60, 60, 60);
+                    doc.text(value, 80, yOffset);
+                    doc.setTextColor(44, 62, 80);
+                    yOffset += 6;
+                });
+                yOffset += 4;
+
+                // ---------- CROP INFORMATION ----------
+                if (includeCrops) {
+                    if (yOffset > 240) { doc.addPage();
+                        yOffset = 20; }
+
+                    doc.setFontSize(14);
+                    doc.setTextColor(46, 204, 113);
+                    doc.text('Crop Information', 20, yOffset);
+                    yOffset += 8;
+
+                    const cropSelect = document.getElementById('fieldCrop');
+                    const cropType = cropSelect ? cropSelect.value || 'Not specified' : 'Not specified';
+                    const soilType = document.getElementById('soilType')?.value || 'Not specified';
+                    const area = document.getElementById('fieldArea')?.value || 'Not specified';
+
+                    doc.setFontSize(10);
+                    doc.setTextColor(44, 62, 80);
+                    const cropData = [
+                        ['Crop Type', cropType],
+                        ['Soil Type', soilType],
+                        ['Field Area', `${area} acres`],
+                        ['Season', getCurrentSeason()]
+                    ];
+
+                    cropData.forEach(([label, value]) => {
+                        doc.text(`${label}:`, 25, yOffset);
+                        doc.setTextColor(60, 60, 60);
+                        doc.text(value, 80, yOffset);
+                        doc.setTextColor(44, 62, 80);
+                        yOffset += 6;
+                    });
+                    yOffset += 4;
+                }
+
+                // ---------- SOIL MOISTURE DATA ----------
+                if (includeMoisture) {
+                    if (yOffset > 220) { doc.addPage();
+                        yOffset = 20; }
+
+                    doc.setFontSize(14);
+                    doc.setTextColor(46, 204, 113);
+                    doc.text('Soil Moisture Analysis', 20, yOffset);
+                    yOffset += 8;
+
+                    // Get sensor data with fallbacks
+                    const tempEl = document.getElementById('s-temp');
+                    const humEl = document.getElementById('s-hum');
+                    const moistEl = document.getElementById('s-moist');
+                    
+                    let temp = tempEl ? tempEl.textContent || 'N/A' : 'N/A';
+                    let hum = humEl ? humEl.textContent || 'N/A' : 'N/A';
+                    let moist = moistEl ? moistEl.textContent || 'N/A' : 'N/A';
+
+                    // Clean up values - remove any special characters
+                    const cleanTemp = temp.replace(/[^0-9.]/g, '');
+                    const cleanHum = hum.replace(/[^0-9.]/g, '');
+                    const cleanMoist = moist.replace(/[^0-9.]/g, '');
+
+                    const moistureData = [
+                        ['Parameter', 'Value', 'Status'],
+                        ['Temperature', `${cleanTemp || 'N/A'} °C`, getTemperatureStatus(cleanTemp)],
+                        ['Humidity', `${cleanHum || 'N/A'} %`, getHumidityStatus(cleanHum)],
+                        ['Soil Moisture', `${cleanMoist || 'N/A'} %`, getMoistureStatus(cleanMoist)]
+                    ];
+
+                    doc.autoTable({
+                        startY: yOffset,
+                        head: [moistureData[0]],
+                        body: moistureData.slice(1),
+                        theme: 'striped',
+                        headStyles: { fillColor: [46, 204, 113], textColor: [255, 255, 255] },
+                        styles: { fontSize: 10, cellPadding: 4 },
+                        columnStyles: { 0: { cellWidth: 50 }, 1: { cellWidth: 35 }, 2: { cellWidth: 55 } }
+                    });
+
+                    yOffset = doc.lastAutoTable.finalY + 6;
+
+                    // Irrigation recommendation
+                    const irrigationAdvice = getIrrigationAdvice(cleanMoist);
+                    doc.setFontSize(10);
+                    doc.setTextColor(46, 204, 113);
+                    doc.text('Recommendation:', 20, yOffset);
+                    yOffset += 5;
+                    doc.setTextColor(60, 60, 60);
+                    // Split long text to avoid overflow
+                    const wrappedAdvice = doc.splitTextToSize(irrigationAdvice, 160);
+                    doc.text(wrappedAdvice, 25, yOffset);
+                    yOffset += wrappedAdvice.length * 5 + 8;
+                }
+
+                // ---------- DISEASE DETECTION ----------
+                if (includeDisease) {
+                    if (yOffset > 220) { doc.addPage();
+                        yOffset = 20; }
+
+                    doc.setFontSize(14);
+                    doc.setTextColor(46, 204, 113);
+                    doc.text('Disease Detection Results', 20, yOffset);
+                    yOffset += 8;
+
+                    const resultEl = document.getElementById('detectResult');
+                    const suggestionEl = document.getElementById('diseaseSuggestion');
+                    
+                    let resultText = resultEl ? resultEl.textContent || 'No detection performed' : 'No detection performed';
+                    let suggestionText = suggestionEl ? suggestionEl.textContent || 'No suggestions available' : 'No suggestions available';
+
+                    // Clean up HTML tags
+                    resultText = resultText.replace(/<[^>]*>/g, '').trim();
+                    suggestionText = suggestionText.replace(/<[^>]*>/g, '').trim();
+
+                    doc.setFontSize(10);
+                    doc.setTextColor(44, 62, 80);
+
+                    // Parse detection results
+                    let detectionSummary = 'No issues detected';
+                    if (resultText.includes('Detected Issues')) {
+                        const lines = resultText.split('\n');
+                        const issues = lines.filter(l => l.includes('•') || l.includes('-') || l.includes('*'));
+                        if (issues.length > 0) {
+                            detectionSummary = issues.join('; ').replace(/[•\-*]/g, '').trim();
+                        }
+                    }
+
+                    doc.text('Detection Summary:', 25, yOffset);
+                    yOffset += 5;
+                    doc.setTextColor(60, 60, 60);
+                    const wrappedSummary = doc.splitTextToSize(detectionSummary, 150);
+                    doc.text(wrappedSummary, 25, yOffset);
+                    yOffset += wrappedSummary.length * 5 + 5;
+
+                    if (suggestionText && !suggestionText.includes('—')) {
+                        doc.setTextColor(46, 204, 113);
+                        doc.text('Suggestions:', 25, yOffset);
+                        yOffset += 5;
+                        doc.setTextColor(60, 60, 60);
+                        const wrappedSuggestions = doc.splitTextToSize(suggestionText, 150);
+                        doc.text(wrappedSuggestions, 25, yOffset);
+                        yOffset += wrappedSuggestions.length * 5 + 8;
+                    }
+                }
+
+                // ---------- FIELD ANALYSIS ----------
+                if (includeField) {
+                    if (yOffset > 220) { doc.addPage();
+                        yOffset = 20; }
+
+                    doc.setFontSize(14);
+                    doc.setTextColor(46, 204, 113);
+                    doc.text('Field Analysis', 20, yOffset);
+                    yOffset += 8;
+
+                    const fieldResultEl = document.getElementById('fieldResult');
+                    let fieldResult = fieldResultEl ? fieldResultEl.textContent || 'No field analysis performed' : 'No field analysis performed';
+                    fieldResult = fieldResult.replace(/<[^>]*>/g, '').trim();
+
+                    doc.setFontSize(10);
+                    doc.setTextColor(60, 60, 60);
+                    const wrappedField = doc.splitTextToSize(fieldResult, 160);
+                    doc.text(wrappedField, 20, yOffset);
+                    yOffset += wrappedField.length * 5 + 8;
+                }
+
+                // ---------- RECOMMENDATIONS ----------
+                if (includeRecommendations) {
+                    if (yOffset > 200) { doc.addPage();
+                        yOffset = 20; }
+
+                    doc.setFontSize(14);
+                    doc.setTextColor(46, 204, 113);
+                    doc.text('Recommendations Summary', 20, yOffset);
+                    yOffset += 8;
+
+                    const recommendations = [
+                        'Monitor soil moisture levels regularly',
+                        'Apply irrigation based on crop water requirements',
+                        'Conduct regular pest and disease inspections',
+                        'Maintain proper crop rotation for soil health',
+                        'Use organic fertilizers when possible',
+                        'Keep detailed records for better farm planning'
+                    ];
+
+                    doc.setFontSize(10);
+                    doc.setTextColor(60, 60, 60);
+                    recommendations.forEach(rec => {
+                        doc.text(`• ${rec}`, 25, yOffset);
+                        yOffset += 6;
+                    });
+                    yOffset += 4;
+                }
+
+                // ---------- FOOTER ----------
+                if (yOffset > 250) { doc.addPage();
+                    yOffset = 20; }
+
+                doc.setDrawColor(200, 200, 200);
+                doc.line(20, yOffset + 10, pageWidth - 20, yOffset + 10);
+                doc.setFontSize(9);
+                doc.setTextColor(150, 150, 150);
+                doc.text('Generated by AgroTech - Smart Farming Dashboard', pageWidth / 2, yOffset + 18, { align: 'center' });
+                doc.text(`© ${new Date().getFullYear()} AgroTech. All rights reserved.`, pageWidth / 2, yOffset + 25, { align: 'center' });
+
+                // Save the PDF
+                doc.save(`AgroTech_Report_${Date.now()}.pdf`);
+
+                // Show success message
+                alert('✅ PDF Report generated successfully!');
+
+            } catch (error) {
+                console.error('PDF Generation Error:', error);
+                alert('❌ Error generating PDF: ' + error.message);
+            } finally {
+                // Reset button
+                const btn = document.querySelector('#reportModal .primary-btn');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                closeReportModal();
+            }
+        }
+
+        // ======================= HELPER FUNCTIONS =======================
+
+        function getCurrentSeason() {
+            const month = new Date().getMonth();
+            if (month >= 2 && month <= 4) return 'Spring (Rabi)';
+            if (month >= 5 && month <= 8) return 'Summer (Kharif)';
+            if (month >= 9 && month <= 11) return 'Autumn (Rabi)';
+            return 'Winter (Rabi)';
+        }
+
+        function getTemperatureStatus(temp) {
+            const t = parseFloat(temp);
+            if (isNaN(t)) return 'N/A';
+            if (t < 15) return 'Cold';
+            if (t < 25) return 'Optimal';
+            if (t < 35) return 'Warm';
+            return 'Hot';
+        }
+
+        function getHumidityStatus(hum) {
+            const h = parseFloat(hum);
+            if (isNaN(h)) return 'N/A';
+            if (h < 30) return 'Dry';
+            if (h < 60) return 'Optimal';
+            if (h < 80) return 'Humid';
+            return 'Very Humid';
+        }
+
+        function getMoistureStatus(moist) {
+            const m = parseFloat(moist);
+            if (isNaN(m)) return 'N/A';
+            if (m < 30) return 'Low - Need Water';
+            if (m < 50) return 'Moderate';
+            if (m < 70) return 'Optimal';
+            return 'High - Risk of Waterlogging';
+        }
+
+        function getIrrigationAdvice(moist) {
+            const m = parseFloat(moist);
+            if (isNaN(m)) return 'No data available for irrigation recommendation.';
+            if (m < 30) return 'CRITICAL: Immediate irrigation required! Water your field within 24 hours.';
+            if (m < 45) return 'Low moisture: Plan irrigation within 48-72 hours.';
+            if (m < 65) return 'Optimal moisture: Maintain current irrigation schedule.';
+            if (m < 80) return 'High moisture: Reduce irrigation to prevent waterlogging.';
+            return 'Very high moisture: Stop irrigation and monitor drainage.';
+        }
+
+        // ======================= AUTH UI =======================
         const authPanel = document.getElementById('authPanel');
         const signInForm = document.getElementById('signInForm');
         const signUpForm = document.getElementById('signUpForm');
 
-        document.getElementById('switchToSignUp').onclick = () => { signInForm.style.display = 'none'; signUpForm.style.display = 'block'; document.getElementById('siMsg').textContent = ''; };
-        document.getElementById('switchToSignIn').onclick = () => { signUpForm.style.display = 'none'; signInForm.style.display = 'block'; document.getElementById('suMsg').textContent = ''; };
+        document.getElementById('switchToSignUp').onclick = () => { signInForm.style.display = 'none';
+            signUpForm.style.display = 'block';
+            document.getElementById('siMsg').textContent = ''; };
+        document.getElementById('switchToSignIn').onclick = () => { signUpForm.style.display = 'none';
+            signInForm.style.display = 'block';
+            document.getElementById('suMsg').textContent = ''; };
 
-        /* SIGN UP */
         document.getElementById('signUpBtn').onclick = async () => {
             const name = document.getElementById('suName').value.trim();
             const email = document.getElementById('suEmail').value.trim();
@@ -1274,60 +1478,52 @@ function analyzeField() {
             try {
                 const userCred = await auth.createUserWithEmailAndPassword(email, password);
                 if (name) await userCred.user.updateProfile({ displayName: name });
-                msg.style.color = 'lightgreen'; msg.textContent = 'Account created. Signing in...';
-                // signed in automatically; onAuthStateChanged will handle UI
-            } catch (err) { msg.style.color = 'salmon'; msg.textContent = err.message; }
+                msg.style.color = 'lightgreen';
+                msg.textContent = 'Account created. Signing in...';
+            } catch (err) { msg.style.color = 'salmon';
+                msg.textContent = err.message; }
         };
 
-        /* SIGN IN */
         document.getElementById('signInBtn').onclick = async () => {
             const email = document.getElementById('siEmail').value.trim();
             const password = document.getElementById('siPassword').value;
-            const msg = document.getElementById('siMsg'); msg.textContent = '';
+            const msg = document.getElementById('siMsg');
+            msg.textContent = '';
             if (!email || !password) { msg.textContent = 'Email & password required'; return; }
             try { await auth.signInWithEmailAndPassword(email, password); } catch (err) { msg.textContent = err.message; }
         };
 
-        /* GOOGLE SIGN-IN */
         document.getElementById('googleSignInBtn').onclick = async () => {
             const provider = new firebase.auth.GoogleAuthProvider();
             try { await auth.signInWithPopup(provider); } catch (err) { alert(err.message); }
         };
 
-        /* PASSWORD RESET */
         document.getElementById('forgotBtn').onclick = async () => {
             const email = prompt('Enter your email for reset:');
             if (!email) return;
-            try { await auth.sendPasswordResetEmail(email); alert('Reset email sent'); } catch (err) { alert(err.message); }
+            try { await auth.sendPasswordResetEmail(email);
+                alert('Reset email sent'); } catch (err) { alert(err.message); }
         };
 
-        /* AUTH STATE CHANGE */
         auth.onAuthStateChanged(user => {
             if (user) {
                 document.getElementById('userEmailTop').textContent = user.email;
                 document.getElementById('p-email').textContent = user.email;
                 document.getElementById('p-name').textContent = user.displayName || 'No display name';
                 document.getElementById('profileAvatar').textContent = (user.displayName || user.email).charAt(0).toUpperCase();
-                // hide overlay
+                document.getElementById('welcomeTitle').textContent = `Welcome, ${user.displayName || 'Farmer'}`;
                 authPanel.style.display = 'none';
-                // show app
                 navClick('dashboard');
             } else {
-                // show overlay
                 authPanel.style.display = 'flex';
                 hideAllPages();
             }
         });
 
-        /* LOGOUT */
         function logout() { auth.signOut(); }
 
-        /* ======================= Disease Detection Logic ======================= */
-
-        // GLOBAL state (important!)
+        // ======================= Disease Detection Logic =======================
         window.imageLoaded = false;
-
-        // DOM refs
         const fileInput = document.getElementById('fileInput');
         const preview = document.getElementById('preview');
         const detectResult = document.getElementById('detectResult');
@@ -1335,19 +1531,13 @@ function analyzeField() {
         const espBtn = document.getElementById('espCaptureBtn');
         const runBtn = document.getElementById('processBtn');
 
-        // ------------------ Laptop image upload ------------------
         fileInput.addEventListener('change', e => {
             const file = e.target.files[0];
-            if (!file) {
-                window.imageLoaded = false;
-                return;
-            }
-
+            if (!file) { window.imageLoaded = false; return; }
             const reader = new FileReader();
             reader.onload = ev => {
                 preview.src = ev.target.result;
                 preview.style.display = 'block';
-
                 detectResult.textContent = 'Image loaded from device. Ready to analyze.';
                 diseaseSuggestion.textContent = '';
                 window.imageLoaded = true;
@@ -1355,160 +1545,104 @@ function analyzeField() {
             reader.readAsDataURL(file);
         });
 
-        // ------------------ ESP32-CAM capture ------------------
         const ESP_IP = '10.182.153.159';
-
         espBtn.addEventListener('click', () => {
-
-            if (!ESP_IP) {
-                detectResult.textContent = 'ESP32 IP not set.';
-                return;
-            }
-
-            const espUrl = `http://${ESP_IP}/cam.jpg`; // ✅ correct endpoint
-
+            if (!ESP_IP) { detectResult.textContent = 'ESP32 IP not set.'; return; }
+            const espUrl = `http://${ESP_IP}/cam.jpg`;
             preview.onload = () => {
-                detectResult.textContent =
-                    'Image captured from ESP32-CAM. Ready to analyze.';
+                detectResult.textContent = 'Image captured from ESP32-CAM. Ready to analyze.';
                 window.imageLoaded = true;
             };
-
             preview.onerror = () => {
                 preview.style.display = 'none';
                 detectResult.textContent = 'ESP32-CAM not reachable.';
                 window.imageLoaded = false;
             };
-
-            preview.src = espUrl + '?t=' + Date.now(); // cache-bust
+            preview.src = espUrl + '?t=' + Date.now();
             preview.style.display = 'block';
         });
 
-        // ------------------ Run Detection ------------------
         runBtn.addEventListener('click', () => {
             if (!window.imageLoaded) {
                 detectResult.textContent = 'Please upload or capture an image first.';
                 diseaseSuggestion.textContent = '';
                 return;
             }
-
             detectResult.textContent = 'Analyzing image…';
 
-            // SIMULATED AI RESULT (demo purpose)
-           
-setTimeout(() => {
+            setTimeout(() => {
+                const img = preview;
+                const canvas = document.createElement("canvas");
+                const ctx = canvas.getContext("2d");
+                canvas.width = img.naturalWidth;
+                canvas.height = img.naturalHeight;
+                ctx.drawImage(img, 0, 0);
+                const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+                let greenPixels = 0;
+                for (let i = 0; i < pixels.length; i += 4) {
+                    const r = pixels[i];
+                    const g = pixels[i + 1];
+                    const b = pixels[i + 2];
+                    if (g > r + 20 && g > b + 20) { greenPixels++; }
+                }
+                const greenRatio = greenPixels / (pixels.length / 4);
 
-    // ---------- SIMPLE PLANT DETECTION ----------
-    const img = preview;
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
+                if (greenRatio < 0.15) {
+                    detectResult.innerHTML = `
+                        ❌ <b>No plant detected</b><br>
+                        Please upload a clear image of a crop or plant leaf.
+                    `;
+                    diseaseSuggestion.textContent = '';
+                    return;
+                }
 
-    canvas.width = img.naturalWidth;
-    canvas.height = img.naturalHeight;
-    ctx.drawImage(img, 0, 0);
+                const diseases = ['Healthy', 'Early Blight', 'Leaf Rust', 'Nutrient Deficiency', 'Bacterial Spot'];
+                const detectedDiseases = diseases.filter(() => Math.random() > 0.6);
+                if (detectedDiseases.length === 0) detectedDiseases.push('Healthy');
 
-    const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-    let greenPixels = 0;
+                const confidence = detectedDiseases.map(d => ({
+                    name: d,
+                    confidence: (70 + Math.random() * 25).toFixed(0)
+                }));
 
-    for (let i = 0; i < pixels.length; i += 4) {
-        const r = pixels[i];
-        const g = pixels[i + 1];
-        const b = pixels[i + 2];
-
-        if (g > r + 20 && g > b + 20) {
-            greenPixels++;
-        }
-    }
-
-    const greenRatio = greenPixels / (pixels.length / 4);
-
-    // ---------- NO PLANT FOUND ----------
-    if (greenRatio < 0.15) {
-        detectResult.innerHTML = `
-            ❌ <b>No plant detected</b><br>
-            Please upload a clear image of a crop or plant leaf.
-        `;
-        diseaseSuggestion.textContent = '';
-        return;
-    }
-
-    // ---------- PLANT FOUND → DISEASE LOGIC ----------
-    const diseases = [
-        'Healthy',
-        'Early Blight',
-        'Leaf Rust',
-        'Nutrient Deficiency',
-        'Bacterial Spot'
-    ];
-
-    const detectedDiseases = diseases.filter(() => Math.random() > 0.6);
-    if (detectedDiseases.length === 0) detectedDiseases.push('Healthy');
-
-    const confidence = detectedDiseases.map(d => ({
-        name: d,
-        confidence: (70 + Math.random() * 25).toFixed(0)
-    }));
-
-    detectResult.innerHTML = `
-        <strong>Detected Issues:</strong>
-        <ul>
-            ${confidence.map(d =>
-                `<li>${d.name} <span class="muted">(${d.confidence}%)</span></li>`
-            ).join('')}
-        </ul>
-    `;
-
-    diseaseSuggestion.innerText = 'Suggestion: ' +
-        getDiseaseSuggestion(detectedDiseases);
-
-}, 1200);
+                detectResult.innerHTML = `
+                    <strong>Detected Issues:</strong>
+                    <ul>
+                        ${confidence.map(d =>
+                            `<li>${d.name} <span class="muted">(${d.confidence}%)</span></li>`
+                        ).join('')}
+                    </ul>
+                `;
+                diseaseSuggestion.innerText = 'Suggestion: ' + getDiseaseSuggestion(detectedDiseases);
+            }, 1200);
         });
 
-        // ------------------ Disease suggestions ------------------
         function getDiseaseSuggestion(diseases) {
-  const suggestions = {
-    'Healthy':
-      '🌱 Plant appears healthy. Continue regular monitoring and irrigation.',
+            const suggestions = {
+                'Healthy': 'Plant appears healthy. Continue regular monitoring and irrigation.',
+                'Early Blight': 'Remove affected leaves and apply recommended fungicide.',
+                'Leaf Rust': 'Use rust-resistant varieties and apply sulfur-based fungicide.',
+                'Nutrient Deficiency': 'Apply balanced fertilizer and improve soil nutrition.',
+                'Bacterial Spot': 'Avoid overhead irrigation and use copper-based spray.'
+            };
+            if (!Array.isArray(diseases)) { diseases = [diseases]; }
+            if (diseases.length === 1 && diseases[0] === 'Healthy') {
+                return suggestions['Healthy'];
+            }
+            return diseases
+                .filter(d => d !== 'Healthy')
+                .map(d => `• ${d}: ${suggestions[d] || 'Consult agricultural expert.'}`)
+                .join('\n');
+        }
 
-    'Early Blight':
-      '🍂 Remove affected leaves and apply recommended fungicide.',
-
-    'Leaf Rust':
-      '🟠 Use rust-resistant varieties and apply sulfur-based fungicide.',
-
-    'Nutrient Deficiency':
-      '🧪 Apply balanced fertilizer and improve soil nutrition.',
-
-    'Bacterial Spot':
-      '💧 Avoid overhead irrigation and use copper-based spray.'
-  };
-
-  // ensure array
-  if (!Array.isArray(diseases)) {
-    diseases = [diseases];
-  }
-
-  // if only Healthy
-  if (diseases.length === 1 && diseases[0] === 'Healthy') {
-    return suggestions['Healthy'];
-  }
-
-  // build multi-disease output
-  return diseases
-    .filter(d => d !== 'Healthy')
-    .map(d => `• ${d}: ${suggestions[d] || 'Consult agricultural expert.'}`)
-    .join('\n');
-}
-        
-
-
-        /* ======================= Seed Calculator (dropdown with icons) ======================= */
+        // ======================= Seed Calculator =======================
         const cropSelect = document.getElementById('cropSelect');
         const otherWeightWrap = document.getElementById('otherWeightWrap');
         cropSelect.addEventListener('change', () => {
             const selected = cropSelect.options[cropSelect.selectedIndex];
-            const weight100 = parseFloat(selected.dataset.w || 0);
-            if (selected.value === 'Other') { otherWeightWrap.style.display = 'block'; }
-            else { otherWeightWrap.style.display = 'none'; document.getElementById('otherWeightInput').value = ''; }
+            if (selected.value === 'Other') { otherWeightWrap.style.display = 'block'; } else { otherWeightWrap.style.display =
+                    'none';
+                document.getElementById('otherWeightInput').value = ''; }
         });
 
         function calcSeeds() {
@@ -1517,27 +1651,22 @@ setTimeout(() => {
             const sel = cropSelect.options[cropSelect.selectedIndex];
             const crop = sel.value || 'Crop';
             let weight100 = parseFloat(sel.dataset.w || 0);
-
             if (crop === 'Other') {
                 weight100 = parseFloat(document.getElementById('otherWeightInput').value);
                 if (!weight100) { alert('Enter weight per 100 seeds for the Other crop'); return; }
             }
-
             if (!spacing || !area) { alert('Please enter spacing & area'); return; }
             const seeds = Math.round((area * 10000) / (spacing * spacing));
             document.getElementById('seedResult').textContent = `${crop}: Required Seeds ≈ ${seeds.toLocaleString()}`;
-
             if (weight100 && weight100 > 0) {
-                const gramsPerSeed = weight100 / 100.0;
-                const totalKg = (seeds * gramsPerSeed) / 1000.0;
+                const totalKg = (seeds * (weight100 / 100.0)) / 1000.0;
                 document.getElementById('seedWeightResult').textContent = `Required Weight ≈ ${totalKg.toFixed(2)} kg`;
             } else {
                 document.getElementById('seedWeightResult').textContent = 'Required Weight: —';
             }
         }
 
-        /* ======================= Moisture Monitor - Realtime via Firebase ======================= */
-        /* Chart setup */
+        // ======================= Moisture Monitor =======================
         const ctx = document.getElementById('moistureChart').getContext('2d');
         let chartData = [50, 50, 50, 50, 50, 50, 50, 50, 50, 50];
         const moistureChart = new Chart(ctx, {
@@ -1545,62 +1674,25 @@ setTimeout(() => {
             data: { labels: chartData.map((_, i) => i + 1), datasets: [{ data: chartData, borderColor: 'rgba(39,174,96,1)', backgroundColor: 'rgba(39,174,96,0.12)', tension: 0.35, fill: true }] },
             options: { scales: { y: { min: 0, max: 100 } }, plugins: { legend: { display: false } }, maintainAspectRatio: false }
         });
+
         function addMoisturePoint(val) {
             moistureChart.data.datasets[0].data.push(val);
             if (moistureChart.data.datasets[0].data.length > 20) moistureChart.data.datasets[0].data.shift();
             moistureChart.update();
         }
 
-        // ===== Sensor readings + analysis (FINAL, SAFE) =====
-
-        const sensorRef = db
-            .ref('/agrotech/sensors')
-            .limitToLast(1);
-
+        const sensorRef = db.ref('/agrotech/sensors').limitToLast(1);
         sensorRef.on('child_added', snap => {
             const d = snap.val();
             if (!d) return;
-
-            // update sensor cards (SAFE, no ??)
             document.getElementById('s-temp').textContent = d.temp !== undefined ? d.temp : '—';
             document.getElementById('s-hum').textContent = d.hum !== undefined ? d.hum : '—';
             document.getElementById('s-moist').textContent = d.soil !== undefined ? d.soil : '—';
-
-            // update chart
-            if (!isNaN(d.soil)) {
-                addMoisturePoint(Number(d.soil));
-            }
-
-            // update time
-            document.getElementById('lastUpdated').textContent =
-                'Last Updated: ' + new Date().toLocaleString();
-
-            // crop-based analysis
-            const cropSel = document.getElementById('cropType-moisture');
-            if (!cropSel) return;
-
-            const analysis = analyzeReadings(
-                cropSel.value,
-                d.temp,
-                d.hum,
-                d.soil
-            );
-
-            document.getElementById('s-cause').textContent = analysis.cause;
-            document.getElementById('s-suggest').textContent = analysis.suggest;
+            if (!isNaN(d.soil)) { addMoisturePoint(Number(d.soil)); }
+            document.getElementById('lastUpdated').textContent = 'Last Updated: ' + new Date().toLocaleString();
         });
 
-        // debug message if nothing arrives
-        setTimeout(() => {
-            if (document.getElementById('s-temp').textContent === '—') {
-                console.log('ESP32 not sending data yet');
-            }
-        }, 3000);
-
-
-
-
-        /* ======================= Profile actions ======================= */
+        // ======================= Profile actions =======================
         function updateName() {
             const newName = document.getElementById('editName').value.trim();
             if (!newName) return alert('Enter a name');
@@ -1612,333 +1704,472 @@ setTimeout(() => {
                 alert('Name updated');
             }).catch(err => alert(err.message));
         }
+
         function deleteAccount() {
             if (!confirm('Are you sure? This will permanently delete your account.')) return;
             const user = auth.currentUser;
-            user.delete().then(() => { alert('Account deleted'); location.reload(); }).catch(err => {
+            user.delete().then(() => { alert('Account deleted');
+                location.reload(); }).catch(err => {
                 if (err.code === 'auth/requires-recent-login') alert('Please sign out and sign in again before deleting your account.');
                 else alert(err.message);
             });
         }
 
-        /* ======================= Parallax mouse move ======================= */
+        // ======================= Field Analysis =======================
+        function analyzeFieldImage() {
+            const crop = document.getElementById("fieldCrop").value;
+            const fileInput = document.getElementById("fieldImage");
+            const result = document.getElementById("imageResult");
+
+            if (!fileInput.files.length) {
+                result.innerHTML = "❌ Please upload a field image.";
+                return;
+            }
+            if (!crop) {
+                result.innerHTML = "❌ Please select crop type.";
+                return;
+            }
+
+            const fileName = fileInput.files[0].name.toLowerCase();
+            const cropKeywords = {
+                Rice: ["rice", "paddy"],
+                Wheat: ["wheat"],
+                Maize: ["maize", "corn"],
+                Bajra: ["bajra", "millet"],
+                Cotton: ["cotton"],
+                Groundnut: ["groundnut", "peanut"],
+                Mustard: ["mustard"],
+                Soybean: ["soybean", "soy"],
+                Sunflower: ["sunflower"],
+                Chickpea: ["chickpea", "gram"],
+                Jowar: ["jowar", "sorghum"],
+                Barley: ["barley"]
+            };
+            const stressKeywords = ["burn", "burnt", "dry", "drought", "damaged", "wilt", "stress"];
+            const isCropMatch = (cropKeywords[crop] || []).some(k => fileName.includes(k));
+            const isStressed = stressKeywords.some(k => fileName.includes(k));
+
+            if (!isCropMatch && !isStressed) {
+                result.innerHTML = `
+                    ❌ <b>Invalid Image</b><br>
+                    The uploaded image does not appear to be a <b>${crop}</b> field.<br>
+                    📷 Please upload a proper crop/field image.
+                `;
+                return;
+            }
+
+            if (isStressed) {
+                result.innerHTML = `
+                    ⚠️ <b>Crop Stress Detected</b><br><br>
+                    🔍 <b>Observed Condition:</b><br>
+                    The crop shows signs of dryness or burning, which may reduce yield.<br><br>
+                    🧪 <b>Possible Causes:</b>
+                    <ul>
+                        <li>Insufficient irrigation or drought condition</li>
+                        <li>High temperature / heat stress</li>
+                        <li>Nutrient deficiency or soil imbalance</li>
+                    </ul>
+                    🩺 <b>Treatment & Corrective Measures:</b>
+                    <ul>
+                        <li>🚿 Increase irrigation frequency (avoid flooding)</li>
+                        <li>🌱 Apply organic mulch to retain soil moisture</li>
+                        <li>🧪 Conduct soil testing before fertilizer application</li>
+                        <li>🧂 Apply micronutrients if deficiency is confirmed</li>
+                        <li>⏳ Monitor crop recovery for 7–10 days</li>
+                    </ul>
+                    📌 <i>If stress persists, consult an agricultural expert.</i>
+                `;
+                return;
+            }
+
+            result.innerHTML = `
+                ✅ <b>Crop Looks Healthy</b><br>
+                🌱 No visible stress detected in the field image.<br>
+                ✔ Continue regular irrigation, nutrient management, and monitoring.
+            `;
+        }
+
+        function analyzeField() {
+            const crop = document.getElementById('fieldCrop').value;
+            const soil = document.getElementById('soilType').value;
+            const area = Number(document.getElementById('fieldArea').value);
+            const resultBox = document.getElementById('fieldResult');
+
+            if (!crop || !soil || !area) {
+                alert('Please select crop, soil type and field area');
+                return;
+            }
+
+            let status = '',
+                risk = '',
+                recommendation = '';
+
+            // Rice
+            if (crop.includes('Rice')) {
+                if (soil === 'Alluvial' || soil === 'Loamy') {
+                    status = '✅ Ideal Condition';
+                    risk = 'Low';
+                    recommendation =
+                        'Rice performs best in alluvial/loamy soil. Maintain shallow standing water (3–5 cm), apply nitrogen in split doses, and monitor stem borer and leaf folder.';
+                } else if (soil === 'Clay') {
+                    status = '⚠ Advisory Needed';
+                    risk = 'Waterlogging risk';
+                    recommendation =
+                        'Clay soil retains excess water. Improve drainage and avoid prolonged flooding to prevent root rot.';
+                } else if (soil === 'Sandy') {
+                    status = '⚠ Advisory Needed';
+                    risk = 'Low water retention';
+                    recommendation =
+                        'Sandy soil drains quickly. Increase irrigation frequency and add organic matter to improve moisture holding.';
+                } else {
+                    status = '❌ High Risk';
+                    risk = 'Unsuitable soil';
+                    recommendation =
+                        'This soil type is not suitable for rice. Consider soil amendment or alternative crop.';
+                }
+            }
+            // Wheat
+            else if (crop.includes('Wheat')) {
+                if (soil === 'Loamy' || soil === 'Alluvial') {
+                    status = '✅ Ideal Condition';
+                    risk = 'Low';
+                    recommendation =
+                        'Wheat grows well in loamy/alluvial soil. Ensure good drainage, timely irrigation, and balanced NPK application.';
+                } else if (soil === 'Clay') {
+                    status = '⚠ Advisory Needed';
+                    risk = 'Poor aeration';
+                    recommendation =
+                        'Clay soil may restrict root growth. Avoid over-irrigation and practice shallow tillage.';
+                } else {
+                    status = '⚠ Advisory Needed';
+                    risk = 'Sub-optimal soil';
+                    recommendation =
+                        'Improve soil structure using farmyard manure and proper irrigation scheduling.';
+                }
+            }
+            // Maize
+            else if (crop.includes('Maize')) {
+                if (soil === 'Loamy' || soil === 'Alluvial') {
+                    status = '✅ Ideal Condition';
+                    risk = 'Low';
+                    recommendation =
+                        'Maize prefers well-drained loamy soil. Apply nitrogen in stages and avoid water stagnation.';
+                } else if (soil === 'Sandy') {
+                    status = '⚠ Advisory Needed';
+                    risk = 'Nutrient leaching';
+                    recommendation =
+                        'Sandy soil causes nutrient loss. Apply organic manure and split fertilizer doses.';
+                } else {
+                    status = '⚠ Advisory Needed';
+                    risk = 'Moisture stress';
+                    recommendation =
+                        'Monitor soil moisture carefully and irrigate during critical growth stages.';
+                }
+            }
+            // Mustard
+            else if (crop.includes('Mustard')) {
+                if (soil === 'Loamy' || soil === 'Sandy') {
+                    status = '✅ Ideal Condition';
+                    risk = 'Low';
+                    recommendation =
+                        'Mustard grows well in light soils. Avoid waterlogging and monitor aphid infestation.';
+                } else {
+                    status = '⚠ Advisory Needed';
+                    risk = 'Excess moisture';
+                    recommendation =
+                        'Heavy soil may cause poor root growth. Ensure drainage and avoid excess irrigation.';
+                }
+            }
+            // Soybean
+            else if (crop.includes('Soybean')) {
+                if (soil === 'Loamy' || soil === 'Black') {
+                    status = '✅ Ideal Condition';
+                    risk = 'Low';
+                    recommendation =
+                        'Soybean performs best in loamy/black soil. Ensure good drainage and watch for leaf yellowing.';
+                } else {
+                    status = '⚠ Advisory Needed';
+                    risk = 'Root rot risk';
+                    recommendation =
+                        'Avoid water stagnation and apply seed treatment before sowing.';
+                }
+            }
+            // Groundnut
+            else if (crop.includes('Groundnut')) {
+                if (soil === 'Sandy' || soil === 'Loamy') {
+                    status = '✅ Ideal Condition';
+                    risk = 'Low';
+                    recommendation =
+                        'Loose sandy/loamy soil is ideal for pod development. Ensure calcium availability.';
+                } else {
+                    status = '⚠ Advisory Needed';
+                    risk = 'Poor pod formation';
+                    recommendation =
+                        'Heavy soil restricts pod growth. Improve soil aeration.';
+                }
+            }
+            // Bajra
+            else if (crop.includes('Bajra')) {
+                if (soil === 'Sandy' || soil === 'Loamy') {
+                    status = '✅ Ideal Condition';
+                    risk = 'Low';
+                    recommendation =
+                        'Bajra is drought-tolerant. Minimal irrigation required. Avoid excess fertilizers.';
+                } else {
+                    status = '⚠ Advisory Needed';
+                    risk = 'Water stress';
+                    recommendation =
+                        'Ensure proper drainage and avoid waterlogging.';
+                }
+            }
+            // Sunflower
+            else if (crop.includes('Sunflower')) {
+                if (soil === 'Loamy') {
+                    status = '✅ Ideal Condition';
+                    risk = 'Low';
+                    recommendation =
+                        'Sunflower requires well-drained soil and full sunlight. Monitor for pests.';
+                } else {
+                    status = '⚠ Advisory Needed';
+                    risk = 'Poor root growth';
+                    recommendation =
+                        'Ensure soil aeration and balanced fertilization.';
+                }
+            }
+            // Cotton
+            else if (crop.includes('Cotton')) {
+                if (soil === 'Black') {
+                    status = '✅ Ideal Condition';
+                    risk = 'Low';
+                    recommendation =
+                        'Black soil is ideal for cotton. Monitor bollworm and avoid excess nitrogen.';
+                } else {
+                    status = '⚠ Advisory Needed';
+                    risk = 'Moisture imbalance';
+                    recommendation =
+                        'Maintain proper irrigation schedule and pest monitoring.';
+                }
+            }
+            // Chickpea
+            else if (crop.includes('Chickpea')) {
+                if (soil === 'Loamy') {
+                    status = '✅ Ideal Condition';
+                    risk = 'Low';
+                    recommendation =
+                        'Chickpea prefers well-drained loamy soil. Avoid excess irrigation.';
+                } else {
+                    status = '⚠ Advisory Needed';
+                    risk = 'Root rot risk';
+                    recommendation =
+                        'Ensure proper drainage and avoid water stagnation.';
+                }
+            }
+            // Jowar
+            else if (crop.includes('Jowar')) {
+                status = '✅ Suitable Condition';
+                risk = 'Low';
+                recommendation =
+                    'Jowar tolerates varied soils. Requires moderate irrigation and timely weed control.';
+            }
+            // Barley
+            else if (crop.includes('Barley')) {
+                if (soil === 'Loamy' || soil === 'Alluvial') {
+                    status = '✅ Ideal Condition';
+                    risk = 'Low';
+                    recommendation =
+                        'Barley grows well in light soils. Avoid excess nitrogen and waterlogging.';
+                } else {
+                    status = '⚠ Advisory Needed';
+                    risk = 'Yield reduction';
+                    recommendation =
+                        'Improve soil fertility and drainage for better yield.';
+                }
+            }
+            // Default
+            else {
+                status = '⚠ Advisory Needed';
+                risk = 'Limited data';
+                recommendation =
+                    'Crop-soil combination requires expert consultation.';
+            }
+
+            let areaNote = '';
+            if (area >= 5) {
+                areaNote =
+                    '<br>🚜 Large field detected: Mechanized irrigation and scheduled monitoring recommended.';
+            }
+
+            resultBox.innerHTML = `
+                🌱 <b>Crop:</b> ${crop}<br>
+                🌍 <b>Soil:</b> ${soil}<br>
+                📐 <b>Area:</b> ${area} acres<br><br>
+                <b>Status:</b> ${status}<br>
+                <b>Risk:</b> ${risk}<br><br>
+                <b>Practical Recommendation:</b><br>
+                ${recommendation}
+                ${areaNote}
+            `;
+        }
+
+        // ======================= Parallax =======================
         const bgImage = document.getElementById('bgImage');
         document.addEventListener('mousemove', (e) => {
-            const w = window.innerWidth, h = window.innerHeight;
+            const w = window.innerWidth,
+                h = window.innerHeight;
             const nx = (e.clientX - w / 2) / (w / 2);
             const ny = (e.clientY - h / 2) / (h / 2);
             bgImage.style.transform = `translate3d(${nx * 8}px, ${ny * 6}px, 0) scale(1.06)`;
         });
 
-        /* ======================= Initial UI adjustments ======================= */
-        /* Hide auth overlay if already signed in is handled by auth listener */
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                authPanel.style.display = 'none';
-                // show default dashboard
-                navClick('dashboard');
+        // ======================= Voice Commands =======================
+        let mic = document.getElementById("b-voice");
+        let sideMic = document.getElementById("m-voice");
+        let SpeechTool = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition = null;
+        let isListening = false;
+
+        if (SpeechTool) {
+            recognition = new SpeechTool();
+            recognition.lang = "en-IN";
+            recognition.continuous = false;
+            recognition.interimResults = false;
+        } else {
+            if (mic) mic.style.opacity = "0.5";
+            if (sideMic) sideMic.style.opacity = "0.5";
+        }
+
+        function speakText(text) {
+            if (!window.speechSynthesis) return;
+            window.speechSynthesis.cancel();
+            let voice = new SpeechSynthesisUtterance(text);
+            voice.lang = "en-IN";
+            voice.rate = 0.95;
+            window.speechSynthesis.speak(voice);
+        }
+
+        function setMicColor(on) {
+            if (mic) mic.classList.toggle("listening", on);
+            if (sideMic) sideMic.classList.toggle("active", on);
+        }
+
+        function startListening() {
+            if (!recognition) {
+                alert("Voice command is not supported. Please use Google Chrome.");
+                return;
             }
-        });
-
-        /* ======================= Accessibility / keyboard helper ======================= */
-        document.addEventListener('keydown', e => {
-            if (e.key === 'Escape') { /* could close overlays etc */ }
-        });
-
-        function analyzeReadings(crop, temp, hum, moist) {
-
-            if (crop === 'Wheat') {
-                if (moist < 40)
-                    return { cause: 'Low soil moisture', suggest: 'Irrigate field immediately.' };
-                if (temp > 32)
-                    return { cause: 'Heat stress', suggest: 'Light irrigation, avoid fertilizers.' };
+            if (isListening) return;
+            try {
+                isListening = true;
+                setMicColor(true);
+                recognition.start();
+            } catch (error) {
+                isListening = false;
+                setMicColor(false);
             }
+        }
 
-            if (crop === 'Rice') {
-                if (moist < 60)
-                    return { cause: 'Insufficient water', suggest: 'Maintain flooded condition.' };
-            }
-
-            if (crop === 'Maize') {
-                if (moist < 35)
-                    return { cause: 'Dry soil', suggest: 'Irrigation required for maize growth.' };
-            }
-
-            if (crop === 'Cotton') {
-                if (hum > 80)
-                    return { cause: 'High humidity', suggest: 'Risk of fungal disease, monitor leaves.' };
-            }
-
-            return {
-                cause: 'Conditions normal',
-                suggest: 'No action required. Continue monitoring.'
+        if (recognition) {
+            recognition.onresult = function(event) {
+                let text = event.results[0][0].transcript;
+                checkCommand(text);
+            };
+            recognition.onend = function() {
+                isListening = false;
+                setMicColor(false);
+            };
+            recognition.onerror = function(event) {
+                isListening = false;
+                setMicColor(false);
+                if (event.error === "not-allowed") {
+                    alert("Please allow microphone permission in Chrome.");
+                } else if (event.error === "no-speech") {
+                    speakText("I did not hear anything. Please speak again.");
+                } else if (event.error === "audio-capture") {
+                    alert("Microphone not found. Please check your mic.");
+                } else if (event.error === "network") {
+                    alert("Voice needs internet connection in Chrome.");
+                } else {
+                    alert("Voice error: " + event.error);
+                }
             };
         }
 
-    </script>
-    <script>
-function analyzeFieldImage() {
-  const crop = document.getElementById("fieldCrop").value;
-  const fileInput = document.getElementById("fieldImage");
-  const result = document.getElementById("imageResult");
+        function checkCommand(words) {
+            let text = words.toLowerCase().trim();
+            let command = "";
 
-  if (!fileInput.files.length) {
-    result.innerHTML = "❌ Please upload a field image.";
-    return;
-  }
+            if (text.includes("hello") || text.includes("hey there") || text.includes("namaste")) {
+                command = "greeting";
+            } else if (text.includes("dashboard") || text.includes("home")) {
+                command = "dashboard";
+            } else if (text.includes("disease") || text.includes("detect") || text.includes("bimari")) {
+                command = "disease";
+            } else if (text.includes("seed") || text.includes("calculator") || text.includes("dana")) {
+                command = "seed";
+            } else if (text.includes("moisture") || text.includes("sensor") || text.includes("nami")) {
+                command = "moisture";
+            } else if (text.includes("field") || text.includes("analysis")) {
+                command = "field";
+            } else if (text.includes("profile")) {
+                command = "profile";
+            } else if (text.includes("help") || text.includes("madad")) {
+                command = "help";
+            } else if (text.includes("logout") || text.includes("sign out")) {
+                command = "logout";
+            } else {
+                command = "unknown";
+            }
 
-  if (!crop) {
-    result.innerHTML = "❌ Please select crop type.";
-    return;
-  }
-
-  const fileName = fileInput.files[0].name.toLowerCase();
-
-  /* ===== Crop keyword validation ===== */
-  const cropKeywords = {
-    Rice: ["rice", "paddy"],
-    Wheat: ["wheat"],
-    Maize: ["maize", "corn"],
-    Bajra: ["bajra", "millet"],
-    Cotton: ["cotton"],
-    Groundnut: ["groundnut", "peanut"],
-    Mustard: ["mustard"],
-    Soybean: ["soybean", "soy"],
-    Sunflower: ["sunflower"],
-    Chickpea: ["chickpea", "gram"],
-    Jowar: ["jowar", "sorghum"],
-    Barley: ["barley"]
-  };
-
-  /* ===== Stress keywords ===== */
-  const stressKeywords = [
-    "burn",
-    "burnt",
-    "dry",
-    "drought",
-    "damaged",
-    "wilt",
-    "stress"
-  ];
-
-  const isCropMatch =
-    (cropKeywords[crop] || []).some(k => fileName.includes(k));
-
-  const isStressed =
-    stressKeywords.some(k => fileName.includes(k));
-
-  /* ===== Invalid image ===== */
-  if (!isCropMatch && !isStressed) {
-    result.innerHTML = `
-      ❌ <b>Invalid Image</b><br>
-      The uploaded image does not appear to be a <b>${crop}</b> field.<br>
-      📷 Please upload a proper crop/field image.
-    `;
-    return;
-  }
-
-  /* ===== Stressed / Burnt crop ===== */
-  if (isStressed) {
-    result.innerHTML = `
-      ⚠️ <b>Crop Stress Detected</b><br><br>
-
-      🔍 <b>Observed Condition:</b><br>
-      The crop shows signs of dryness or burning, which may reduce yield.<br><br>
-
-      🧪 <b>Possible Causes:</b>
-      <ul>
-        <li>Insufficient irrigation or drought condition</li>
-        <li>High temperature / heat stress</li>
-        <li>Nutrient deficiency or soil imbalance</li>
-      </ul>
-
-      🩺 <b>Treatment & Corrective Measures:</b>
-      <ul>
-        <li>🚿 Increase irrigation frequency (avoid flooding)</li>
-        <li>🌱 Apply organic mulch to retain soil moisture</li>
-        <li>🧪 Conduct soil testing before fertilizer application</li>
-        <li>🧂 Apply micronutrients if deficiency is confirmed</li>
-        <li>⏳ Monitor crop recovery for 7–10 days</li>
-      </ul>
-
-      📌 <i>If stress persists, consult an agricultural expert.</i>
-    `;
-    return;
-  }
-
-  /* ===== Healthy crop ===== */
-  result.innerHTML = `
-    ✅ <b>Crop Looks Healthy</b><br>
-    🌱 No visible stress detected in the field image.<br>
-    ✔ Continue regular irrigation, nutrient management, and monitoring.
-  `;
-}
-</script>
-
-<script>
-
-/* Voice Command Feature */
-let mic = document.getElementById("b-voice");
-let sideMic = document.getElementById("m-voice");
-
-let SpeechTool = window.SpeechRecognition || window.webkitSpeechRecognition;
-let recognition = null;
-let isListening = false;
-
-if (SpeechTool) {
-    recognition = new SpeechTool();
-    recognition.lang = "en-IN";
-    recognition.continuous = false;
-    recognition.interimResults = false;
-} else {
-    if (mic) mic.style.opacity = "0.5";
-    if (sideMic) sideMic.style.opacity = "0.5";
-}
-
-function speakText(text) {
-    if (!window.speechSynthesis) return;
-
-    window.speechSynthesis.cancel();
-
-    let voice = new SpeechSynthesisUtterance(text);
-    voice.lang = "en-IN";
-    voice.rate = 0.95;
-
-    window.speechSynthesis.speak(voice);
-}
-
-function setMicColor(on) {
-    if (mic) mic.classList.toggle("listening", on);
-    if (sideMic) sideMic.classList.toggle("active", on);
-}
-
-function startListening() {
-    if (!recognition) {
-        alert("Voice command is not supported. Please use Google Chrome.");
-        return;
-    }
-
-    if (isListening) return;
-
-    try {
-        isListening = true;
-        setMicColor(true);
-        recognition.start();
-    } catch (error) {
-        isListening = false;
-        setMicColor(false);
-    }
-}
-
-if (recognition) {
-    recognition.onresult = function(event) {
-        let text = event.results[0][0].transcript;
-        checkCommand(text);
-    };
-
-    recognition.onend = function() {
-        isListening = false;
-        setMicColor(false);
-    };
-
-    recognition.onerror = function(event) {
-        isListening = false;
-        setMicColor(false);
-
-        if (event.error === "not-allowed") {
-            alert("Please allow microphone permission in Chrome.");
-        } 
-        else if (event.error === "no-speech") {
-            speakText("I did not hear anything. Please speak again.");
-        } 
-        else if (event.error === "audio-capture") {
-            alert("Microphone not found. Please check your mic.");
-        } 
-        else if (event.error === "network") {
-            alert("Voice needs internet connection in Chrome.");
-        } 
-        else {
-            alert("Voice error: " + event.error);
+            switch (command) {
+                case "greeting":
+                    speakText("Hello, welcome to AgroTech. How can I help you?");
+                    break;
+                case "dashboard":
+                    navClick("dashboard");
+                    speakText("Opening dashboard.");
+                    break;
+                case "disease":
+                    navClick("detect");
+                    speakText("Opening disease detection.");
+                    break;
+                case "seed":
+                    navClick("seed");
+                    speakText("Opening seed calculator.");
+                    break;
+                case "moisture":
+                    navClick("moisture");
+                    speakText("Opening moisture monitor.");
+                    break;
+                case "field":
+                    navClick("field");
+                    speakText("Opening field analysis.");
+                    break;
+                case "profile":
+                    navClick("profile");
+                    speakText("Opening profile.");
+                    break;
+                case "help":
+                    speakText("You can say dashboard, disease, seed, moisture, field, profile, or logout.");
+                    break;
+                case "logout":
+                    speakText("Signing out.");
+                    setTimeout(logout, 1200);
+                    break;
+                default:
+                    speakText("Command not found. Say help to hear available commands.");
+            }
         }
-    };
-}
 
-function checkCommand(words) {
-    let text = words.toLowerCase().trim();
-    let command = "";
+        // Close modals with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeReportModal();
+            }
+        });
 
-    if (text.includes("hello") || text.includes("hey there")|| text.includes("namaste")) {
-        command = "greeting";
-    } else if (text.includes("dashboard") || text.includes("home")) {
-        command = "dashboard";
-    } else if (text.includes("disease") || text.includes("detect") || text.includes("bimari")) {
-        command = "disease";
-    } else if (text.includes("seed") || text.includes("calculator") || text.includes("dana")) {
-        command = "seed";
-    } else if (text.includes("moisture") || text.includes("sensor") || text.includes("nami")) {
-        command = "moisture";
-    } else if (text.includes("field") || text.includes("analysis")){
-        command = "field";
-    } else if (text.includes("profile")) {
-        command = "profile";
-    } else if (text.includes("help") || text.includes("madad")) {
-        command = "help";
-    } else if (text.includes("logout") || text.includes("sign out")) {
-        command = "logout";
-    } else {
-        command = "unknown";
-    }
-
-    switch (command) {
-        case "greeting":
-            speakText("Hello, welcome to AgroTech. How can I help you?");
-            break;
-
-        case "dashboard":
-            navClick("dashboard");
-            speakText("Opening dashboard.");
-            break;
-
-        case "disease":
-            navClick("detect");
-            speakText("Opening disease detection.");
-            break;
-
-        case "seed":
-            navClick("seed");
-            speakText("Opening seed calculator.");
-            break;
-
-        case "moisture":
-            navClick("moisture");
-            speakText("Opening moisture monitor.");
-            break;
-
-        case "field":
-            navClick("field");
-            speakText("Opening field analysis.");
-            break;
-
-        case "profile":
-            navClick("profile");
-            speakText("Opening profile.");
-            break;
-
-        case "help":
-            speakText("You can say dashboard, disease, seed, moisture, field, profile, or logout.");
-            break;
-
-        case "logout":
-            speakText("Signing out.");
-            setTimeout(logout, 1200);
-            break;
-
-        default:
-            speakText("Command not found. Say help to hear available commands.");
-    }
-}
-</script>
-
+        console.log('🌱 AgroTech Dashboard loaded successfully!');
+        console.log('📄 PDF Report feature ready!');
+    </script>
 </body>
 
 </html>
