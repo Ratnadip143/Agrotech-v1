@@ -298,6 +298,18 @@
             font-size: 13px;
         }
 
+        .form-error {
+            display: none;
+            margin-top: 10px;
+            color: #b42318;
+            background: #fff4f2;
+            border: 1px solid #ffd7d2;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
         /* image preview */
         #preview {
             max-width: 100%;
@@ -639,20 +651,21 @@
 
                             <div class="field">
                                 <label class="muted">Row spacing (cm)</label>
-                                <input id="spacingInp" type="number" placeholder="20">
+                                <input id="spacingInp" type="number" min="0.01" step="0.01" placeholder="20">
                             </div>
                             <div class="field">
                                 <label class="muted">Field area (m²)</label>
-                                <input id="areaInp" type="number" placeholder="100">
+                                <input id="areaInp" type="number" min="0.01" step="0.01" placeholder="100">
                             </div>
 
                             <!-- if "Other" selected, user can enter weight per 100 seeds -->
                             <div class="field" id="otherWeightWrap" style="display:none;">
                                 <label class="muted">Weight per 100 seeds (g) — for Other crop</label>
-                                <input id="otherWeightInput" type="number" step="0.01" placeholder="e.g. 10">
+                                <input id="otherWeightInput" type="number" min="0.01" step="0.01" placeholder="e.g. 10">
                             </div>
 
                             <button class="primary-btn" onclick="calcSeeds()">Calculate</button>
+                            <div id="seedError" class="form-error" role="alert"></div>
                         </div>
 
                         <div style="width:320px;">
@@ -1447,25 +1460,52 @@ setTimeout(() => {
         function calcSeeds() {
             const spacing = parseFloat(document.getElementById('spacingInp').value);
             const area = parseFloat(document.getElementById('areaInp').value);
+            const seedError = document.getElementById('seedError');
+            const seedResult = document.getElementById('seedResult');
+            const seedWeightResult = document.getElementById('seedWeightResult');
             const sel = cropSelect.options[cropSelect.selectedIndex];
             const crop = sel.value || 'Crop';
             let weight100 = parseFloat(sel.dataset.w || 0);
 
+            seedError.style.display = 'none';
+            seedError.textContent = '';
+
             if (crop === 'Other') {
                 weight100 = parseFloat(document.getElementById('otherWeightInput').value);
-                if (!weight100) { alert('Enter weight per 100 seeds for the Other crop'); return; }
+                if (!Number.isFinite(weight100) || weight100 <= 0) {
+                    seedError.textContent = '⚠️ Seed weight can’t be negative or zero. Please enter a value greater than 0 g.';
+                    seedError.style.display = 'block';
+                    seedResult.textContent = 'Required Seeds: —';
+                    seedWeightResult.textContent = '';
+                    return;
+                }
             }
 
-            if (!spacing || !area) { alert('Please enter spacing & area'); return; }
+            if (!Number.isFinite(spacing) || spacing <= 0) {
+                seedError.textContent = '⚠️ Row spacing can’t be negative or zero. Please enter a value greater than 0 cm.';
+                seedError.style.display = 'block';
+                seedResult.textContent = 'Required Seeds: —';
+                seedWeightResult.textContent = '';
+                return;
+            }
+
+            if (!Number.isFinite(area) || area <= 0) {
+                seedError.textContent = '⚠️ Field area can’t be negative or zero. Please enter a value greater than 0 m².';
+                seedError.style.display = 'block';
+                seedResult.textContent = 'Required Seeds: —';
+                seedWeightResult.textContent = '';
+                return;
+            }
+
             const seeds = Math.round((area * 10000) / (spacing * spacing));
-            document.getElementById('seedResult').textContent = `${crop}: Required Seeds ≈ ${seeds.toLocaleString()}`;
+            seedResult.textContent = `${crop}: Required Seeds ≈ ${seeds.toLocaleString()}`;
 
             if (weight100 && weight100 > 0) {
                 const gramsPerSeed = weight100 / 100.0;
                 const totalKg = (seeds * gramsPerSeed) / 1000.0;
-                document.getElementById('seedWeightResult').textContent = `Required Weight ≈ ${totalKg.toFixed(2)} kg`;
+                seedWeightResult.textContent = `Required Weight ≈ ${totalKg.toFixed(2)} kg`;
             } else {
-                document.getElementById('seedWeightResult').textContent = 'Required Weight: —';
+                seedWeightResult.textContent = 'Required Weight: —';
             }
         }
 
