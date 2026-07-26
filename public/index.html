@@ -1532,6 +1532,10 @@ setTimeout(() => {
             const seedWeightResult = document.getElementById('seedWeightResult');
             const sel = cropSelect.options[cropSelect.selectedIndex];
             const crop = sel.value || 'Crop';
+            if (!sel.value) {
+                alert("Please select a crop");
+                return;
+            }
             let weight100 = parseFloat(sel.dataset.w || 0);
 
             seedError.style.display = 'none';
