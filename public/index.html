@@ -386,7 +386,7 @@
             position: fixed;
             inset: 0;
             z-index: 60;
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
             background: linear-gradient(rgba(0, 0, 0, 0.32), rgba(0, 0, 0, 0.38)), url('https://images.unsplash.com/photo-1518732714860-b62714ce0c59?auto=format&fit=crop&w=1600&q=70') center/cover;
@@ -447,7 +447,17 @@
             background: linear-gradient(90deg, var(--accent), var(--accent-dark));
             color: #063017;
         }
+        
+        .landing-btn-wrap{
+    margin-top:30px;
+    display:flex;
+    justify-content:center;
+    margin-left: 210px;
+}
 
+.landing-btn:active{
+    transform:scale(.95);
+}
         .authBox .ghost {
             width: 100%;
             padding: 10px;
@@ -464,6 +474,30 @@
             color: #ffdede;
             margin-top: 6px;
         }
+        .landing-btn{
+    margin-top:25px;
+    padding:14px 40px;
+    border:none;
+    border-radius:50px;
+    background:linear-gradient(135deg,#22c55e,#15803d);
+    color:white;
+    font-size:17px;
+    font-weight:700;
+    cursor:pointer;
+    transition:all .3s ease;
+    box-shadow:0 10px 25px rgba(34,197,94,.35);
+    
+}
+
+.landing-btn:hover{
+    transform:translateY(-3px);
+    box-shadow:0 15px 35px rgba(34,197,94,.5);
+    background:linear-gradient(135deg,#16a34a,#166534);
+}
+
+.landing-btn:active{
+    transform:scale(.97);
+}
 
         /* Responsive */
         @media(max-width:900px) {
@@ -562,9 +596,33 @@
                 <section id="page-dashboard" class="dashboard-wrap">
                     <div class="welcome-box">
                         <div class="welcome-left">
-                            <h1 id="welcomeTitle">Welcome</h1>
-                            <p id="welcomeSub" class="muted">Select a tool from the left menu to get started</p>
-                        </div>
+    <h1 id="welcomeTitle">🌱 Welcome to AgroTech</h1>
+
+    <p id="welcomeSub" class="muted">
+        AgroTech is a Smart Farming Platform that helps farmers monitor
+        crops, analyze soil conditions, detect plant diseases, and make
+        better farming decisions using IoT, Firebase, and AI.
+    </p>
+
+    <br>
+
+    <h3>✨ Key Features</h3>
+
+    <ul style="margin-top:10px; line-height:1.8;">
+        <li>🌿 Plant Disease Detection</li>
+        <li>📡 Real-time IoT Sensor Monitoring</li>
+        <li>💧 Soil Moisture & Weather Analysis</li>
+        <li>🌾 Seed Requirement Calculator</li>
+        <li>🧠 Smart Field Analysis & Recommendations</li>
+    </ul>
+
+    <br>
+    <div class="landing-btn-wrap">
+    <button id="landingSignInBtn" class="landing-btn">
+        Sign In
+    </button>
+    </div>
+</div>
                         <div class="welcome-right"><img
                                 src="https://images.unsplash.com/photo-1501004318641-b39e6451bec6?auto=format&fit=crop&w=900&q=70"
                                 alt="plant" /></div>
@@ -1340,20 +1398,26 @@ function report(){
         };
 
         /* AUTH STATE CHANGE */
-        auth.onAuthStateChanged(user => {
+        auth.onAuthStateChanged((user) => {
             if (user) {
                 document.getElementById('userEmailTop').textContent = user.email;
                 document.getElementById('p-email').textContent = user.email;
-                document.getElementById('p-name').textContent = user.displayName || 'No display name';
-                document.getElementById('profileAvatar').textContent = (user.displayName || user.email).charAt(0).toUpperCase();
-                // hide overlay
+                document.getElementById('p-name').textContent =
+                    user.displayName || 'No display name';
+
+                document.getElementById('profileAvatar').textContent =
+                    (user.displayName || user.email).charAt(0).toUpperCase();
+
+                // Hide login popup
                 authPanel.style.display = 'none';
-                // show app
+
+                // Show dashboard
                 navClick('dashboard');
+
             } else {
-                // show overlay
-                authPanel.style.display = 'flex';
-                hideAllPages();
+                // User is not logged in
+                authPanel.style.display = 'none';
+                navClick('dashboard');
             }
         });
 
@@ -2008,6 +2072,15 @@ function checkCommand(words) {
         default:
             speakText("Command not found. Say help to hear available commands.");
     }
+}
+// Landing page Sign In button
+const landingBtn = document.getElementById("landingSignInBtn");
+
+if (landingBtn) {
+    landingBtn.addEventListener("click", () => {
+    console.log("Button clicked");
+    authPanel.style.display = "flex";
+});
 }
 </script>
 
